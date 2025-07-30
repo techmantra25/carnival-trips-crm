@@ -3,7 +3,6 @@
 @section('styles')
 <!-- Add any custom styles here if needed -->
 @endsection
-
 @section('content')
 
 <div class="container">
