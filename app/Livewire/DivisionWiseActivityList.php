@@ -248,7 +248,7 @@ class DivisionWiseActivityList extends Component
                         // $dynamicText = $activity['name'];
                         $dynamicText = $activity['name'].rand(1111,9999);
                         $divisionName = $this->selectedDivisionName; // Assuming you have a division name
-                        $uploadedPath = CustomHelper::uploadImage($file, $dynamicText, $divisionName, 'activities');
+                        $uploadedPath = CustomHelper::uploadImage($file, 'activities', $dynamicText, $divisionName);
                         // Save the uploaded file record
                         DivisionWiseActivityImage::create([
                             'division_wise_activity_id' => $activityRecord->id,
@@ -345,7 +345,7 @@ class DivisionWiseActivityList extends Component
                 foreach ($uploadedFiles as $file) {
                     $dynamicText = $activityRecord->name.rand(1111,9999);
                     $divisionName = $this->selectedDivisionName; // Assuming you have a division name
-                    $uploadedPath = CustomHelper::uploadImage($file, $dynamicText, $divisionName, 'activities');
+                    $uploadedPath = CustomHelper::uploadImage($file, 'activities', $dynamicText, $divisionName);
                     // Save the uploaded file record
                     DivisionWiseActivityImage::create([
                         'division_wise_activity_id' => $activityRecord->id,

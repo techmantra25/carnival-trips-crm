@@ -232,7 +232,7 @@ class DivisionWiseSightseeingList extends Component
                     foreach ($uploadedFiles as $file) {
                         $dynamicText = $activity['name'].rand(1111,9999);
                         $divisionName = $this->selectedDivisionName; // Assuming you have a division name
-                        $uploadedPath = CustomHelper::uploadImage($file, $dynamicText, $divisionName, 'sightseeings');
+                        $uploadedPath = CustomHelper::uploadImage($file, 'sightseeings', $dynamicText, $divisionName);
                         // Save the uploaded file record
                         DivisionWiseSightseeingImage::create([
                             'sightseeing_id' => $activityRecord->id,
@@ -316,7 +316,7 @@ class DivisionWiseSightseeingList extends Component
                 foreach ($uploadedFiles as $file) {
                     $dynamicText = $activityRecord->name.rand(1111,9999);
                     $divisionName = $this->selectedDivisionName; // Assuming you have a division name
-                    $uploadedPath = CustomHelper::uploadImage($file, $dynamicText, $divisionName, 'sightseeings');
+                    $uploadedPath = CustomHelper::uploadImage($file, 'sightseeings', $dynamicText, $divisionName);
                     // Save the uploaded file record
                     DivisionWiseSightseeingImage::create([
                         'sightseeing_id' => $activityRecord->id,

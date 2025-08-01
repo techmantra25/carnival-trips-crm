@@ -108,7 +108,7 @@ class DivisionWiseBannerList extends Component
             if ($uploadedFiles) {
                 $dynamicText =rand(1111,9999);
                 $divisionName = $this->selectedDivisionName; // Assuming you have a division name
-                $uploadedPath = CustomHelper::uploadImage($uploadedFiles, $dynamicText, $divisionName, 'itinerary_banners');
+                $uploadedPath = CustomHelper::uploadImage($uploadedFiles, 'itinerary_banners', $dynamicText, $divisionName);
                 $store->image = $uploadedPath;
             }
             $store->save();

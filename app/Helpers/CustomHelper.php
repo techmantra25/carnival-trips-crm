@@ -286,7 +286,8 @@ class CustomHelper
        
     }
 
-    public static function uploadImage($image, $dynamicText=null, $divisionName=null, $folder)
+    // public static function uploadImage($image, $dynamicText=null, $divisionName=null, $folder)
+    public static function uploadImage($image, $folder, $dynamicText = null, $divisionName = null)
     {
         // Validate the uploaded file
         if (!$image->isValid()) {

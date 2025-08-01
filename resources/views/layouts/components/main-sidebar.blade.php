@@ -50,6 +50,9 @@
 									<li class="slide">
 										<a href="{{route('admin.division.index')}}" class="side-menu__item">Divisions</a>
 									</li>
+									<li class="slide">
+										<a href="{{route('admin.master.trip_preference_form')}}" class="side-menu__item">Trip Preference Form</a>
+									</li>
 								</ul>
 							</li>
 							<!-- Start::slide -->

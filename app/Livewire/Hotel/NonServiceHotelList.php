@@ -46,7 +46,7 @@ class NonServiceHotelList extends Component
         if (isset($this->image)) {
             // Generate a unique filename
             $dynamicText = rand(1111, 9999);
-            $uploadedPath = CustomHelper::uploadImage($this->image, $dynamicText, $this->hotel_name, 'non-service-hotel');
+            $uploadedPath = CustomHelper::uploadImage($this->image, 'non-service-hotel', $dynamicText, $this->hotel_name);
         }
         $hotel = NonServicesHotel::create([
             'city_id'   => $this->division_id,

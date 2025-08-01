@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class SendedLeadItinerary extends Model
+{
+    protected $table = 'sended_lead_itineraries';
+    protected $fillable = [
+        'lead_id',
+        'itinerary_code',
+        'total_cost',
+        'remarks',
+        'send_via',
+        'sent_by_admin_id',
+        'sent_at',
+    ];
+
+    protected $casts = [
+        'sent_at' => 'datetime',
+        'total_cost' => 'decimal:2',
+        'send_via' => 'string',
+    ];
+}

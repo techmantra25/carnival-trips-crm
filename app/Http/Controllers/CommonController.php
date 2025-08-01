@@ -436,5 +436,9 @@ class CommonController extends Controller
             $common = CustomHelper::setHeadersAndTitle('Master Management', 'Destination Wise Season');
             return view('admin.state.season-period-index', compact('common'));
         }
+        public function trip_preference_form(){
+            $common = CustomHelper::setHeadersAndTitle('Master Management', 'Trip Preference Form');
+            return view('admin.leads.trip_preference_form', compact('common'));
+        }
     
 }

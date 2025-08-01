@@ -195,7 +195,7 @@ class CreateItineraryTemplate extends Component
             if ($uploadedFiles) {
                 $dynamicText =rand(1111,9999);
                 $destinationName = $this->destination_name; // Assuming you have a division name
-                $uploadedPath = CustomHelper::uploadImage($uploadedFiles, $dynamicText, $destinationName, 'itinerary_banners');
+                $uploadedPath = CustomHelper::uploadImage($uploadedFiles, 'itinerary_banners', $dynamicText, $destinationName);
                 $store->image = $uploadedPath;
             }
             $store->save();
@@ -222,7 +222,7 @@ class CreateItineraryTemplate extends Component
             foreach ($this->uploadDestinationSlider as $image) {
                 if ($image) {
                     $dynamicText = rand(1111, 9999);
-                    $uploadedPath = CustomHelper::uploadImage($image, $dynamicText, $this->destination_name, 'itinerary_template');
+                    $uploadedPath = CustomHelper::uploadImage($image, 'itinerary_template', $dynamicText, $this->destination_name);
 
                     // Save file path in database
                     ItineraryTemplateDetail::create([
@@ -259,7 +259,7 @@ class CreateItineraryTemplate extends Component
 
             // Store the image
             $dynamicText = rand(1111, 9999);
-            $uploadedPath = CustomHelper::uploadImage($this->great_experience_image, $dynamicText, $this->destination_name, 'itinerary_template');
+            $uploadedPath = CustomHelper::uploadImage($this->great_experience_image, 'itinerary_template', $dynamicText, $this->destination_name);
 
             // Save file path in database
             ItineraryTemplateDetail::updateOrCreate(
@@ -297,7 +297,7 @@ class CreateItineraryTemplate extends Component
 
             // Store the image
             $dynamicText = rand(1111, 9999);
-            $uploadedPath = CustomHelper::uploadImage($this->about_destination_image, $dynamicText, $this->destination_name, 'itinerary_template');
+            $uploadedPath = CustomHelper::uploadImage($this->about_destination_image, 'itinerary_template', $dynamicText, $this->destination_name);
 
             // Save file path in database
             ItineraryTemplateDetail::updateOrCreate(

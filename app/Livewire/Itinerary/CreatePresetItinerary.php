@@ -543,7 +543,7 @@ class CreatePresetItinerary extends Component
             if ($uploadedFiles) {
                 $dynamicText =rand(1111,9999);
                 $destinationName = $this->destinationName; // Assuming you have a division name
-                $uploadedPath = CustomHelper::uploadImage($uploadedFiles, $dynamicText, $destinationName, 'itinerary_banners');
+                $uploadedPath = CustomHelper::uploadImage($uploadedFiles, 'itinerary_banners', $dynamicText, $destinationName);
                 $store->image = $uploadedPath;
             }
             $store->save();
@@ -922,7 +922,7 @@ class CreatePresetItinerary extends Component
             foreach ($this->uploadDestinationSlider as $image) {
                 if ($image) {
                     $dynamicText = rand(1111, 9999);
-                    $uploadedPath = CustomHelper::uploadImage($image, $dynamicText, $this->destinationName, 'itinerary');
+                    $uploadedPath = CustomHelper::uploadImage($image, 'itinerary', $dynamicText, $this->destinationName);
 
                     // Save file path in database
                     ItineraryDetail::create([
@@ -964,7 +964,7 @@ class CreatePresetItinerary extends Component
             foreach ($images as $image) {
                 if ($image) {
                     $dynamicText = rand(1111, 9999);
-                    $uploadedPath = CustomHelper::uploadImage($image, $dynamicText, $this->destinationName, 'itinerary');
+                    $uploadedPath = CustomHelper::uploadImage($image, 'itinerary', $dynamicText, $this->destinationName);
 
                     // Save file path in database
                     ItineraryDetail::create([

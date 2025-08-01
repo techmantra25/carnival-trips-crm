@@ -77,7 +77,7 @@
                                     </div>
                                     <div class="px-1">
                                         <label class="flex items-center gap-2 cursor-pointer">
-                                            <input type="checkbox" wire:model="enableChildren" />
+                                            <input type="checkbox" wire:model="enableChildren" wire:change="toggleChildren" />
                                             <span
                                                 class="block text-sm font-medium text-gray-700 modal_query_lable">Add
                                                 Child</span>
@@ -166,7 +166,7 @@
                                     @error('email_address') <span
                                         class="text-danger text-sm font-12">{{ $message }}</span> @enderror
                                 </div>
-                                <div>
+                                {{-- <div>
                                     <label for="company_name"
                                         class="block text-sm font-medium text-gray-700 modal_query_lable">Assign To
                                         Company<span class="text-danger">*</span>
@@ -183,7 +183,7 @@
 
                                     @error('company_name') <span
                                         class="text-danger text-sm font-12">{{ $message }}</span> @enderror
-                                </div>
+                                </div> --}}
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                                 <div>
@@ -260,7 +260,7 @@
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                                <div>
+                                {{-- <div>
                                     <label for="query_type"
                                         class="block text-sm font-medium text-gray-700 modal_query_lable">Query
                                         Type<span class="text-danger">*</span>
@@ -277,7 +277,7 @@
 
                                     @error('query_type') <span
                                         class="text-danger text-sm font-12">{{ $message }}</span> @enderror
-                                </div>
+                                </div> --}}
                                 <div class="relative w-full" wire:click.away="$set('night_halt_status', 0)">
                                     <div class="flex justify-between">
                                         <div>

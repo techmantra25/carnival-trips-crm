@@ -40,7 +40,7 @@ class ImageUploader extends Component
                
                 $timestamp = now()->format('YmdHis'); // Format: YYYYMMDDHHMMSS
                 $dynamicText = rand(1111, 9999);
-                $uploadedPath = CustomHelper::uploadImage($image, $dynamicText, $timestamp, 'hotel');
+                $uploadedPath = CustomHelper::uploadImage($image, 'hotel', $dynamicText, $timestamp);
                 $imageData = [
                     'name' => $image->getClientOriginalName(),
                     'size' => $image->getSize(),

@@ -129,11 +129,11 @@ class CostCalculatorQueryEdit extends Component
         $this->total_members = $leadExists->number_of_travellor;
         $this->number_of_adults = $leadExists->number_of_adults;
         $this->number_of_childs = $leadExists->number_of_children;
-        $this->query_type = $leadExists->lead_type;
+        // $this->query_type = $leadExists->lead_type;
         $this->mobile_number = $leadExists->customer_mobile;
         $this->arrival_date = $leadExists->arrival_date;
         $this->departure_date = $leadExists->departure_date;
-        $this->company_name = $leadExists->lead_source;
+        // $this->company_name = $leadExists->lead_source;
         $this->whatsapp_number = $leadExists->customer_whatsapp;
         $this->email_address = $leadExists->customer_email;
         $this->hotel_category = $leadExists->hotel_category;
@@ -167,8 +167,9 @@ class CostCalculatorQueryEdit extends Component
         unset($this->childs[$index]);
         $this->childs = array_values($this->childs);
     }
-    public function updatedEnableChildren($value){
-        if(!$value){
+    public function toggleChildren()
+    {
+        if (!$this->enableChildren) {
             $this->childs = [];
         }
     }
@@ -440,11 +441,11 @@ class CostCalculatorQueryEdit extends Component
             'childs.*.quantity' => 'required_if:enableChildren,true',
             'childs.*.age' => 'required_if:enableChildren,true',
 
-            'query_type' => 'required|string',
+            // 'query_type' => 'required|string',
             'mobile_number' => 'nullable|digits:10',
             'arrival_date' => 'required|date',
             'departure_date' => 'required|date|after_or_equal:arrival_date',
-            'company_name' => 'required|string',
+            // 'company_name' => 'required|string',
             'whatsapp_number' => 'nullable|digits:10',
             'email_address' => 'nullable|email',
             'hotel_category' => 'required',
@@ -461,13 +462,13 @@ class CostCalculatorQueryEdit extends Component
             'total_members.numeric' => 'Total members must be a number.',
             'number_of_adults.required' => 'Adults count is required.',
             'number_of_adults.numeric' => 'Adults must be a number.',
-            'query_type.required' => 'Query type is required.',
+            // 'query_type.required' => 'Query type is required.',
             'mobile_number.digits' => 'Mobile must be 10 digits.',
       
             'arrival_date.required' => 'Arrival Date is required.',
             'departure_date.required' => 'Departure Date is required.',
             'departure_date.after_or_equal' => 'Departure must be after arrival.',
-            'company_name.required' => 'Company name is required.',
+            // 'company_name.required' => 'Company name is required.',
             'whatsapp_number.digits' => 'WhatsApp must be 10 digits.',
             'email_address.email' => 'Enter a valid email.',
             'hotel_category.required' => 'Hotel category is required.',
@@ -548,8 +549,8 @@ class CostCalculatorQueryEdit extends Component
             $lead->children_data = $children_data;
             $lead->number_of_travellor = $this->total_members;
 
-            $lead->lead_type =$this->query_type;
-            $lead->lead_source =$this->company_name;
+            // $lead->lead_type =$this->query_type;
+            // $lead->lead_source =$this->company_name;
             $lead->meal_type =$this->meal_type;
             $lead->nationality_type =$this->nationality_type;
             $lead->number_of_rooms =$this->number_of_rooms;

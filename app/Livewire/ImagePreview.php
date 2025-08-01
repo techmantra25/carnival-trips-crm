@@ -43,7 +43,7 @@ class ImagePreview extends Component
                 // Store the image with the unique filename
                 // $path = $image->storeAs('hotel_images', $uniqueFilename, 'public');
                 $dynamicText = rand(1111, 9999);
-                $uploadedPath = CustomHelper::uploadImage($image, $dynamicText, $timestamp, 'hotel');
+                $uploadedPath = CustomHelper::uploadImage($image, 'hotel', $dynamicText, $timestamp);
         
                 $imageData = [
                     'name' => $image->getClientOriginalName(),

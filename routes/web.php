@@ -178,6 +178,9 @@ use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagem
                 Route::post('/update', [CommonController::class,'division_update'])->name('admin.division.update');
                 Route::get('/destroy/{id}', [CommonController::class,'division_destroy'])->name('admin.division.destroy');
             });
+
+            // Trip Preference Form
+            Route::get('/trip-preference-form',[CommonController::class,'trip_preference_form'])->name('admin.master.trip_preference_form');
         });
         Route::prefix('route')->group(function(){
             Route::get('division-wise-cabs', [RouteManagementController::class, 'DivisionWiseCabList'])->name('admin.route.division_wise_cab_list');

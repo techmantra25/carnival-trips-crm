@@ -133,7 +133,7 @@ class CommonRepository
         $uploadedPath = 'assets/img/cab.png';
         if(isset($data['image'])){
             $dynamicText = rand(1111, 9999);
-            $uploadedPath = CustomHelper::uploadImage($data['image'], $dynamicText, $data['title'], 'cabs');
+            $uploadedPath = CustomHelper::uploadImage($data['image'], 'cabs', $dynamicText, $data['title']);
         }
         $cab->image = $uploadedPath;
         $cab->save();
@@ -161,7 +161,7 @@ class CommonRepository
         $uploadedPath = 'assets/img/cab.png';
         if(isset($data['image'])){
             $dynamicText = rand(1111, 9999);
-            $uploadedPath = CustomHelper::uploadImage($data['image'], $dynamicText, $data['title'], 'cabs');
+            $uploadedPath = CustomHelper::uploadImage($data['image'], 'cabs', $dynamicText, $data['title']);
         }
         $cab->image = $uploadedPath;
         $cab->save();

@@ -124,10 +124,7 @@
                                     </div>
                                 </div>
                             </div>
-                            {{-- <div class="text-center itinerary_total_amount">
-                                <p class="uppercase">Total Amount</p>
-                                <p class="text-2xl">{{env('DEFAULT_CURRENCY_SYMBOL')}}{{$total_amount}}</p>
-                            </div> --}}
+                           
                         </div>
                         <div class="flex flex-col right-column">
                             <div class="logo">
@@ -1398,15 +1395,14 @@
                     <div class="box-body">
 
                         <div class="hidden sm:block border-b border-gray-200 dark:border-white/10">
-                            <nav class="flex space-x-4 rtl:space-x-reverse text-sm font-medium" aria-label="Tabs" role="tablist">
-                                <button
-                                    type="button"
-                                    wire:click="$set('activeInExTab', 'inclusion')"
+                           <nav class="flex space-x-4 rtl:space-x-reverse text-sm font-medium" aria-label="Tabs" role="tablist">
+                                <button 
+                                    type="button" 
+                                    wire:click="$set('activeInExTab', 'inclusion')" 
                                     class="px-4 py-2 rounded-t-md border-b-2 transition-all duration-200
                                         {{ $activeInExTab === 'inclusion' 
-                                            ? 'text-primary border-primary bg-white dark:bg-gray-800 dark:text-white' 
-                                            : 'text-gray-500 hover:text-primary border-transparent' }}"
-                                >
+                                            ? 'text-primary border-primary bg-white dark:bg-gray-800 dark:text-white font-extrabold font-mono' 
+                                            : 'text-gray-500 hover:text-primary border-transparent' }}">
                                     Inclusions
                                 </button>
 
@@ -1415,20 +1411,21 @@
                                     wire:click="$set('activeInExTab', 'exclusion')"
                                     class="px-4 py-2 rounded-t-md border-b-2 transition-all duration-200
                                         {{ $activeInExTab === 'exclusion' 
-                                            ? 'text-primary border-primary bg-white dark:bg-gray-800 dark:text-white' 
-                                            : 'text-gray-500 hover:text-primary border-transparent' }}"
-                                >
+                                            ? 'text-primary border-primary bg-white dark:bg-gray-800 dark:text-white font-extrabold font-mono' 
+                                            : 'text-gray-500 hover:text-primary border-transparent' }}">
                                     Exclusions
                                 </button>
+
                                 <button type="button"
                                         wire:click="$set('activeInExTab', 'trip_highlight')"
                                         class="px-4 py-2 rounded-t-md border-b-2 transition-all duration-200
                                             {{ $activeInExTab === 'trip_highlight' 
-                                                ? 'text-primary border-primary bg-white dark:bg-gray-800 dark:text-white' 
-                                                : 'text-gray-500 hover:text-primary border-transparent' }}" >
-                                        Trip Highlights
-                                    </button>
+                                                ? 'text-primary border-primary bg-white dark:bg-gray-800 dark:text-white font-extrabold font-mono' 
+                                                : 'text-gray-500 hover:text-primary border-transparent' }}">
+                                    Trip Highlights
+                                </button>
                             </nav>
+
                         </div>
 
 
@@ -1438,7 +1435,7 @@
                                 <div class="p-4">
                                     <ul class="space-y-3">
                                         @foreach ($inclusions as $in_index => $inclusion)
-                                            <li class="flex items-start gap-3 p-4 border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-700 shadow-sm">
+                                            <li class="flex items-start gap-3 p-4 border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-700 shadow-sm addon_list_item">
                                                 <p class="text-gray-700 dark:text-white text-base leading-snug">
                                                     {{ $inclusion }}
                                                 </p>
@@ -1459,7 +1456,7 @@
                                 <div class="p-4">
                                     <ul class="space-y-3">
                                         @foreach ($exclusions as $ex_index => $exclusion)
-                                            <li class="flex items-start gap-3 p-4 border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-700 shadow-sm">
+                                            <li class="flex items-start gap-3 p-4 border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-700 shadow-sm addon_list_item">
                                                 <p class="text-gray-700 dark:text-white text-base leading-snug">
                                                     {{ $exclusion }}
                                                 </p>
@@ -1480,7 +1477,7 @@
                                 <div class="p-4">
                                     <ul class="space-y-3">
                                         @foreach ($triphighlight as $trip_index => $trip_highlight_item)
-                                            <li class="flex items-start gap-3 p-4 border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-700 shadow-sm">
+                                            <li class="flex items-start gap-3 p-4 border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-700 shadow-sm addon_list_item">
                                                 <p class="text-gray-700 dark:text-white text-base leading-snug">
                                                     {{ $trip_highlight_item }}
                                                 </p>
@@ -1500,6 +1497,15 @@
                     </div>
                 </div>
             </div>
+            <div class="col-span-12 md:col-span-6 xxl:!col-span-4">
+                <div class="box">
+                    <div class="box-body">
+                        <div class="text-center itinerary_total_amount">
+                            <p class="uppercase">Total Amount</p>
+                            <p class="text-2xl">{{env('DEFAULT_CURRENCY_SYMBOL')}}{{$total_amount}}</p>
+                        </div>
+                    </div>
+                </div>
         </div>
     </div>
     <!-- Livewire Modal -->

@@ -139,7 +139,7 @@ class HotelRepository
             if (isset($data['image'])) {
                 // Generate a unique filename
                 $dynamicText = rand(1111, 9999);
-                $uploadedPath = CustomHelper::uploadImage($data['image'], $dynamicText, $hotel->name, 'hotel');
+                $uploadedPath = CustomHelper::uploadImage($data['image'], 'hotel', $dynamicText, $hotel->name);
                 $hotel->image = $uploadedPath;
                 $hotel->save();
             }
@@ -150,7 +150,7 @@ class HotelRepository
                 foreach ($data['images'] as $image) {
                     // Generate a unique filename
                     $dynamicText = rand(1111, 9999);
-                    $uploadedPath = CustomHelper::uploadImage($image, $dynamicText, $hotel->name, 'hotel');
+                    $uploadedPath = CustomHelper::uploadImage($image, 'hotel', $dynamicText, $hotel->name);
             
                     // Add to the batch insert array
                     $imageData[] = [
@@ -240,7 +240,7 @@ class HotelRepository
             if (isset($data['image'])) {
                 // Generate a unique filename
                 $dynamicText = rand(1111, 9999);
-                $uploadedPath = CustomHelper::uploadImage($data['image'], $dynamicText, $hotel->name, 'hotel');
+                $uploadedPath = CustomHelper::uploadImage($data['image'], 'hotel', $dynamicText, $hotel->name);
                 $hotel->image = $uploadedPath;
                 $hotel->save();
             }
@@ -251,7 +251,7 @@ class HotelRepository
                 foreach ($data['images'] as $image) {
                     // Generate a unique filename
                     $dynamicText = rand(1111, 9999);
-                    $uploadedPath = CustomHelper::uploadImage($image, $dynamicText, $hotel->name, 'hotel');
+                    $uploadedPath = CustomHelper::uploadImage($image, 'hotel', $dynamicText, $hotel->name);
             
                     // Add to the batch insert array
                     $imageData[] = [
