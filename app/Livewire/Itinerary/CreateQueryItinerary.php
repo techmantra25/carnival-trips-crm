@@ -24,12 +24,15 @@ use App\Models\HotelPriceChartType;
 use App\Models\DivisionWiseSightseeing;
 use App\Models\ServiceWiseSightseeing;
 use App\Models\ServiceWiseActivity;
+use App\Models\SendedLeadItinerary;
+use App\Models\SendedLeadItineraryDetail;
 use App\Helpers\CustomHelper;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 use App\Models\ItineraryBanner;
 
@@ -48,6 +51,7 @@ class CreateQueryItinerary extends Component
     public $destinationId;
     public $itineraryType;
     public $itinerary_id;
+    public $itineraryData;
     public $active_assign_route_modal;
     public $selectedDivision;
     public $categoryId;
@@ -62,7 +66,6 @@ class CreateQueryItinerary extends Component
     public $itinerary_syntax;
     public $itinerary_journey = [];
     public $night;
-    public $errorMessage = '';
     public $uploadDayImages = [];
     public $day_by_divisions = [];
 
@@ -108,11 +111,15 @@ class CreateQueryItinerary extends Component
     public $budgetSortOrder = 'DESC';
     public $day_hotel_category = [];
     public $loadDayHotelsTime = 1;
+    public $send_whatsapp = false;
+    public $send_email = false;
+    public $send_sms = false;
 
     public function mount($encryptedId){
 
         $itineraryExists = Itinerary::with('lead')->find($encryptedId);
         $this->itinerary_id =$encryptedId;
+        $this->itineraryData =$itineraryExists;
         $this->stay_by_journey =$itineraryExists->stay_by_journey;
         $this->leadData = $itineraryExists->lead;
         $this->selected_night_halt = $itineraryExists->itinerary_journey;
@@ -2796,6 +2803,114 @@ class CreateQueryItinerary extends Component
         $this->budgetSortOrder = $this->package_budget === 'min' ? 'ASC' : 'DESC';
         $this->filterHotelData();
     }
+
+    public function messageChannelChanged()
+    {
+
+    }
+    public function sendMessages()
+    {
+        
+        $methods = [];
+
+        if ($this->send_whatsapp) {
+            $methods[] = 'WhatsApp';
+        }
+        if ($this->send_email) {
+            $methods[] = 'Email';
+        }
+        if ($this->send_sms) {
+            $methods[] = 'SMS';
+        }
+
+        $sent_via = implode(',', $methods);
+        // Get initials from customer name (e.g. 'RAK')
+        $initials = collect(explode(' ', $this->leadData->customer_name))
+            ->filter()
+            ->map(fn($word) => strtoupper(substr($word, 0, 1)))
+            ->implode('');
+
+       // Step 2: Initialize counter and loop
+        $sent_count = SendedLeadItinerary::where('lead_id', $this->leadData->id)->count();
+        $counter = $sent_count + 1;
+
+        do {
+            $code = $initials . str_pad($counter, 3, '0', STR_PAD_LEFT);
+            $exists = SendedLeadItinerary::
+                where('itinerary_code', $code)
+                ->exists();
+            $counter++;
+        } while ($exists);
+
+        // Final unique $code
+                
+        DB::beginTransaction();
+        try {
+            $store = new SendedLeadItinerary;
+            $store->lead_id = $this->leadData->id;
+            $store->itinerary_code = $code;
+            $store->destination_id = $this->itineraryData->destination_id;
+            $store->hotel_category = $this->itineraryData->hotel_category;
+            $store->itinerary_syntax =$this->itineraryData->itinerary_syntax;
+            $store->total_days = $this->itineraryData->total_days;
+            $store->total_nights = $this->itineraryData->total_nights;
+            $store->stay_by_journey = $this->itineraryData->stay_by_journey;
+            $store->itinerary_journey = $this->itineraryData->itinerary_journey;
+            $store->total_cost = $this->total_amount;
+            $store->send_via = $sent_via;
+            $store->sent_by_admin_id = Auth::guard('admin')->user()->id;
+            $store->sent_at = now()->toDateTimeString();
+            $store->save();
+
+            // Step 2: Fetch itinerary details
+            $fetch_itineraries = ItineraryDetail::where('itinerary_id', $this->itinerary_id)->get();
+
+            // Step 3: Prepare bulk insert data
+            $bulkInsertData = [];
+            foreach ($fetch_itineraries as $item) {
+                $bulkInsertData[] = [
+                    'sended_lead_itinerary_id' => $store->id,
+                    'route_service_summary_id' => $item->route_service_summary_id,
+                    'hotel_id' => $item->hotel_id,
+                    'room_id' => $item->room_id,
+                    'cab_id' => $item->cab_id,
+                    'header' => $item->header,
+                    'field' => $item->field,
+                    'value' => $item->value,
+                    'value_quantity' => $item->value_quantity,
+                    'price' => $item->price,
+                    'rate' => $item->rate,
+                    'ticket_price' => $item->ticket_price,
+                    'created_at'=> now()->toDateTimeString(),
+                    'updated_at'=> now()->toDateTimeString()
+                ];
+            }
+
+            // Step 4: Bulk insert
+            if (!empty($bulkInsertData)) {
+                SendedLeadItineraryDetail::insert($bulkInsertData);
+            }
+           
+          DB::commit();
+            session()->flash('success', 'Itinerary sent and details saved successfully!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('error', 'Failed to send itinerary. Please try again.');
+            dd('Transaction failed: ' . $e->getMessage());
+        }
+
+        if ($this->send_whatsapp) {
+            // Logic for WhatsApp
+        }
+
+        if ($this->send_email) {
+            // Logic for Email
+        }
+
+        if ($this->send_sms) {
+            // Logic for SMS
+        }
+    }
     public function render()
     {   
         // dd($this->dayExtraHotels);
@@ -2804,7 +2919,8 @@ class CreateQueryItinerary extends Component
         $this->selected_rooms_count = ItineraryDetail::where('itinerary_id', $this->itinerary_id)->whereNotNull('room_id')->where('field', 'day_room_main_plan')->sum('value_quantity');
         // Per day wise amount
         $this->mainBanner = ItineraryBanner::where('destination_id', $this->destinationId)->get();
-        return view('livewire.itinerary.create-query-itinerary');
+        $sent_itineraries = SendedLeadItinerary::where('lead_id', $this->leadData->id)->orderBy('id','DESC')->get();
+        return view('livewire.itinerary.create-query-itinerary',compact('sent_itineraries'));
     }
    
 }

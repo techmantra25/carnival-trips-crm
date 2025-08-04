@@ -44,6 +44,10 @@ class CronController extends Controller
                 // Step 1: If any click data exists, mark as "Active Lead"
                 // Only if status is NOT already "Active Lead", "Pipeline", or "High Intend Lead"
                 if ($leadUrlClickCount > 0 && in_array($lead->status, ['Link Generated'])) {
+                    $lead->status = 'Hot Leads';
+                    $updated = true;
+                }
+                if ($leadUrlClickCount > 2 && in_array($lead->status, ['Link Generated', 'Hot Leads'])) {
                     $lead->status = 'Active Lead';
                     $updated = true;
                 }

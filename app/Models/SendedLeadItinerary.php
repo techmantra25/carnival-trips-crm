@@ -8,13 +8,7 @@ class SendedLeadItinerary extends Model
 {
     protected $table = 'sended_lead_itineraries';
     protected $fillable = [
-        'lead_id',
-        'itinerary_code',
-        'total_cost',
-        'remarks',
-        'send_via',
-        'sent_by_admin_id',
-        'sent_at',
+        'lead_id', 'itinerary_code', 'destination_id', 'hotel_category', 'itinerary_syntax', 'total_days', 'total_nights', 'stay_by_journey', 'itinerary_journey', 'total_cost', 'remarks', 'send_via', 'sent_by_admin_id', 'sent_at'
     ];
 
     protected $casts = [

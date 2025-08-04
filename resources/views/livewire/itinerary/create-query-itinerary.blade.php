@@ -1378,7 +1378,6 @@
                                                                 </div> --}}
                                                             </div>
                                                         </div>
-                                                        
                                                     </td>
                                                 </tr>
                                             </tbody>
@@ -1497,122 +1496,208 @@
                     </div>
                 </div>
             </div>
-            <div class="col-span-12 md:col-span-6 xxl:!col-span-4">
-                <div class="box">
-                    <div class="box-body">
-                        <div class="text-center itinerary_total_amount">
-                            <p class="uppercase">Total Amount</p>
-                            <p class="text-2xl">{{env('DEFAULT_CURRENCY_SYMBOL')}}{{$total_amount}}</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-2">
+                <!-- Left Card - Message Options -->
+                <div class="col-span-1 md:col-span-2 h-full">
+                    <div class="bg-white shadow-lg rounded-2xl p-6 space-y-5 min-h-[350px]">
+                        <!-- Header -->
+                        <h2 class="uppercase text-gray-600 text-sm font-semibold">Send Message Via</h2>
+
+                        <!-- Message Options -->
+                        <div class="flex flex-wrap gap-6">
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" wire:model="send_whatsapp"  wire:change="messageChannelChanged" class="form-checkbox h-5 w-5 text-blue-600 focus:ring-blue-500">
+                                <span class="text-gray-800 font-medium cursor-pointer">WhatsApp</span>
+                            </label>
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" wire:model="send_email" wire:change="messageChannelChanged" class="form-checkbox h-5 w-5 text-blue-600 focus:ring-blue-500">
+                                <span class="text-gray-800 font-medium cursor-pointer">Email</span>
+                            </label>
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" wire:model="send_sms" wire:change="messageChannelChanged" class="form-checkbox h-5 w-5 text-blue-500 focus:ring-blue-500">
+                                <span class="text-gray-800 font-medium cursor-pointer">SMS</span>
+                            </label>
+                        </div>
+
+                        <!-- Status Badge -->
+                        <span class="badge gap-2 bg-danger/10 text-danger">
+                            <span class="w-1.5 h-1.5 inline-block bg-danger rounded-full"></span>
+                           SENT PACKAGES
+                        </span>
+
+                        <!-- History Table -->
+                        <div class="overflow-x-auto !mt-0">
+                            <table class="table-auto min-w-full text-sm text-center border border-gray-200 rounded table-sent-packages">
+                                <thead class="bg-gray-100 uppercase text-xs text-gray-600">
+                                    <tr>
+                                        <th class="px-3 py-2 border">Date</th>
+                                        <th class="px-3 py-2 border">Itinerary</th>
+                                        <th class="px-3 py-2 border">Sent Via</th>
+                                        <th class="px-3 py-2 border">Estimated Amount</th>
+                                        <th class="px-3 py-2 border">
+                                            Link
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Sample No Data Row -->
+                                    @forelse ($sent_itineraries as $item)
+                                        <tr>
+                                            <td class="px-3 py-2 border">{{ \Carbon\Carbon::parse($item->sent_at)->format('d M Y, h:i A') }}</td>
+                                            <td class="px-3 py-2 border">{{ $item->itinerary_syntax }}</td>
+                                            <td class="px-3 py-2 border">{{ $item->send_via }}</td>
+                                            <td class="px-3 py-2 border">₹{{ number_format($item->total_cost, 2) }}</td>
+                                            <td class="px-3 py-2 border">
+                                                {{-- {{ route('lead.shared.itinerary.view', $item->id) }} --}}
+                                                <a href="#" target="_blank" class="text-blue-600 underline">View</a>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="4" class="py-3 text-sm italic text-gray-500 text-center">
+                                                No packages sent yet.
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
-        </div>
-    </div>
-    <!-- Livewire Modal -->
-   
-    @if($isRelatedModalOpen)
-        <div class="side-model {{$isRelatedModalOpen ? 'open' : ''}}">
-            <!-- Modal Content -->
-            <div class="ti-modal-content p-4 h-full flex flex-col overflow-hidden">
-
-                <!-- Header -->
-                <div class="ti-modal-header items-center border-b pb-4">
-                    <div class="flex justify-between mb-2">
-                        <div>
-                            <span class="badge gap-2 bg-primary/10 text-primary uppercase text-small m-2">Showing
-                                {{count($related_hotels)}} <i class="fas fa-hotel"></i> in {{$selected_division}}
-                            </span>
-                        </div>
-                        <button type="button"
-                            class="text-gray-400 hover:text-gray-600 focus:outline-none badge gap-2 bg-danger/10 text-danger"
-                            wire:click="closeRelatedModal">
-                            <i class="fa-solid fa-xmark text-lg text-dark"></i>
-                        </button>
+                <!-- Right Card - Total & Send -->
+                <div class="flex flex-col justify-between bg-white shadow-lg rounded-2xl p-6 max-height-250">
+                    <div class="text-center mb-4">
+                        <p class="uppercase text-gray-500 text-sm">Total Estimated Amount</p>
+                        <p class="text-2xl font-bold text-gray-800">
+                            {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $total_amount }}
+                        </p>
                     </div>
-                    @if (session('related_hotel_error'))
+                    @if($send_whatsapp || $send_email || $send_sms)
+                        @if (session('success'))
+                            <div class="alert alert-success mb-1">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+                        @if (session('error'))
+                            <div class="alert alert-danger mb-1">
+                                {!! session('error') !!}
+                            </div>
+                        @endif
+                        <button wire:click="sendMessages"
+                            class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition-all">
+                            Send
+                        </button>
+                    @endif
+                </div>
+                
+            </div>
+
+        </div>
+        <!-- Livewire Modal -->
+    
+        @if($isRelatedModalOpen)
+            <div class="side-model {{$isRelatedModalOpen ? 'open' : ''}}">
+                <!-- Modal Content -->
+                <div class="ti-modal-content p-4 h-full flex flex-col overflow-hidden">
+
+                    <!-- Header -->
+                    <div class="ti-modal-header items-center border-b pb-4">
+                        <div class="flex justify-between mb-2">
+                            <div>
+                                <span class="badge gap-2 bg-primary/10 text-primary uppercase text-small m-2">Showing
+                                    {{count($related_hotels)}} <i class="fas fa-hotel"></i> in {{$selected_division}}
+                                </span>
+                            </div>
+                            <button type="button"
+                                class="text-gray-400 hover:text-gray-600 focus:outline-none badge gap-2 bg-danger/10 text-danger"
+                                wire:click="closeRelatedModal">
+                                <i class="fa-solid fa-xmark text-lg text-dark"></i>
+                            </button>
+                        </div>
+                        @if (session('related_hotel_error'))
                         <div class="alert alert-danger">
                             {!! session('related_hotel_error') !!}
                         </div>
-                    @endif
-                </div>
+                        @endif
+                    </div>
 
-                <!-- Body -->
-                <div class="flex-grow mt-6 overflow-y-auto">
+                    <!-- Body -->
+                    <div class="flex-grow mt-6 overflow-y-auto">
 
-                    @forelse ($related_hotels as $related_hotel_index=>$related_hotel)
-                    <div class="custom-hotel-container relative !overflow-visible mt-1">
-                        <div class="custom-hotel-content">
-                            <div class="custom-hotel-image-container w-2/5">
-                                <div class="custom-image-carousel">
-                                    <div class="custom-image-wrapper"
-                                        style="padding: 3px;max-width: 150px;min-height: 100px;">
-                                        @if($related_hotel_index==0)
-                                        <div class="selectedBadgeWrapper ">
-                                            <span class="badgeBar"></span>
-                                            <div class="selectedBadgeContainer">
-                                                <div class="tickContainer">
-                                                    <div class="tick"></div>
+                        @forelse ($related_hotels as $related_hotel_index=>$related_hotel)
+                        <div class="custom-hotel-container relative !overflow-visible mt-1">
+                            <div class="custom-hotel-content">
+                                <div class="custom-hotel-image-container w-2/5">
+                                    <div class="custom-image-carousel">
+                                        <div class="custom-image-wrapper"
+                                            style="padding: 3px;max-width: 150px;min-height: 100px;">
+                                            @if($related_hotel_index==0)
+                                            <div class="selectedBadgeWrapper ">
+                                                <span class="badgeBar"></span>
+                                                <div class="selectedBadgeContainer">
+                                                    <div class="tickContainer">
+                                                        <div class="tick"></div>
+                                                    </div>
+                                                    <span class="selectedBadgeText font10"
+                                                        data-testid="selected-room">Selected Hotel</span>
                                                 </div>
-                                                <span class="selectedBadgeText font10"
-                                                    data-testid="selected-room">Selected Hotel</span>
                                             </div>
+                                            @endif
+                                            <img class="custom-hotel-image" src="{{asset($related_hotel['image'])}}"
+                                                alt="Hotel Image">
                                         </div>
-                                        @endif
-                                        <img class="custom-hotel-image" src="{{asset($related_hotel['image'])}}"
-                                            alt="Hotel Image">
                                     </div>
                                 </div>
-                            </div>
 
-                            <div class="w-3/5">
-                                <div class="custom-hotel-details-top">
-                                    <p class="text-black-600 text-base italic related_hotel_title">
-                                        {{$related_hotel['name']}}</p>
-                                    <p class="text-gray-500 text-small">{{$related_hotel['address']}}</p>
-                                    <div class="flex justify-between">
-                                        <div>
-                                            <label class="hotel-preview-label relative cursor-pointer">
-                                                <input type="radio" name="related_hotel.{{$related_hotel_index}}.room"
-                                                    value="{{$related_hotel['selected_room_id']}}" class="hidden peer"
-                                                    checked="">
-                                                <div class="hotel-card">
-                                                    <span
-                                                        class="hotel-name related_hotel_title">{{$related_hotel['selected_room_name']}}</span>
-                                                    <span class="checkmark">✓</span>
-                                                </div>
-                                            </label>
-                                        </div>
-                                        <div>
-                                            @if($related_hotel_index>0)
+                                <div class="w-3/5">
+                                    <div class="custom-hotel-details-top">
+                                        <p class="text-black-600 text-base italic related_hotel_title">
+                                            {{$related_hotel['name']}}</p>
+                                        <p class="text-gray-500 text-small">{{$related_hotel['address']}}</p>
+                                        <div class="flex justify-between">
                                             <div>
-                                                <span class="related_hotel_amount">{{$related_hotel['sign']}}
-                                                    {{ENV('DEFAULT_CURRENCY_SYMBOL')}}{{$related_hotel['difference']}}</span>
+                                                <label class="hotel-preview-label relative cursor-pointer">
+                                                    <input type="radio" name="related_hotel.{{$related_hotel_index}}.room"
+                                                        value="{{$related_hotel['selected_room_id']}}" class="hidden peer"
+                                                        checked="">
+                                                    <div class="hotel-card">
+                                                        <span
+                                                            class="hotel-name related_hotel_title">{{$related_hotel['selected_room_name']}}</span>
+                                                        <span class="checkmark">✓</span>
+                                                    </div>
+                                                </label>
                                             </div>
-                                            <a href="javascript:void(0)" wire:click="updateDayHotel({{$related_hotel['selected_day']}},{{$related_hotel['selected_hotel_id']}},{{$related_hotel['id']}},'{{$related_hotel['selected_room_name']}}', '{{$related_hotel['selected_season']}}')"
-                                                class="py-1 px-3  inline-flex items-center gap-x-2 text-sm rounded-full ti-btn-primary-gradient text-white  me-[0.375rem] !mb-2 uppercase">Select</a>
+                                            <div>
+                                                @if($related_hotel_index>0)
+                                                <div>
+                                                    <span class="related_hotel_amount">{{$related_hotel['sign']}}
+                                                        {{ENV('DEFAULT_CURRENCY_SYMBOL')}}{{$related_hotel['difference']}}</span>
+                                                </div>
+                                                <a href="javascript:void(0)"
+                                                    wire:click="updateDayHotel({{$related_hotel['selected_day']}},{{$related_hotel['selected_hotel_id']}},{{$related_hotel['id']}},'{{$related_hotel['selected_room_name']}}', '{{$related_hotel['selected_season']}}')"
+                                                    class="py-1 px-3  inline-flex items-center gap-x-2 text-sm rounded-full ti-btn-primary-gradient text-white  me-[0.375rem] !mb-2 uppercase">Select</a>
+                                            </div>
+                                            @endif
                                         </div>
-                                        @endif
                                     </div>
                                 </div>
+
                             </div>
-
                         </div>
-                    </div>
-                    @empty
-                    <div class="alert alert-secondary">
-                        Sorry! no related hotels available for the selected criteria.
-                    </div>
-                    @endforelse
+                        @empty
+                        <div class="alert alert-secondary">
+                            Sorry! no related hotels available for the selected criteria.
+                        </div>
+                        @endforelse
 
+                    </div>
                 </div>
             </div>
-        </div>
-        </div>
-    @endif
-
+        @endif
+    </div>
     {{-- Model --}}
 
-    <div wire:loading class="loader" wire:target="addAboutDescHighlight, ItineraryImageDelete, deleteDayImage, OpenNewRouteModal,OpenAssignRouteModal, RemoveDayRouteItem,RemoveDayRoute,RemoveDayHotel, getActivityOrSightseeing, getRoute, main_banner, removeAboutDescHighlight,getHotel,updateSelectedRoom,ResetItinerary,updateSelectedRoomPlan,GetRoomAddonPlan,decreaseQuantity,increaseQuantity,confirm_for_all_day_cab,getPerDayCab,RemovePerDayCabItem,ChangeHotel,ChangeSimilarHotel,closeRelatedModal,updateDayHotel,CreateNewRoute,OpenNewSightseeingModal,addSightseeing,removeSightSeing,submitNewSightSeeingForm,OpenNewActivityModal,submitNewActivityForm,addActivity,removeActivity,updateType,toggleInclusion,toggleExclusion,changePackageBudget,changeDayHotelCategory">
+    <div wire:loading class="loader" wire:target="addAboutDescHighlight, ItineraryImageDelete, deleteDayImage, OpenNewRouteModal,OpenAssignRouteModal, RemoveDayRouteItem,RemoveDayRoute,RemoveDayHotel, getActivityOrSightseeing, getRoute, main_banner, removeAboutDescHighlight,getHotel,updateSelectedRoom,ResetItinerary,updateSelectedRoomPlan,GetRoomAddonPlan,decreaseQuantity,increaseQuantity,confirm_for_all_day_cab,getPerDayCab,RemovePerDayCabItem,ChangeHotel,ChangeSimilarHotel,closeRelatedModal,updateDayHotel,CreateNewRoute,OpenNewSightseeingModal,addSightseeing,removeSightSeing,submitNewSightSeeingForm,OpenNewActivityModal,submitNewActivityForm,addActivity,removeActivity,updateType,toggleInclusion,toggleExclusion,changePackageBudget,changeDayHotelCategory,messageChannelChanged,sendMessages">
         <div class="spinner">
         <img src="{{asset('build/assets/images/media/loader.svg')}}" alt="">
         </div>
@@ -1620,6 +1705,7 @@
     @if($isRelatedModalOpen)
         <div class="overlay" wire:click="closeRelatedModal"></div>
     @endif
+
 </div>
 <!-- Include Dragula JS -->
 @section('scripts')
