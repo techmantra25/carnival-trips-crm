@@ -39,7 +39,6 @@ class CronController extends Controller
 
             // Step 2: Click-based behavior
             if (in_array($currentStatus, ['Link Generated', 'Active Lead'])) {
-                
                 $leadUrlClickCount = LeadUrlClick::where('lead_id', $lead->id)->count();
                 // Step 1: If any click data exists, mark as "Active Lead"
                 // Only if status is NOT already "Active Lead", "Pipeline", or "High Intend Lead"
