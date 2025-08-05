@@ -47,7 +47,7 @@ use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagem
 
     });
 
-    Route::get('dashboard', [DashboardsController::class, 'index'])->name('admin.dashboard');
+    // Route::get('dashboard', [DashboardsController::class, 'index'])->name('admin.dashboard');
     Route::prefix('admin')->middleware('auth:admin')->group(function () {
         // Admin dashboard (only accessible if the user is authenticated as an admin)
         Route::get('dashboard', [DashboardsController::class, 'index'])->name('admin.dashboard');

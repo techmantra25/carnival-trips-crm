@@ -70,17 +70,16 @@
                         </div>
                     </div>
                     <div>
-                        <div class="grid grid-cols-1 hover:grid-cols-6">
+                        <div class="grid grid-cols-1 hover:grid-cols-6" wire:ignore>
                             <label for="">
                                 <span class="badge gap-2 bg-danger/10 text-danger uppercase">
                                     Hotels
                                 </span>
                             </label>
                             <!-- Hotel Select -->
-                            <select name="hotel_list"
-                                class="placeholder:text-textmuted text-sm selected_seasion_type"
+                            <select name="hotel_list" id="hotel_list"
+                                class="placeholder:text-textmuted text-sm selected_seasion_type select2"
                                 wire:model="hotel_id"
-                                wire:change="getHotel($event.target.value)" 
                                 wire:key="filter-hotel-0">
                                <option value="" disabled {{ $hotel_id === '' ? 'selected' : '' }}>
                                     Filter hotels
@@ -129,8 +128,8 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse ($hotels as $index=>$item)
-                                        <tr>
+                                    @forelse ($hotels as $index => $item)
+                                        <tr wire:key="hotel-{{ $item->id }}">
                                           <td class="!text-center !p-1 w-[10%]"><span class="badge bg-primary/10 text-primary">{{$index+1}}</span>
                                             </td>
                                            <td scope="row" class="align-top !p-1 w-[25%]">
@@ -150,6 +149,9 @@
                                             </td>
                                             <td class="!text-center">{{optional($item->city)->name??"N/A"}}</td>
                                             <td class="!text-center">
+                                                <button wire:click="editHotel({{ $item->id }})" class="ti-btn ti-btn-sm ti-btn-soft-info !border !border-info/20">
+                                                    <i class="ti ti-edit"></i>
+                                                </button>
                                                 <a href="javascript:void(0);" class="ti-btn ti-btn-sm ti-btn-soft-danger !border !border-danger/20" id="action-button-{{$item->id}}" wire:click="removeExistingHotel({{$item->id}})">
                                                     <i class="ti ti-trash"></i>
                                                 </a>
@@ -233,9 +235,9 @@
                                 <label>
                                     <span class="badge gap-2 bg-primary/10 text-primary uppercase">Hotel Name</span>
                                 </label>
-                                <input type="text" wire:model="hotel_name" name="hotel_name"
-                                    placeholder="hotel name"
-                                    class="form-control form-control-lg placeholder:text-textmuted text-sm font-12 {{ $errors->has('hotel_name') ? '!border-danger focus:border-danger focus:ring-danger' : '' }}">
+                                <input type="text" wire:model="hotel_name"
+                                    placeholder="hotel name" id="hotel_name"
+                                    class="form-control form-control-lg placeholder:text-textmuted text-sm font-12 {{ $errors->has('hotel_name') ? '!border-danger focus:border-danger focus:ring-danger' : '' }}" value="{{$hotel_name}}">
                                 @error('hotel_name') <span class="text-danger text-sm font-12">{{ $message }}</span> @enderror
                             </div>
 
@@ -266,7 +268,7 @@
                                 <label>
                                     <span class="badge gap-2 bg-primary/10 text-primary uppercase">Hotel Address</span>
                                 </label>
-                                <textarea wire:model="hotel_address" name="hotel_address"
+                                <textarea wire:model="hotel_address" name="hotel_address" id="hotel_address"
                                     class="form-control form-control-lg placeholder:text-textmuted text-sm font-12 {{ $errors->has('hotel_address') ? '!border-danger focus:border-danger focus:ring-danger' : '' }}">
                                 </textarea>
                                 @error('hotel_address') <span class="text-danger text-sm font-12">{{ $message }}</span> @enderror
@@ -276,7 +278,7 @@
                         <div class="ti-model-footer">
                             <div class="text-end mt-3">
                                 <button type="submit" class="ti-btn ti-btn-primary-full !py-1 pt-0 ti-btn-wave me-[0.375rem]">
-                                    <i class="fa-solid fa-save"></i> Save
+                                    <i class="fa-solid fa-save"></i> {{ $edit_mode ? 'Update' : 'Save' }}
                                 </button>
                             </div>
                         </div>
@@ -295,7 +297,7 @@
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-      window.addEventListener('showConfirm', function (event) {
+    window.addEventListener('showConfirm', function (event) {
         let itemId = event.detail[0].itemId;
         Swal.fire({
             title: "Are you sure?",
@@ -308,8 +310,25 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 @this.call('deleteItem', itemId); // Calls Livewire method directly
-                // Swal.fire("Deleted!", "Your item has been deleted.", "success");
             }
+        });
+    });
+    window.addEventListener('FetchContent', function (event) {
+        let hotel_name = event.detail[0].hotel_name;
+        let hotel_address = event.detail[0].hotel_address;
+        document.getElementById('hotel_name').value = hotel_name;
+        document.getElementById('hotel_address').value = hotel_address;
+    });
+
+    $(document).ready(function () {
+        $('.select2').select2();
+        $('#hotel_list').select2({
+            placeholder: "Filter by hotel",
+            allowClear: true // optional: adds "x" to clear selections
+        });
+        $('#hotel_list').on('change', function (e) {
+            var value = $(this).select2("val");
+            @this.call('getHotel', value);
         });
     });
 </script>

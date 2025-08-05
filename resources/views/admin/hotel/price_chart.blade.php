@@ -33,7 +33,6 @@
 </div>
 <!-- Start:: row-10 -->
 <livewire:hotel.hotel-price-chart-list/>
-
 <!-- End:: row-10 -->
 @endsection
 

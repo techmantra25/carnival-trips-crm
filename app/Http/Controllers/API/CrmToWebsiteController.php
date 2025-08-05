@@ -248,9 +248,8 @@ class CrmToWebsiteController extends Controller
             $lead->number_of_adults = $request->travellers;
             $lead->number_of_travellor = $request->travellers;
 
-            $lead->lead_type = "From Website";
+            $lead->lead_type = "website";
             $lead->lead_source = "Others";
-            $lead->package_type = "Holiday Packages";
             $calculatedRooms = round($request->travellers / 2);
             $lead->number_of_rooms = max(1, $calculatedRooms);
             $lead->meal_type = "CP";
