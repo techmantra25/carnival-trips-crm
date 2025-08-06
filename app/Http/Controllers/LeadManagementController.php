@@ -81,7 +81,7 @@ class LeadManagementController extends Controller
         ]);
         try {
             $validatedData['user_id'] = $request->user_id;
-            $validatedData['lead_type'] = $request->lead_type;
+            $validatedData['source_type'] = $request->source_type;
             $validatedData['lead_source'] = $request->lead_source;
 
             $this->leadRepository->createLead($validatedData);

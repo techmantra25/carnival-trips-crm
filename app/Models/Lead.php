@@ -11,7 +11,7 @@ class Lead extends Model
     use HasFactory;
     protected $table = 'leads';
     protected $fillable = [
-        'unique_id', 'generate_from', 'nationality_type', 'customer_name', 'customer_email', 'customer_mobile', 'country_code', 'customer_whatsapp', 'travel_location', 'hotel_category', 'travel_duration', 'travel_in_days', 'travel_in_nights', 'travel_duration_text', 'departure_date', 'arrival_date', 'number_of_adults', 'number_of_children', 'children_data', 'number_of_travellor', 'number_of_rooms', 'extra_mattress', 'meal_type', 'lead_type', 'lead_source', 'created_by', 'team_lead_id', 'assigned_to_id', 'package_type', 'status'
+        'unique_id', 'generate_from', 'nationality_type', 'customer_name', 'customer_email', 'customer_mobile', 'country_code', 'customer_whatsapp', 'travel_location', 'hotel_category', 'travel_duration', 'travel_in_days', 'travel_in_nights', 'travel_duration_text', 'departure_date', 'arrival_date', 'number_of_adults', 'number_of_children', 'children_data', 'number_of_travellor', 'number_of_rooms', 'extra_mattress', 'meal_type', 'source_type', 'lead_source', 'created_by', 'team_lead_id', 'assigned_to_id', 'package_type', 'status'
     ];
 
     // public function city(): BelongsTo

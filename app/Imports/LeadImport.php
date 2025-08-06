@@ -95,10 +95,11 @@ class LeadImport implements ToCollection, WithHeadingRow
                     'extra_child'              => $row['extra_child'] ?? 0,
                     'extra_mattress'           => $row['extra_mattress'] ?? 0,
                     'meal_type'                => $row['meal_type'],
-                    'lead_type'                => $row['lead_type'],
+                    'source_type'              => $row['source_type'],
                     'lead_source'              => $row['lead_source'],
                     'package_type'             => $row['package_type'],
                     'team_lead_id'             => $getNextTeamLeadId,
+                    'assigned_to_id'           => $getNextTeamLeadId,
                     'created_by'               => Auth::guard('admin')->user()->id,
                 ]);
                  if($lead){

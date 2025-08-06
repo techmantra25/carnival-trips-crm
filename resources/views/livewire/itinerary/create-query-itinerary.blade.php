@@ -1549,7 +1549,7 @@
                                             <td class="px-3 py-2 border">₹{{ number_format($item->total_cost, 2) }}</td>
                                             <td class="px-3 py-2 border">
                                                 {{-- {{ route('lead.shared.itinerary.view', $item->id) }} --}}
-                                                <a href="#" target="_blank" class="text-blue-600 underline">View</a>
+                                                <a href="{{route('website.lead.customized.itinerary', $item->itinerary_code)}}" target="_blank" class="text-blue-600 underline">View</a>
                                             </td>
                                         </tr>
                                     @empty

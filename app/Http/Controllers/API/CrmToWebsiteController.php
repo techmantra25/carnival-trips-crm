@@ -248,12 +248,12 @@ class CrmToWebsiteController extends Controller
             $lead->number_of_adults = $request->travellers;
             $lead->number_of_travellor = $request->travellers;
 
-            $lead->lead_type = "website";
             $lead->lead_source = "Others";
             $calculatedRooms = round($request->travellers / 2);
             $lead->number_of_rooms = max(1, $calculatedRooms);
             $lead->meal_type = "CP";
             $lead->team_lead_id = CustomHelper::getNextTeamLeadIdByLeadCount($Itinerary->destination_id);
+            $lead->assigned_to_id = $lead->team_lead_id;
             $lead->save();
 
             // Create new Itinerary linked to lead

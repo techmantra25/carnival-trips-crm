@@ -19,7 +19,7 @@ use App\Http\Controllers\RouteManagementController;
 
 // New Code
 use App\Http\Controllers\CronController;
-use App\Livewire\Website\{FrontGetPresetItinerary,TripPreferenceForm};
+use App\Livewire\Website\{FrontGetPresetItinerary,TripPreferenceForm,FrontGetCustomizedItinerary};
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\AdminAuthController;
@@ -227,6 +227,7 @@ use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagem
     });
 
     Route::get('/trip-preference-form/{code}', TripPreferenceForm::class)->name('website.trip.preference.form');
+    Route::get('customized/itinerary/{code}', FrontGetCustomizedItinerary::class)->name('website.lead.customized.itinerary');
     Route::get('{destination_slug}/{itinerary_slug}/{encryptedSharedLinkId}', FrontGetPresetItinerary::class)
     ->name('website.lead.destination.preset-itinerary');
     require __DIR__.'/auth.php';

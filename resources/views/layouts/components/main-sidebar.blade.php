@@ -94,12 +94,12 @@
 									<li class="slide {{ request()->is('admin/leads*')? 'active' : '' }}">
 										<a href="{{route('admin.leads.index')}}" class="side-menu__item">All Leads</a>
 									</li>
-									<li class="slide {{ request()->is('admin/leads/cnp*')? 'active' : '' }}">
+									{{-- <li class="slide {{ request()->is('admin/leads/cnp*')? 'active' : '' }}">
 										<a href="{{route('admin.leads.cnp.list')}}" class="side-menu__item">CNP Leads</a>
 									</li>
 									<li class="slide">
 										<a href="javascript:void(0);" class="side-menu__item">Lead Analytics</a>
-									</li>
+									</li> --}}
 								</ul>
 							</li>
 							<li class="slide has-sub {{ request()->is('admin/hotel*') 

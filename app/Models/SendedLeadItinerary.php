@@ -16,4 +16,17 @@ class SendedLeadItinerary extends Model
         'total_cost' => 'decimal:2',
         'send_via' => 'string',
     ];
+
+     public function lead()
+    {
+        return $this->belongsTo(Lead::class, 'lead_id', 'id');
+    }
+     public function destination()
+    {
+        return $this->belongsTo(State::class, 'destination_id', 'id');
+    }
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'hotel_category', 'id');
+    }
 }

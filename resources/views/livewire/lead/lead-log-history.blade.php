@@ -3,21 +3,6 @@
         <div class="box-body">
             <div class="grid grid-cols-12 gap-3">
                 <div class="col-span-12">
-                    <div class="mb-4">
-                        <h2 class="text-lg font-bold text-gray-800 mb-2">Lead Log History for: {{ $lead->name }} ({{ $lead->email }})</h2>
-
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                            <div>
-                                <label class="text-sm text-gray-600">Start Date</label>
-                                <input type="date" wire:model="start_date" class="form-input w-full border border-gray-300 rounded px-3 py-1.5 text-sm" />
-                            </div>
-                            <div>
-                                <label class="text-sm text-gray-600">End Date</label>
-                                <input type="date" wire:model="end_date" class="form-input w-full border border-gray-300 rounded px-3 py-1.5 text-sm" />
-                            </div>
-                        </div>
-                    </div>
-
                     {{-- Timeline Output --}}
                     <div class="space-y-6">
                         @forelse($logs as $log)
