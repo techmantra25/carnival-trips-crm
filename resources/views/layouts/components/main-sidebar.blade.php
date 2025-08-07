@@ -94,6 +94,9 @@
 									<li class="slide {{ request()->is('admin/leads*')? 'active' : '' }}">
 										<a href="{{route('admin.leads.index')}}" class="side-menu__item">All Leads</a>
 									</li>
+									<li class="slide {{ request()->is('admin/leads/confirmed*')? 'active' : '' }}">
+										<a href="{{route('admin.leads.confirmed.index')}}" class="side-menu__item">Confirmed Leads</a>
+									</li>
 									{{-- <li class="slide {{ request()->is('admin/leads/cnp*')? 'active' : '' }}">
 										<a href="{{route('admin.leads.cnp.list')}}" class="side-menu__item">CNP Leads</a>
 									</li>

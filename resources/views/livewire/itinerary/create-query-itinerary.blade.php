@@ -101,9 +101,11 @@
                                     $encryptedId = Crypt::encrypt($itinerary_id);
                                     @endphp
                                     <p class="text-lg font-semibold uppercase">Itinerary is for:</p>
-                                    <a href="{{route('admin.cost_calculator.query_edit',$encryptedId)}}" class="ti-btn ti-btn-sm ti-btn-teal !border !border-success" title="Edit Itinerary">
-                                        <i class="ti ti-pencil"></i>
-                                    </a>
+                                    @if($leadData->status!=="Confirmed")
+                                        <a href="{{route('admin.cost_calculator.query_edit',$encryptedId)}}" class="ti-btn ti-btn-sm ti-btn-teal !border !border-success" title="Edit Itinerary">
+                                            <i class="ti ti-pencil"></i>
+                                        </a>
+                                    @endif
                                 </div>
                                 <div class="flex">
                                     <div class="px-2">

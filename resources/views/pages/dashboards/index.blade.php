@@ -15,7 +15,8 @@
 @section('scripts')
 
 <!-- Apex Charts JS -->
-<script src="{{asset('build/assets/libs/apexcharts/apexcharts.min.js')}}"></script>
+{{-- <script src="{{asset('build/assets/libs/apexcharts/apexcharts.min.js')}}"></script> --}}
+
 
 <!-- JSVector Maps JS -->
 {{-- <script src="{{asset('build/assets/libs/jsvectormap/js/jsvectormap.min.js')}}"></script> --}}

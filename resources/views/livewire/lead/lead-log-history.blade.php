@@ -38,9 +38,40 @@
                                         
                                         {{-- General Key-Value Log --}}
                                         @else
-                                            <ul class="text-sm list-disc list-inside text-gray-600">
+                                           <ul class="space-y-1">
                                                 @foreach($msg as $key => $value)
-                                                    <li><strong>{{ ucwords(str_replace('_', ' ', $key)) }}:</strong> {{ $value }}</li>
+                                                    <li>
+                                                        @if (is_array($value))
+                                                            <div class="mt-2">
+                                                                <div class="font-medium text-gray-700">{{ ucwords(str_replace('_', ' ', $key)) }}:</div>
+                                                                <ul class="ml-4 mt-1 space-y-1 list-disc list-inside text-gray-600">
+                                                                    @foreach($value as $subKey => $subValue)
+                                                                        <li>
+                                                                            <span class="font-semibold">{{ ucwords(str_replace('_', ' ', $subKey)) }}:</span>
+                                                                            @if (filter_var($subValue, FILTER_VALIDATE_URL))
+                                                                                <a href="{{ $subValue }}" class="text-blue-600 underline text-xs" target="_blank">
+                                                                                    {{ $subValue }}
+                                                                                </a>
+                                                                            @else
+                                                                                {{ $subValue }}
+                                                                            @endif
+                                                                        </li>
+                                                                    @endforeach
+                                                                </ul>
+                                                            </div>
+                                                        @else
+                                                            <div>
+                                                                <span class="font-semibold text-gray-700">{{ ucwords(str_replace('_', ' ', $key)) }}:</span>
+                                                                @if (filter_var($value, FILTER_VALIDATE_URL))
+                                                                    <a href="{{ $value }}" class="text-blue-600 underline text-xs" target="_blank">
+                                                                        {{ $value }}
+                                                                    </a>
+                                                                @else
+                                                                    {{ $value }}
+                                                                @endif
+                                                            </div>
+                                                        @endif
+                                                    </li>
                                                 @endforeach
                                             </ul>
                                         @endif

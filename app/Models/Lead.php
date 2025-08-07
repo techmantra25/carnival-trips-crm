@@ -48,5 +48,9 @@ class Lead extends Model
     {
        return $this->hasOne(Itinerary::class, 'lead_id', 'id');
     }
+    public function sent_itinerary()
+    {
+       return $this->hasMany(SendedLeadItinerary::class, 'lead_id', 'id');
+    }
 
 }

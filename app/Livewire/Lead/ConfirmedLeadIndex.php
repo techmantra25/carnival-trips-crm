@@ -26,12 +26,12 @@ use App\Models\LeadUrlShare;
 use App\Models\SendedLeadItinerary;
 use Maatwebsite\Excel\Facades\Excel;
 
-class LeadIndex extends Component
+class ConfirmedLeadIndex extends Component
 {   
     use WithPagination,WithFileUploads;
     protected $paginationTheme = 'bootstrap';
-    public $active_lead,$common,$filter_package,$filter_source_type,$filter_lead_status = [],$filter,$start_date,$end_date,$selected_member,$selected_status,$selected_itinerary;
-    public $leads_status = [], $destinations = [], $search_destination  = [], $members = [];
+    public $active_lead,$common,$filter_package,$filter_source_type,$filter,$start_date,$end_date,$selected_member,$selected_status,$selected_itinerary;
+    public $destinations = [], $search_destination  = [], $members = [];
 
     public $destination, $selectedType,$search,$meal_type,$customer_name,$total_members,$number_of_adults,$number_of_childs,$source_type,$mobile_number,$arrival_date,$departure_date,$company_name,$whatsapp_number,$email_address,$hotel_category,$package_type,$package_nights,$package_days,$nationality_type,$number_of_rooms,$extra_mattress;
     public $active_assign_new_modal = 0;
@@ -74,10 +74,9 @@ class LeadIndex extends Component
 
         $this->filter_source_type = request()->get('source_type', null); // fallback if not present
 
-        $this->common = CustomHelper::setHeadersAndTitle('Lead Management', 'Leads');
+        $this->common = CustomHelper::setHeadersAndTitle('Lead Management', 'Confirmed Leads');
         
         $this->destinations = State::where('status',1)->orderBy('name','ASC')->get();
-        $this->leads_status = DB::table('leads_status')->where('status', 1)->orderBy('position', 'ASC')->get();
 
         $this->resequence_itinerary_details();
 
@@ -145,7 +144,7 @@ class LeadIndex extends Component
         $this->filter_package = $value;
     }
     public function ResetAllField(){
-        $this->reset(['filter_package','filter_source_type', 'filter_lead_status','filter','search_destination','start_date','end_date']);
+        $this->reset(['filter_package','filter_source_type','filter','search_destination','start_date','end_date']);
         $this->dispatch('refreshComponent');
     }
     public function SetFilter($value)
@@ -167,17 +166,6 @@ class LeadIndex extends Component
         $this->search_destination = [];
     }
 
-    public function changeLeadStatus($value){
-        if (in_array($value, $this->filter_lead_status)) {
-            $this->filter_lead_status = array_diff($this->filter_lead_status, [$value]);
-        } else {
-            $this->filter_lead_status[] = $value;
-        }
-    }
-    public function clearAllLeadStatus()
-    {
-        $this->filter_lead_status = [];
-    }
 
     public function addExtraChild(){
         $this->childs[] = ['quantity'=>'', 'age'=>''];
@@ -821,21 +809,6 @@ class LeadIndex extends Component
         
     }
 
-    public function LeadStatusModal($lead_id){
-        $this->reset(['active_lead']);
-        $this->showLeadStatusModal = true;
-        $this->active_lead = Lead::find($lead_id);
-        $this->selected_status = $this->active_lead->status;
-
-        if ($this->selected_status == 'Confirmed') {
-            $this->sent_lead_itineraries = SendedLeadItinerary::where('lead_id', $this->active_lead->id)
-                ->orderBy('id', 'ASC')
-                ->get();
-            $this->selected_itinerary = SendedLeadItinerary::where('lead_id', $this->active_lead->id)
-                        ->where('is_confirmed', 1)
-                        ->value('id');
-        }
-    }
     public function assignLead(){
         $this->resetErrorBag();
         $this->leadAssignError = null;
@@ -875,100 +848,6 @@ class LeadIndex extends Component
             $this->leadAssignError = $e->getMessage();
         }
     }
-   public function assignLeadStatus()
-    {
-        // The selected status is already updated via wire:model
-        $this->sent_lead_itineraries = SendedLeadItinerary::where('lead_id', $this->active_lead->id)
-            ->orderBy('id', 'ASC')
-            ->get();
-    }
-    public function updateLeadStatus(){
-        $this->resetErrorBag();
-        $this->leadAssignError = null;
-        if(!isset($this->selected_status)){
-            $this->leadAssignError = "Please choose a status";
-            return;
-        }
-        // leadAssignError
-        if ($this->selected_status == 'Confirmed' && !$this->selected_itinerary) {
-            $this->leadAssignError = "Please select an itinerary before confirming the status.";
-            return;
-        }
-
-        try {
-            $lead = Lead::find($this->active_lead->id);
-            if ($lead) {
-                $oldStatus = $lead->status;
-                $lead->status = $this->selected_status;
-                $lead->save();
-
-                $logMessage = [
-                    'action' => 'Status Updated',
-                    'previous_status' => $oldStatus,
-                    'new_status' => $this->selected_status,
-                    'updated_by' => $this->authUser->name . ' (' . $this->authUser->email . ')',
-                    'timestamp' => now()->toDateTimeString(),
-                ];
-
-                if ($this->selected_status == 'Confirmed') {
-                    // Reset previous confirmed itinerary (if any)
-                    $previousConfirmed = SendedLeadItinerary::where('lead_id', $lead->id)
-                        ->where('is_confirmed', 1)
-                        ->first();
-
-                    if ($previousConfirmed && $previousConfirmed->id != $this->selected_itinerary) {
-                        $previousConfirmed->is_confirmed = 0;
-                        $previousConfirmed->confirmed_by = null;
-                        $previousConfirmed->confirmed_at = null;
-                        $previousConfirmed->save();
-                    }
-
-                    // Confirm the newly selected itinerary
-                    $SendedLeadItinerary = SendedLeadItinerary::findOrFail($this->selected_itinerary);
-                    $SendedLeadItinerary->is_confirmed = 1;
-                    $SendedLeadItinerary->confirmed_by = $this->authUser->id;
-                    $SendedLeadItinerary->confirmed_at = now()->toDateTimeString();
-                    $SendedLeadItinerary->save();
-
-                    // Log both itineraries
-                    $logMessage += [
-                        'previous_itinerary' => $previousConfirmed ? [
-                            'itinerary_code' => $previousConfirmed->itinerary_code,
-                            'syntax' => $previousConfirmed->itinerary_syntax,
-                            'total_cost' => $previousConfirmed->total_cost,
-                            'destination' => optional($previousConfirmed->destination)->name,
-                            'hotel_category' => optional($previousConfirmed->category)->name,
-                        ] : null,
-
-                        'new_selected_itinerary' => [
-                            'itinerary_code' => $SendedLeadItinerary->itinerary_code,
-                            'syntax' => $SendedLeadItinerary->itinerary_syntax,
-                            'total_cost' => $SendedLeadItinerary->total_cost,
-                            'destination' => optional($SendedLeadItinerary->destination)->name,
-                            'hotel_category' => optional($SendedLeadItinerary->category)->name,
-                        ],
-                    ];
-                }
-
-                // Final log write
-                LeadActivityLog::create([
-                    'lead_id' => $lead->id,
-                    'updated_by' => $this->authUser->id,
-                    'message' => json_encode($logMessage),
-                ]);
-
-                session()->flash('success', 'Lead status updated successfully!');
-                $this->showLeadStatusModal = false;
-                $this->selected_status = null;
-                $this->selected_itinerary = null;
-            } else {
-                $this->leadAssignError = 'Selected lead not found.';
-            }
-           
-        } catch (\Exception $e) {
-            $this->leadAssignError = $e->getMessage();
-        }
-    }
     public function render()
     {
         $this->divisions= City::where('state_id', $this->destination)->orderBy('name', 'ASC')->get();
@@ -994,10 +873,6 @@ class LeadIndex extends Component
             $source_type = $this->filter_source_type;
             $query->where('source_type',$source_type);
         })
-        ->when($this->filter_lead_status, function ($query){
-            $lead_status = $this->filter_lead_status;
-            $query->whereIn('status',$lead_status);
-        })
         ->when($this->start_date && $this->end_date, function ($query) {
             $query->whereBetween('created_at', [
                 Carbon::parse($this->start_date)->startOfDay(),
@@ -1020,9 +895,10 @@ class LeadIndex extends Component
                 $query->where('assigned_to_id', $this->authUser->id);
             }
         })
+        ->where('status','Confirmed')
         ->orderBy('id', 'DESC')
         ->paginate(10);
-        return view('livewire.lead.lead-index',[
+        return view('livewire.lead.confirmed-lead-index',[
             'leads'=>$leads,
         ]);
     }

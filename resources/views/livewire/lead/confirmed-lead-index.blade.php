@@ -34,40 +34,12 @@
             </nav>
         </div>
 
-        <div class="ti-btn-list flex">
-            {{-- Emergency Alert Banner --}}
-            <div
-                x-data="{
-                    counter: 30,
-                    init() {
-                        setInterval(() => {
-                            if (this.counter > 1) {
-                                this.counter--;
-                            } else {
-                                this.counter = 30;
-                                $wire.$refresh(); // Auto refresh Livewire
-                            }
-                        }, 1000);
-                    }
-                }"
-                role="alert"
-            >
-                <div
-                    class="bg-white text-red-600 font-semibold px-3 py-1 text-xs rounded-full flex items-center space-x-2 shadow"
-                >
-                    <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v6h6M20 20v-6h-6M4 20l16-16" />
-                    </svg>
-                    <span x-text="counter + 's'"></span>
-                </div>
-            </div>
-
-
+        {{-- <div class="ti-btn-list flex">
             <button type="button" wire:click="openImportModal" class="ti-btn ti-btn-orange ti-btn-wave !py-1 pt-0 me-[0.375rem] flex items-center gap-1">
             <i class="ti ti-upload"></i> Import Lead
             </button>
             <a href="javascript:void(0)" wire:click="NewPresetItinerary('yes')" class="ti-btn ti-btn-primary-full !py-1 pt-0 ti-btn-wave  me-[0.375rem]"><i class="fa-solid fa-plus"></i>Add Lead</a>
-        </div>
+        </div> --}}
     </div>
     <div class="grid grid-cols-12 gap-6">
         <div class="xl:col-span-12 col-span-12">
@@ -86,23 +58,6 @@
                             wire:click="toggleDestination({{ $destination_item->id }})"
                         >
                             {{ $destination_item->name }}
-                        </span>
-                    @endforeach
-                </div>
-                <div class="p-0 mx-2 my-2 space-x-1">
-                    <span 
-                        class="badge cursor-pointer {{ empty($filter_lead_status) ? 'bg-success text-white' : 'bg-outline-success' }}"
-                        wire:click="clearAllLeadStatus"
-                    >
-                        All
-                    </span>
-
-                    @foreach ($leads_status as $status)
-                        <span 
-                            class="badge cursor-pointer {{ in_array($status->name, $filter_lead_status ?? []) ? 'bg-success text-white' : 'bg-outline-success' }}" 
-                            wire:click="changeLeadStatus('{{ $status->name }}')"
-                        >
-                            {{ $status->name }}
                         </span>
                     @endforeach
                 </div>
@@ -195,7 +150,9 @@
                                                 </p>
                                             
                                             @php
-                                                $timeInfo = \App\Helpers\CustomHelper::formatLeadTime($lead_item->created_at);
+                                                $confirmed_itinerary = $lead_item->sent_itinerary()->where('is_confirmed', 1)->first();
+                                                $confirmed_by = optional($confirmed_itinerary?->confirmedBy);
+                                                $timeInfo = $confirmed_itinerary ? \App\Helpers\CustomHelper::formatLeadTime($confirmed_itinerary->confirmed_at) : null;
                                             @endphp
                                             <button type="button" class="badge bg-outline-secondary my-3 me-2 badge-custom-outline-secondary">
                                                 {{ $timeInfo['formatted_date'] }}
@@ -287,7 +244,7 @@
                                             </div>
 
                                             <div class="!text-center">
-                                                <a href="javascript:void(0)" wire:click="LeadStatusModal({{$lead_item->id}})"   title="Click to update lead status">
+                                                <a href="javascript:void(0)" title="Click to update lead status">
                                                     <span class="badge gap-2 {{ \App\Helpers\CustomHelper::getLeadStatusBadgeColor($lead_item->status) }}">
                                                         <span class="w-1.5 h-1.5 inline-block bg-black rounded-full"></span>
                                                         {{ ucwords($lead_item->status) }}
@@ -328,10 +285,7 @@
                                                     @php
                                                         $encryptedId = Crypt::encrypt($lead_item->itinerary->id);
                                                     @endphp
-
-                                                    @if($lead_item->status!=="Confirmed")
-                                                    <a href="{{route('admin.cost_calculator.query_edit',$encryptedId)}}" class="ti-btn ti-btn-orange  mt-[0.375rem]" title="Edit Lead"><i class="fa-regular fa-pen-to-square"></i></a>
-                                                    @endif
+                                                    {{-- <a href="{{route('admin.cost_calculator.query_edit',$encryptedId)}}" class="ti-btn ti-btn-orange  mt-[0.375rem]" title="Edit Lead"><i class="fa-regular fa-pen-to-square"></i></a> --}}
 
                                                     {{-- Itinerary --}}
                                                     @if($lead_item->itinerary->night_journey &&                 $lead_item->itinerary->stay_by_journey)
@@ -346,14 +300,9 @@
                                                             $LeadUrlShare = App\Models\LeadUrlShare::where('lead_id', $lead_item->id)->where('itinerary_id', $lead_item->itinerary->id)->first();
                                                             $shared_link = App\Helpers\CustomHelper::secure_encode_id($LeadUrlShare?$LeadUrlShare->id:null);
                                                         @endphp
-                                                    @if($shared_link)
-                                                    <a href="{{route('website.lead.destination.preset-itinerary',[$destination_slug,$lead_itinerary_journey,$shared_link])}}" target="_blank" class="ti-btn ti-btn-secondary ti-btn-border-start  mt-[0.375rem]" title="Itinerary">WEBSITE</a>
-                                                    @endif
                                                 @endif
-                                               
-                                                 <a href="{{route('website.trip.preference.form', $lead_item->unique_id)}}" target="_blank" class="ti-btn ti-btn-secondary ti-btn-border-start  mt-[0.375rem]" title="Itinerary">FB Form</a>
                                             </div>
-                                           <div>
+                                            <div>
                                                 <span class="badge bg-warning/10 text-warning" title="Assign Lead Member">
                                                     <span class="text-black"><i class="fa-regular fa-user me-1"></i></span>
                                                     <span class="text-black"> Assigned To:</span>
@@ -366,10 +315,6 @@
                                                     </strong>
                                                 </span>
                                             </div>
-
-                                            @php
-                                                $confirmed_itinerary = $lead_item->sent_itinerary()->where('is_confirmed', 1)->first();
-                                            @endphp
                                             @if($confirmed_itinerary)
                                                 <div>
                                                     <span class="badge bg-success/10 text-warning" title="Assign Lead Member">
@@ -1188,90 +1133,6 @@
                                 <button wire:click="assignLead"
                                     class="ti-btn ti-btn-primary-full !py-1 pt-0 ti-btn-wave me-[0.375rem]">
                                     Assign
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endif
-        @if($showLeadStatusModal)
-            <div
-                class="hs-overlay {{$showLeadStatusModal?"":"hidden"}} fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                <div
-                    class="hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out lg:!max-w-4xl lg:w-full m-3 lg:!mx-auto modal_md_width bg-white rounded-lg">
-                    <div class="ti-modal-content p-20">
-                        <div class="ti-modal-header flex justify-between items-center">
-                            <div>
-                                 <h2 class="text-lg font-semibold text-gray-800 !mb-0">Active Status ({{$active_lead->unique_id}})</h2>
-                                <button type="button" class="badge bg-outline-secondary me-2 badge-custom-outline-secondary">
-                                    Team Lead
-                                    <span class="badge bg-success ms-2 text-white">{{optional($active_lead->teamLead)->name}}</span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="ti-modal-body text-start mt-4">
-                            {{-- Show already assigned info --}}
-                           @if($active_lead->status)
-                                <div class="mb-3">
-                                    <div class="p-3 bg-yellow-100 text-yellow-900 rounded text-sm">
-                                        This lead currently has the status: 
-                                        <strong>{{ ucfirst($active_lead->status) }}</strong>.
-                                    </div>
-                                </div>
-                            @endif
-
-                            <div>
-                                <label for="select-1"
-                                        class="ti-form-select rounded-sm !py-2 !px-3-label text-sm text-textmuted custom_lable">Status</label>
-                                <select class="ti-form-select border-2 border-gray-300 rounded-sm !py-2 !px-3 !p-0"
-                                    autocomplete="off" wire:model="selected_status" wire:change="assignLeadStatus">
-                                    <option value="" hidden>Select a status...</option>
-                                        @foreach ($leads_status as $status_item)
-                                            <option value="{{ $status_item->name }}">{{ ucwords($status_item->name)}}</option>
-                                        @endforeach
-                                </select>
-                                @if($selected_status == "Confirmed")
-                                    <label for="select-1"
-                                        class="ti-form-select rounded-sm !py-2 !px-3-label text-sm text-textmuted custom_lable">Itinerary</label>
-
-                                    <select class="ti-form-select border-2 border-gray-300 rounded-sm !py-2 !px-3 !p-0"
-                                        autocomplete="off" wire:model="selected_itinerary">
-                                        <option value="" hidden>Select an itinerary...</option>
-
-                                        @foreach ($sent_lead_itineraries as $lead_itineraries)
-                                            @php
-                                                $title = "Code: {$lead_itineraries->itinerary_code}\n";
-                                                $title .= "Itinerary: {$lead_itineraries->itinerary_syntax}\n";
-                                                $title .= "Total Cost: ₹" . number_format($lead_itineraries->total_cost) . "\n";
-                                                $title .= "Destination: " . optional($lead_itineraries->destination)->name . "\n";
-                                                $title .= "Hotel Category: " . optional($lead_itineraries->category)->name;
-                                            @endphp
-
-                                            <option value="{{ $lead_itineraries->id }}" title="{{ $title }}">
-                                                {{ $lead_itineraries->itinerary_code }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                @endif
-
-
-                                @if($leadAssignError)
-                                    <p class="text-red-600 text-sm font-medium mt-1">
-                                        {{ $leadAssignError }}
-                                    </p>
-                                @endif
-                            </div>
-
-                            <!-- Footer -->
-                            <div class="text-right mt-2">
-                                <button wire:click="$set('showLeadStatusModal', false)"
-                                    class="ti-btn ti-btn-danger-full !py-1 pt-0 ti-btn-wave me-[0.375rem]">
-                                    Cancel
-                                </button>
-                                <button wire:click="updateLeadStatus"
-                                    class="ti-btn ti-btn-primary-full !py-1 pt-0 ti-btn-wave me-[0.375rem]">
-                                    Update
                                 </button>
                             </div>
                         </div>

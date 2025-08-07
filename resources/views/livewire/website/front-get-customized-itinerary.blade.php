@@ -312,3 +312,40 @@
     
     @endforeach
 </div>
+@section('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 1. Track every page click
+            document.addEventListener('click', function () {
+                 @this.call('incrementClick');
+            });
+
+            // 2. Track when user exits the page/tab
+            window.addEventListener('beforeunload', function () {
+                 @this.call('setExitTime');
+            });
+
+           // 1. Start session when visible
+            if (document.visibilityState === 'visible') {
+                @this.call('startNewClickLog');
+            }
+
+            // 2. Handle tab visibility change
+            document.addEventListener('visibilitychange', function () {
+                if (document.visibilityState === 'visible') {
+                    @this.call('startNewClickLog');
+                } else {
+                    @this.call('closeClickLog');
+                }
+            });
+
+            // 3. Update exit_time every second only if tab is active
+            setInterval(function () {
+                if (document.visibilityState === 'visible') {
+                    @this.call('updateExitTime');
+                }
+            }, 1000);
+
+        });
+    </script>
+@endsection

@@ -4,18 +4,23 @@ namespace App\Livewire\Website;
 
 use Livewire\Component;
 use App\Models\SendedLeadItinerary;
+use Illuminate\Support\Facades\Request;
 use App\Models\SendedLeadItineraryDetail;
 use Carbon\Carbon;
 use App\Models\City;
+use App\Models\LeadUrlShare;
+use App\Models\LeadUrlClick;
 
 class FrontGetCustomizedItinerary extends Component
 {
     public $title = "Customized Itinerary";
-    public $sent_lead_itinerary, $itinerary = [];
+    public $sent_lead_itinerary, $itinerary = [],$clickLogId,$lead_url_share;
     public $day_itinerary = [];
     public function mount($code){
        $this->sent_lead_itinerary = SendedLeadItinerary::where('itinerary_code', $code)
         ->firstOrFail();
+
+        $this->lead_url_share = LeadUrlShare::where('sended_lead_itinerary_id', $this->sent_lead_itinerary->id)->firstOrFail();
 
         // dd($this->sent_lead_itinerary->lead);
         $this->itinerary = [
@@ -110,6 +115,62 @@ class FrontGetCustomizedItinerary extends Component
             ];
         }
         return $routeWiseData;
+    }
+
+    public function incrementClick()
+    {
+        if ($this->clickLogId) {
+            LeadUrlClick::where('id', $this->clickLogId)->increment('click_count');
+        }
+    }
+
+     public function setExitTime()
+    {
+        if ($this->clickLogId) {
+            LeadUrlClick::where('id', $this->clickLogId)->update([
+                'exit_time' => now()->toDateTimeString()
+            ]);
+        }
+    }
+
+    public function startNewClickLog()
+    {
+        // Close old session if still active
+        if ($this->clickLogId) {
+            LeadUrlClick::where('id', $this->clickLogId)->update([
+                'exit_time' => now()->toDateTimeString()
+            ]);
+        }
+
+        // Start new session
+        $log = LeadUrlClick::create([
+            'lead_id' => $this->sent_lead_itinerary->lead_id,
+            'lead_url_share_id' => $this->lead_url_share->id,
+            'ip_address' => Request::ip(),
+            'user_agent' => Request::userAgent(),
+            'referrer' => Request::server('HTTP_REFERER'),
+            'entry_time' => now()->toDateTimeString(),
+        ]);
+
+        $this->clickLogId = $log->id;
+    }
+    public function closeClickLog()
+    {
+        if ($this->clickLogId) {
+            LeadUrlClick::where('id', $this->clickLogId)->update([
+                'exit_time' => now()->toDateTimeString()
+            ]);
+
+            $this->clickLogId = null; // reset for next session
+        }
+    }
+    public function updateExitTime()
+    {
+        if ($this->clickLogId) {
+            LeadUrlClick::where('id', $this->clickLogId)->update([
+                'exit_time' => now()->toDateTimeString()
+            ]);
+        }
     }
     public function render()
     {

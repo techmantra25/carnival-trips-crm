@@ -23,6 +23,10 @@ class LeadManagementController extends Controller
     {
         return view('admin.leads.index');
     }
+    public function confirmed(Request $request)
+    {
+        return view('admin.leads.confirmed');
+    }
     public function lead_log_history($lead_id){
         $common = CustomHelper::setHeadersAndTitle('Lead Management', 'Log History');
 

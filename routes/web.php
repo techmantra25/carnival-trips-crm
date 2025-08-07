@@ -58,6 +58,7 @@ use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagem
             // Lead Management
         Route::prefix('leads')->group(function(){
             Route::get('/', [LeadManagementController::class, 'index'])->name('admin.leads.index');
+            Route::get('/confirmed', [LeadManagementController::class, 'confirmed'])->name('admin.leads.confirmed.index');
             Route::get('/log-history/{lead_id}', [LeadManagementController::class, 'lead_log_history'])->name('admin.leads.log.history');
             Route::get('/shared-history/{lead_id}', [LeadManagementController::class, 'lead_shared_history'])->name('admin.leads.shared.itinerary.history');
             Route::get('/trip-preference-form/{lead_id}', [LeadManagementController::class, 'trip_preference_data'])->name('admin.leads.trip.preference.data');

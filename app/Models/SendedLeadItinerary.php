@@ -8,7 +8,7 @@ class SendedLeadItinerary extends Model
 {
     protected $table = 'sended_lead_itineraries';
     protected $fillable = [
-        'lead_id', 'itinerary_code', 'destination_id', 'hotel_category', 'itinerary_syntax', 'total_days', 'total_nights', 'stay_by_journey', 'itinerary_journey', 'total_cost', 'remarks', 'send_via', 'sent_by_admin_id', 'sent_at'
+        'lead_id', 'itinerary_code', 'destination_id', 'hotel_category', 'itinerary_syntax', 'total_days', 'total_nights', 'stay_by_journey', 'itinerary_journey', 'total_cost', 'remarks', 'send_via', 'sent_by_admin_id', 'sent_at', 'is_confirmed', 'confirmed_by', 'confirmed_at'
     ];
 
     protected $casts = [
@@ -28,5 +28,9 @@ class SendedLeadItinerary extends Model
     public function category()
     {
         return $this->belongsTo(Category::class, 'hotel_category', 'id');
+    }
+    public function confirmedBy()
+    {
+        return $this->belongsTo(Admin::class, 'confirmed_by');
     }
 }
