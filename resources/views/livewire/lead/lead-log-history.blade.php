@@ -3,21 +3,6 @@
         <div class="box-body">
             <div class="grid grid-cols-12 gap-3">
                 <div class="col-span-12">
-                    <div class="mb-4">
-                        <h2 class="text-lg font-bold text-gray-800 mb-2">Lead Log History for: {{ $lead->name }} ({{ $lead->email }})</h2>
-
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                            <div>
-                                <label class="text-sm text-gray-600">Start Date</label>
-                                <input type="date" wire:model="start_date" class="form-input w-full border border-gray-300 rounded px-3 py-1.5 text-sm" />
-                            </div>
-                            <div>
-                                <label class="text-sm text-gray-600">End Date</label>
-                                <input type="date" wire:model="end_date" class="form-input w-full border border-gray-300 rounded px-3 py-1.5 text-sm" />
-                            </div>
-                        </div>
-                    </div>
-
                     {{-- Timeline Output --}}
                     <div class="space-y-6">
                         @forelse($logs as $log)
@@ -53,9 +38,40 @@
                                         
                                         {{-- General Key-Value Log --}}
                                         @else
-                                            <ul class="text-sm list-disc list-inside text-gray-600">
+                                           <ul class="space-y-1">
                                                 @foreach($msg as $key => $value)
-                                                    <li><strong>{{ ucwords(str_replace('_', ' ', $key)) }}:</strong> {{ $value }}</li>
+                                                    <li>
+                                                        @if (is_array($value))
+                                                            <div class="mt-2">
+                                                                <div class="font-medium text-gray-700">{{ ucwords(str_replace('_', ' ', $key)) }}:</div>
+                                                                <ul class="ml-4 mt-1 space-y-1 list-disc list-inside text-gray-600">
+                                                                    @foreach($value as $subKey => $subValue)
+                                                                        <li>
+                                                                            <span class="font-semibold">{{ ucwords(str_replace('_', ' ', $subKey)) }}:</span>
+                                                                            @if (filter_var($subValue, FILTER_VALIDATE_URL))
+                                                                                <a href="{{ $subValue }}" class="text-blue-600 underline text-xs" target="_blank">
+                                                                                    {{ $subValue }}
+                                                                                </a>
+                                                                            @else
+                                                                                {{ $subValue }}
+                                                                            @endif
+                                                                        </li>
+                                                                    @endforeach
+                                                                </ul>
+                                                            </div>
+                                                        @else
+                                                            <div>
+                                                                <span class="font-semibold text-gray-700">{{ ucwords(str_replace('_', ' ', $key)) }}:</span>
+                                                                @if (filter_var($value, FILTER_VALIDATE_URL))
+                                                                    <a href="{{ $value }}" class="text-blue-600 underline text-xs" target="_blank">
+                                                                        {{ $value }}
+                                                                    </a>
+                                                                @else
+                                                                    {{ $value }}
+                                                                @endif
+                                                            </div>
+                                                        @endif
+                                                    </li>
                                                 @endforeach
                                             </ul>
                                         @endif

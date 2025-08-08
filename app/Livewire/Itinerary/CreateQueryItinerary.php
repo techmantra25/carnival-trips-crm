@@ -25,7 +25,9 @@ use App\Models\DivisionWiseSightseeing;
 use App\Models\ServiceWiseSightseeing;
 use App\Models\ServiceWiseActivity;
 use App\Models\SendedLeadItinerary;
+use App\Models\LeadUrlShare;
 use App\Models\SendedLeadItineraryDetail;
+use App\Models\LeadActivityLog;
 use App\Helpers\CustomHelper;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\DB;
@@ -2890,25 +2892,45 @@ class CreateQueryItinerary extends Component
             if (!empty($bulkInsertData)) {
                 SendedLeadItineraryDetail::insert($bulkInsertData);
             }
-           
+        
+
+            // Shared Log link
+            $leadUrlShare = new LeadUrlShare();
+            $leadUrlShare->lead_id = $store->lead_id;
+            $leadUrlShare->sended_lead_itinerary_id = $store->id;
+            $leadUrlShare->shared_by = Auth::guard('admin')->id();
+            $leadUrlShare->channel = $sent_via;
+            $leadUrlShare->links = asset('customized/itinerary/'.$store->itinerary_code);
+            $leadUrlShare->save();
+
+            // Log the assignment
+            LeadActivityLog::create([
+                'lead_id' => $store->lead_id,
+                'updated_by' => Auth::guard('admin')->id(), // cleaner and safer
+                'message' => json_encode([
+                    'action' => 'Customize Itinerary Sent',
+                    'itinerary_code' => $store->itinerary_code,
+                    'destination' => $store->destination?->name,
+                    'hotel_category' => $store->category?->name, // changed key for consistency
+                    'total_days' => $store->total_days,
+                    'total_nights' => $store->total_nights,
+                    'total_cost' => $store->total_cost,
+                    'sent_via' => $sent_via, // hardcoded is fine if applicable
+                    'link' => $leadUrlShare->links, // hardcoded is fine if applicable
+                    'sent_by' => Auth::guard('admin')->user()->name . ' (' . Auth::guard('admin')->user()->email . ')',
+                    'timestamp' => now()->toDateTimeString(),
+                ]),
+            ]);
+
+
+
+            
           DB::commit();
             session()->flash('success', 'Itinerary sent and details saved successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('error', 'Failed to send itinerary. Please try again.');
             dd('Transaction failed: ' . $e->getMessage());
-        }
-
-        if ($this->send_whatsapp) {
-            // Logic for WhatsApp
-        }
-
-        if ($this->send_email) {
-            // Logic for Email
-        }
-
-        if ($this->send_sms) {
-            // Logic for SMS
         }
     }
     public function render()

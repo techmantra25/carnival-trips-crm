@@ -260,24 +260,24 @@
                                 </div>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                                {{-- <div>
-                                    <label for="query_type"
-                                        class="block text-sm font-medium text-gray-700 modal_query_lable">Query
+                                <div>
+                                    <label for="source_type"
+                                        class="block text-sm font-medium text-gray-700 modal_query_lable">Source
                                         Type<span class="text-danger">*</span>
                                     </label>
-                                    <select name="query_type" wire:model="query_type"
-                                        class="form-control font-12 {{ $errors->has('query_type') ? '!border-danger focus:border-danger focus:ring-danger' : '' }}">
-                                        <option value="" selected hidden>Select query type</option>
+                                    <select name="source_type" wire:model="source_type"
+                                        class="form-control font-12 {{ $errors->has('source_type') ? '!border-danger focus:border-danger focus:ring-danger' : '' }}">
+                                        <option value="" selected hidden>Select source type</option>
                                         @foreach ($queryTypes as $item_query)
                                         <option value="{{$item_query['name']}}"
-                                            {{ old('query_type') == $item_query['name'] ? 'selected' : '' }}>
+                                            {{ old('source_type') == $item_query['name'] ? 'selected' : '' }}>
                                             {{$item_query['name']}}</option>
                                         @endforeach
                                     </select>
 
-                                    @error('query_type') <span
+                                    @error('source_type') <span
                                         class="text-danger text-sm font-12">{{ $message }}</span> @enderror
-                                </div> --}}
+                                </div>
                                 <div class="relative w-full" wire:click.away="$set('night_halt_status', 0)">
                                     <div class="flex justify-between">
                                         <div>

@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Crypt;
 class CostCalculatorQueryEdit extends Component
 {
     public $destinations = [];
-    public $destination,$meal_type,$customer_name,$total_members,$number_of_adults,$number_of_childs,$query_type,$mobile_number,$arrival_date,$departure_date,$company_name,$whatsapp_number,$email_address,$hotel_category,$package_type,$package_nights,$package_days,$nationality_type,$number_of_rooms,$extra_mattress;
+    public $destination,$meal_type,$customer_name,$total_members,$number_of_adults,$number_of_childs,$source_type,$mobile_number,$arrival_date,$departure_date,$company_name,$whatsapp_number,$email_address,$hotel_category,$package_type,$package_nights,$package_days,$nationality_type,$number_of_rooms,$extra_mattress;
     public $active_assign_new_modal = 0;
     public $queryTypes = [];
     public $companies = [];
@@ -64,11 +64,9 @@ class CostCalculatorQueryEdit extends Component
         $this->night_halt = $encryptedLeadId;
         $this->EditQuery($this->itineraryData->lead_id);
         $this->queryTypes = collect([
-            ['name' => 'From Website'],
-            ['name' => 'From Salesman'],
-            ['name' => 'Personal Ref'],
-            ['name' => 'Walk-in Customer'],
-            ['name' => 'From Social Media'],
+            ['name' => 'Facebook'],
+            ['name' => 'Instagram'],
+            ['name' => 'Website'],
         ]);
         $this->companies = collect([
             ['name' => 'Global Tours Pvt Ltd'],
@@ -129,7 +127,7 @@ class CostCalculatorQueryEdit extends Component
         $this->total_members = $leadExists->number_of_travellor;
         $this->number_of_adults = $leadExists->number_of_adults;
         $this->number_of_childs = $leadExists->number_of_children;
-        // $this->query_type = $leadExists->lead_type;
+        $this->source_type = $leadExists->source_type;
         $this->mobile_number = $leadExists->customer_mobile;
         $this->arrival_date = $leadExists->arrival_date;
         $this->departure_date = $leadExists->departure_date;
@@ -441,7 +439,7 @@ class CostCalculatorQueryEdit extends Component
             'childs.*.quantity' => 'required_if:enableChildren,true',
             'childs.*.age' => 'required_if:enableChildren,true',
 
-            // 'query_type' => 'required|string',
+            // 'source_type' => 'required|string',
             'mobile_number' => 'nullable|digits:10',
             'arrival_date' => 'required|date',
             'departure_date' => 'required|date|after_or_equal:arrival_date',
@@ -462,7 +460,7 @@ class CostCalculatorQueryEdit extends Component
             'total_members.numeric' => 'Total members must be a number.',
             'number_of_adults.required' => 'Adults count is required.',
             'number_of_adults.numeric' => 'Adults must be a number.',
-            // 'query_type.required' => 'Query type is required.',
+            'source_type.required' => 'Source type is required.',
             'mobile_number.digits' => 'Mobile must be 10 digits.',
       
             'arrival_date.required' => 'Arrival Date is required.',
@@ -549,7 +547,7 @@ class CostCalculatorQueryEdit extends Component
             $lead->children_data = $children_data;
             $lead->number_of_travellor = $this->total_members;
 
-            // $lead->lead_type =$this->query_type;
+            $lead->source_type =$this->source_type;
             // $lead->lead_source =$this->company_name;
             $lead->meal_type =$this->meal_type;
             $lead->nationality_type =$this->nationality_type;

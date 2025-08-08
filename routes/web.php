@@ -19,7 +19,7 @@ use App\Http\Controllers\RouteManagementController;
 
 // New Code
 use App\Http\Controllers\CronController;
-use App\Livewire\Website\{FrontGetPresetItinerary,TripPreferenceForm};
+use App\Livewire\Website\{FrontGetPresetItinerary,TripPreferenceForm,FrontGetCustomizedItinerary};
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\AdminAuthController;
@@ -47,7 +47,7 @@ use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagem
 
     });
 
-    Route::get('dashboard', [DashboardsController::class, 'index'])->name('admin.dashboard');
+    // Route::get('dashboard', [DashboardsController::class, 'index'])->name('admin.dashboard');
     Route::prefix('admin')->middleware('auth:admin')->group(function () {
         // Admin dashboard (only accessible if the user is authenticated as an admin)
         Route::get('dashboard', [DashboardsController::class, 'index'])->name('admin.dashboard');
@@ -58,6 +58,7 @@ use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagem
             // Lead Management
         Route::prefix('leads')->group(function(){
             Route::get('/', [LeadManagementController::class, 'index'])->name('admin.leads.index');
+            Route::get('/confirmed', [LeadManagementController::class, 'confirmed'])->name('admin.leads.confirmed.index');
             Route::get('/log-history/{lead_id}', [LeadManagementController::class, 'lead_log_history'])->name('admin.leads.log.history');
             Route::get('/shared-history/{lead_id}', [LeadManagementController::class, 'lead_shared_history'])->name('admin.leads.shared.itinerary.history');
             Route::get('/trip-preference-form/{lead_id}', [LeadManagementController::class, 'trip_preference_data'])->name('admin.leads.trip.preference.data');
@@ -227,6 +228,7 @@ use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagem
     });
 
     Route::get('/trip-preference-form/{code}', TripPreferenceForm::class)->name('website.trip.preference.form');
+    Route::get('customized/itinerary/{code}', FrontGetCustomizedItinerary::class)->name('website.lead.customized.itinerary');
     Route::get('{destination_slug}/{itinerary_slug}/{encryptedSharedLinkId}', FrontGetPresetItinerary::class)
     ->name('website.lead.destination.preset-itinerary');
     require __DIR__.'/auth.php';

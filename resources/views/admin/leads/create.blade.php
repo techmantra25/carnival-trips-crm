@@ -156,8 +156,8 @@
                             </div>
                 
                             <div>
-                                <label for="lead_type" class="block text-sm font-medium text-gray-700">Lead Type</label>
-                                <x-input-field type="text" name="lead_type" placeholder="Lead Type" ariaLabel="Lead Type" class="mb-3 placeholder:text-textmuted text-sm {{ $errors->has('lead_type') ? '!border-danger focus:border-danger focus:ring-danger' : '' }}" size="lg" value="B2B" readonly/>
+                                <label for="source_type" class="block text-sm font-medium text-gray-700">Lead Type</label>
+                                <x-input-field type="text" name="source_type" placeholder="Lead Type" ariaLabel="Lead Type" class="mb-3 placeholder:text-textmuted text-sm {{ $errors->has('source_type') ? '!border-danger focus:border-danger focus:ring-danger' : '' }}" size="lg" value="B2B" readonly/>
                             </div>
                 
                             <div>
@@ -172,7 +172,7 @@
                         </div>
                 
                         <x-input-field type="hidden" name="user_id" value="{{auth()->user()->id}}" />
-                        <x-input-field type="hidden" name="lead_type" value="B2B" />
+                        <x-input-field type="hidden" name="source_type" value="B2B" />
                         <x-input-field type="hidden" name="lead_source" value="Agent" />
                         <div class="flex justify-end">
                             <x-form-submit-button text="Submit" class="change-text-button ti-btn ti-btn-primary-full !py-1 !px-2 ti-btn-wave me-[0.375rem]" />

@@ -23,16 +23,17 @@ use Livewire\WithFileUploads;
 use App\Imports\LeadImport;
 use App\Models\LeadActivityLog;
 use App\Models\LeadUrlShare;
+use App\Models\SendedLeadItinerary;
 use Maatwebsite\Excel\Facades\Excel;
 
 class LeadIndex extends Component
 {   
     use WithPagination,WithFileUploads;
     protected $paginationTheme = 'bootstrap';
-    public $active_lead,$common,$filter_package,$filter_lead_type,$filter_lead_status = [],$filter,$start_date,$end_date,$selected_member,$selected_status;
+    public $active_lead,$common,$filter_package,$filter_source_type,$filter_lead_status = [],$filter,$start_date,$end_date,$selected_member,$selected_status,$selected_itinerary;
     public $leads_status = [], $destinations = [], $search_destination  = [], $members = [];
 
-    public $destination, $selectedType,$search,$meal_type,$customer_name,$total_members,$number_of_adults,$number_of_childs,$query_type,$mobile_number,$arrival_date,$departure_date,$company_name,$whatsapp_number,$email_address,$hotel_category,$package_type,$package_nights,$package_days,$nationality_type,$number_of_rooms,$extra_mattress;
+    public $destination, $selectedType,$search,$meal_type,$customer_name,$total_members,$number_of_adults,$number_of_childs,$source_type,$mobile_number,$arrival_date,$departure_date,$company_name,$whatsapp_number,$email_address,$hotel_category,$package_type,$package_nights,$package_days,$nationality_type,$number_of_rooms,$extra_mattress;
     public $active_assign_new_modal = 0;
     public $queryTypes = [];
     public $companies = [];
@@ -61,7 +62,7 @@ class LeadIndex extends Component
     public $selectedCategory =null;
 
     public $enableChildren = false;
-    public $childs = [];
+    public $childs = [],$sent_lead_itineraries = [];
     public $showImportModal = false;
     public $showAssignLeadModal = false;
     public $showLeadStatusModal = false;
@@ -71,6 +72,8 @@ class LeadIndex extends Component
     public function mount(){
         $this->authUser = Auth::guard('admin')->user();
 
+        $this->filter_source_type = request()->get('source_type', null); // fallback if not present
+
         $this->common = CustomHelper::setHeadersAndTitle('Lead Management', 'Leads');
         
         $this->destinations = State::where('status',1)->orderBy('name','ASC')->get();
@@ -78,12 +81,10 @@ class LeadIndex extends Component
 
         $this->resequence_itinerary_details();
 
-        $this->queryTypes = collect([
-            ['name' => 'From Website'],
-            ['name' => 'From Salesman'],
-            ['name' => 'Personal Ref'],
-            ['name' => 'Walk-in Customer'],
-            ['name' => 'From Social Media'],
+         $this->queryTypes = collect([
+            ['name' => 'Facebook'],
+            ['name' => 'Instagram'],
+            ['name' => 'Website'],
         ]);
         $this->companies = collect([
             ['name' => 'Global Tours Pvt Ltd'],
@@ -138,13 +139,13 @@ class LeadIndex extends Component
         $this->childsData = $flattened;
     }
     public function changeLeadType($value){
-        $this->filter_lead_type = $value;
+        $this->filter_source_type = $value;
     }
     public function changePackage($value){
         $this->filter_package = $value;
     }
     public function ResetAllField(){
-        $this->reset(['filter_package','filter_lead_type', 'filter_lead_status','filter','search_destination','start_date','end_date']);
+        $this->reset(['filter_package','filter_source_type', 'filter_lead_status','filter','search_destination','start_date','end_date']);
         $this->dispatch('refreshComponent');
     }
     public function SetFilter($value)
@@ -546,7 +547,7 @@ class LeadIndex extends Component
             'childs.*.quantity' => 'required_if:enableChildren,true',
             'childs.*.age' => 'required_if:enableChildren,true',
 
-            // 'query_type' => 'required|string',
+            'source_type' => 'required|string',
             'mobile_number' => 'nullable|digits:10',
             'arrival_date' => 'required|date',
             'departure_date' => 'required|date|after_or_equal:arrival_date',
@@ -567,7 +568,7 @@ class LeadIndex extends Component
             'total_members.numeric' => 'Total members must be a number.',
             'number_of_adults.required' => 'Adults count is required.',
             'number_of_adults.numeric' => 'Adults must be a number.',
-            // 'query_type.required' => 'Query type is required.',
+            'source_type.required' => 'Source type is required.',
             'mobile_number.digits' => 'Mobile must be 10 digits.',
       
             'arrival_date.required' => 'Arrival Date is required.',
@@ -649,13 +650,14 @@ class LeadIndex extends Component
             $lead->children_data = $children_data;
             $lead->number_of_travellor = $this->total_members;
 
-            // $lead->lead_type =$this->query_type;
+            $lead->source_type =$this->source_type;
             // $lead->lead_source =$this->company_name;
             $lead->meal_type =$this->meal_type;
             $lead->nationality_type =$this->nationality_type;
             $lead->number_of_rooms =$this->number_of_rooms;
             $lead->extra_mattress =$this->extra_mattress;
             $lead->team_lead_id = CustomHelper::getNextTeamLeadIdByLeadCount($this->destination);
+            $lead->assigned_to_id = $lead->team_lead_id;
             $lead->created_by = Auth::guard('admin')->user()->id;
         
             // Save the model to the database
@@ -800,11 +802,18 @@ class LeadIndex extends Component
         $this->active_lead = Lead::find($lead_id);
 
         $this->members = Admin::select('id', 'name')
-        ->when(in_array($this->authUser->role, ['team_lead', 'member']), function ($query){
-            $query->where('team_lead', $this->authUser->id);
+        ->when(in_array($this->authUser->role, ['team_lead', 'member']), function ($query) {
+            $query->where(function ($q) {
+                $q->where('team_lead', $this->authUser->id)
+                ->orWhere('id', $this->authUser->id); // include team_lead themselves
+            });
         })
-        ->when(in_array($this->authUser->role, ['super_admin', 'admin']), function ($query){
-            $query->where('role', 'member')->where('team_lead', $this->active_lead->team_lead_id);
+        ->when(in_array($this->authUser->role, ['super_admin', 'admin']), function ($query) {
+            $query->where(function ($q) {
+                $q->where('role', 'member')
+                ->where('team_lead', $this->active_lead->team_lead_id)
+                ->orWhere('id', $this->active_lead->team_lead_id); // include the team_lead
+            });
         })
         ->get();
 
@@ -817,6 +826,15 @@ class LeadIndex extends Component
         $this->showLeadStatusModal = true;
         $this->active_lead = Lead::find($lead_id);
         $this->selected_status = $this->active_lead->status;
+
+        if ($this->selected_status == 'Confirmed') {
+            $this->sent_lead_itineraries = SendedLeadItinerary::where('lead_id', $this->active_lead->id)
+                ->orderBy('id', 'ASC')
+                ->get();
+            $this->selected_itinerary = SendedLeadItinerary::where('lead_id', $this->active_lead->id)
+                        ->where('is_confirmed', 1)
+                        ->value('id');
+        }
     }
     public function assignLead(){
         $this->resetErrorBag();
@@ -857,13 +875,26 @@ class LeadIndex extends Component
             $this->leadAssignError = $e->getMessage();
         }
     }
+   public function assignLeadStatus()
+    {
+        // The selected status is already updated via wire:model
+        $this->sent_lead_itineraries = SendedLeadItinerary::where('lead_id', $this->active_lead->id)
+            ->orderBy('id', 'ASC')
+            ->get();
+    }
     public function updateLeadStatus(){
         $this->resetErrorBag();
-        $this->leadStatusError = null;
+        $this->leadAssignError = null;
         if(!isset($this->selected_status)){
-            $this->leadStatusError = "Please choose a status";
+            $this->leadAssignError = "Please choose a status";
             return;
         }
+        // leadAssignError
+        if ($this->selected_status == 'Confirmed' && !$this->selected_itinerary) {
+            $this->leadAssignError = "Please select an itinerary before confirming the status.";
+            return;
+        }
+
         try {
             $lead = Lead::find($this->active_lead->id);
             if ($lead) {
@@ -871,28 +902,71 @@ class LeadIndex extends Component
                 $lead->status = $this->selected_status;
                 $lead->save();
 
-                // Log the status update
+                $logMessage = [
+                    'action' => 'Status Updated',
+                    'previous_status' => $oldStatus,
+                    'new_status' => $this->selected_status,
+                    'updated_by' => $this->authUser->name . ' (' . $this->authUser->email . ')',
+                    'timestamp' => now()->toDateTimeString(),
+                ];
+
+                if ($this->selected_status == 'Confirmed') {
+                    // Reset previous confirmed itinerary (if any)
+                    $previousConfirmed = SendedLeadItinerary::where('lead_id', $lead->id)
+                        ->where('is_confirmed', 1)
+                        ->first();
+
+                    if ($previousConfirmed && $previousConfirmed->id != $this->selected_itinerary) {
+                        $previousConfirmed->is_confirmed = 0;
+                        $previousConfirmed->confirmed_by = null;
+                        $previousConfirmed->confirmed_at = null;
+                        $previousConfirmed->save();
+                    }
+
+                    // Confirm the newly selected itinerary
+                    $SendedLeadItinerary = SendedLeadItinerary::findOrFail($this->selected_itinerary);
+                    $SendedLeadItinerary->is_confirmed = 1;
+                    $SendedLeadItinerary->confirmed_by = $this->authUser->id;
+                    $SendedLeadItinerary->confirmed_at = now()->toDateTimeString();
+                    $SendedLeadItinerary->save();
+
+                    // Log both itineraries
+                    $logMessage += [
+                        'previous_itinerary' => $previousConfirmed ? [
+                            'itinerary_code' => $previousConfirmed->itinerary_code,
+                            'syntax' => $previousConfirmed->itinerary_syntax,
+                            'total_cost' => $previousConfirmed->total_cost,
+                            'destination' => optional($previousConfirmed->destination)->name,
+                            'hotel_category' => optional($previousConfirmed->category)->name,
+                        ] : null,
+
+                        'new_selected_itinerary' => [
+                            'itinerary_code' => $SendedLeadItinerary->itinerary_code,
+                            'syntax' => $SendedLeadItinerary->itinerary_syntax,
+                            'total_cost' => $SendedLeadItinerary->total_cost,
+                            'destination' => optional($SendedLeadItinerary->destination)->name,
+                            'hotel_category' => optional($SendedLeadItinerary->category)->name,
+                        ],
+                    ];
+                }
+
+                // Final log write
                 LeadActivityLog::create([
                     'lead_id' => $lead->id,
                     'updated_by' => $this->authUser->id,
-                    'message' => json_encode([
-                        'action' => 'Status Updated',
-                        'previous_status' => $oldStatus,
-                        'new_status' => $this->selected_status,
-                        'updated_by' => $this->authUser->name . ' (' . $this->authUser->email . ')',
-                        'timestamp' => now()->toDateTimeString(),
-                    ]),
+                    'message' => json_encode($logMessage),
                 ]);
 
                 session()->flash('success', 'Lead status updated successfully!');
                 $this->showLeadStatusModal = false;
                 $this->selected_status = null;
+                $this->selected_itinerary = null;
             } else {
-                $this->leadStatusError = 'Selected lead not found.';
+                $this->leadAssignError = 'Selected lead not found.';
             }
            
         } catch (\Exception $e) {
-            $this->leadStatusError = $e->getMessage();
+            $this->leadAssignError = $e->getMessage();
         }
     }
     public function render()
@@ -916,9 +990,9 @@ class LeadIndex extends Component
             $package_type = $this->filter_package;
             $query->where('package_type',$package_type);
         })
-        ->when($this->filter_lead_type, function ($query){
-            $lead_type = $this->filter_lead_type;
-            $query->where('lead_type',$lead_type);
+        ->when($this->filter_source_type, function ($query){
+            $source_type = $this->filter_source_type;
+            $query->where('source_type',$source_type);
         })
         ->when($this->filter_lead_status, function ($query){
             $lead_status = $this->filter_lead_status;

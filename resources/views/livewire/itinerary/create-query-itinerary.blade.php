@@ -101,9 +101,11 @@
                                     $encryptedId = Crypt::encrypt($itinerary_id);
                                     @endphp
                                     <p class="text-lg font-semibold uppercase">Itinerary is for:</p>
-                                    <a href="{{route('admin.cost_calculator.query_edit',$encryptedId)}}" class="ti-btn ti-btn-sm ti-btn-teal !border !border-success" title="Edit Itinerary">
-                                        <i class="ti ti-pencil"></i>
-                                    </a>
+                                    @if($leadData->status!=="Confirmed")
+                                        <a href="{{route('admin.cost_calculator.query_edit',$encryptedId)}}" class="ti-btn ti-btn-sm ti-btn-teal !border !border-success" title="Edit Itinerary">
+                                            <i class="ti ti-pencil"></i>
+                                        </a>
+                                    @endif
                                 </div>
                                 <div class="flex">
                                     <div class="px-2">
@@ -1549,7 +1551,7 @@
                                             <td class="px-3 py-2 border">₹{{ number_format($item->total_cost, 2) }}</td>
                                             <td class="px-3 py-2 border">
                                                 {{-- {{ route('lead.shared.itinerary.view', $item->id) }} --}}
-                                                <a href="#" target="_blank" class="text-blue-600 underline">View</a>
+                                                <a href="{{route('website.lead.customized.itinerary', $item->itinerary_code)}}" target="_blank" class="text-blue-600 underline">View</a>
                                             </td>
                                         </tr>
                                     @empty

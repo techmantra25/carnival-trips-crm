@@ -23,6 +23,10 @@ class LeadManagementController extends Controller
     {
         return view('admin.leads.index');
     }
+    public function confirmed(Request $request)
+    {
+        return view('admin.leads.confirmed');
+    }
     public function lead_log_history($lead_id){
         $common = CustomHelper::setHeadersAndTitle('Lead Management', 'Log History');
 
@@ -81,7 +85,7 @@ class LeadManagementController extends Controller
         ]);
         try {
             $validatedData['user_id'] = $request->user_id;
-            $validatedData['lead_type'] = $request->lead_type;
+            $validatedData['source_type'] = $request->source_type;
             $validatedData['lead_source'] = $request->lead_source;
 
             $this->leadRepository->createLead($validatedData);

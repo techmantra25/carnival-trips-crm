@@ -10,6 +10,7 @@ class LeadUrlShare extends Model
     protected $fillable = [
         'lead_id',
         'itinerary_id',
+        'sended_lead_itinerary_id',
         'shared_by',
         'channel',
         'is_cron',
@@ -25,6 +26,10 @@ class LeadUrlShare extends Model
     public function itinerary()
     {
         return $this->belongsTo(Itinerary::class);
+    }
+    public function sent_itinerary()
+    {
+        return $this->belongsTo(SendedLeadItinerary::class, 'sended_lead_itinerary_id', 'id');
     }
 
     public function sharedBy()

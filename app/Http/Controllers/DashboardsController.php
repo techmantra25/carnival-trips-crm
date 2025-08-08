@@ -9,7 +9,6 @@ class DashboardsController extends Controller
     
     public function index()
     {
-        // dd("test");
         return view('pages.dashboards.index');
     }
 

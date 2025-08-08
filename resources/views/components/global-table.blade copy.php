@@ -35,7 +35,7 @@
                     </td>
                     <td>
                         {{ $item->lead_source }} 
-                        <span class="badge bg-primary text-white">{{ $item->lead_type }} </span>
+                        <span class="badge bg-primary text-white">{{ $item->source_type }} </span>
                     </td>
                     <td>
                         <div>

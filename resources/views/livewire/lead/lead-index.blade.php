@@ -110,9 +110,7 @@
                     <table class="table whitespace-nowrap min-w-full">
                         <tbody>
                             <tr>
-                                <td class="py-0 mt-0">
-                                    {{-- <label for="select-1"
-                                        class="ti-form-select rounded-sm !py-2 !px-3-label text-sm text-textmuted custom_lable">PACKAGE</label> --}}
+                                {{-- <td class="py-0 mt-0">
                                     <select class="ti-form-select rounded-sm !py-2 !px-3 !p-0 custom_field refresh_component" id="select-beast"
                                         autocomplete="off" name="filter_package" wire:model="filter_package" wire:change="changePackage($event.target.value)">
                                         <option value="">Select a package...</option>
@@ -121,16 +119,17 @@
                                         <option value="Logistics">Logistics</option>
                                         
                                     </select>
-                                </td>
+                                </td> --}}
                                 <td class="py-0 mt-0">
                                     {{-- <label for="select-1"
                                         class="ti-form-select rounded-sm !py-2 !px-3-label text-sm text-textmuted custom_lable">LEAD
                                         TYPE</label> --}}
                                     <select class="ti-form-select rounded-sm !py-2 !px-3 !p-0 custom_field refresh_component" id="select-beast"
-                                        autocomplete="off" name="filter_lead_type" wire:model="filter_lead_type" wire:change="changeLeadType($event.target.value)">
-                                        <option value="">Select a type...</option>
-                                        <option value="B2B">B2B</option>
-                                        <option value="B2C">B2C</option>
+                                        autocomplete="off" name="filter_source_type" wire:model="filter_source_type" wire:change="changeLeadType($event.target.value)">
+                                        <option value="">Select source type...</option>
+                                        <option value="Facebook">Facebook</option>
+                                        <option value="Instagram">Instagram</option>
+                                        <option value="Website">Website</option>
                                     </select>
                                 </td>
                                 <td>
@@ -186,11 +185,6 @@
                                     <tr class="text-grey" id="delete{{$lead_item->id}}">
                                         <td scope="row" class="!text-center !p-1">
                                             <span class="badge bg-primary/10 text-primary"> {{ $leads->firstItem() + $index }}</span>
-                                            <div>
-                                                {{-- {{ $lead_item->lead_source }} <br>  --}}
-                                                {{-- <span class="badge bg-primary text-white">{{ $lead_item->lead_type }} </span> --}}
-                                            </div>
-
                                         </td>
                                         <td>
                                                 <p class="badge bg-primary text-white">{{$lead_item->unique_id }}</p>
@@ -234,6 +228,25 @@
                                         </td>
                                         <td>
                                             <div>
+                                                <span 
+                                                    class="badge text-white 
+                                                        @if ($lead_item->source_type === 'Facebook') bg-primary
+                                                        @elseif ($lead_item->source_type === 'Instagram') bg-danger
+                                                        @elseif ($lead_item->source_type === 'Website') bg-black
+                                                        @else bg-secondary
+                                                        @endif
+                                                    "
+                                                    title="@switch($lead_item->source_type)
+                                                        @case('Facebook') Lead Source: Facebook Campaign @break
+                                                        @case('Instagram') Lead Source: Instagram Ads @break
+                                                        @case('Website') Lead Source: Website Form @break
+                                                        @default Lead Source: Other
+                                                    @endswitch"
+                                                >
+                                                    {{ $lead_item->source_type }}
+                                                </span>
+                                            </div>
+                                            <div>
                                                 <i class="ri-map-pin-line"></i>
                                                 {{ $lead_item->destination?$lead_item->destination->name:"..." }} 
                                                 <span class="badge bg-primary/10 text-primary">{{$lead_item->travel_duration_text}} @if($lead_item->number_of_travellor)| {{$lead_item->number_of_travellor}} PAX @endif</span>
@@ -254,6 +267,25 @@
                                             </div>
                                         </td>
                                         <td>
+                                            <div class="!text-center mb-2">
+                                                @foreach($lead_item->sent_itinerary()->orderBy('id', 'ASC')->get() as $sent_itinerary_item)
+                                                    @php
+                                                        $title = "Itinerary: {$sent_itinerary_item->itinerary_syntax}\n";
+                                                        $title .= "Send Via: {$sent_itinerary_item->send_via}\n";
+                                                        $title .= "Total Cost: ₹" . number_format($sent_itinerary_item->total_cost) . "\n";
+                                                        $title .= "Destination: " . optional($sent_itinerary_item->destination)->name . "\n";
+                                                        $title .= "Hotel Category: " . optional($sent_itinerary_item->category)->name;
+                                                    @endphp
+
+                                                    <span 
+                                                        class="badge bg-outline-secondary {{$sent_itinerary_item->is_confirmed==0?"badge-custom-outline-secondary":"badge-custom-outline-secondary-selected"}} cursor-pointer" 
+                                                        title="{{ $title }}"
+                                                    >
+                                                        {{ $sent_itinerary_item->itinerary_code }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
+
                                             <div class="!text-center">
                                                 <a href="javascript:void(0)" wire:click="LeadStatusModal({{$lead_item->id}})"   title="Click to update lead status">
                                                     <span class="badge gap-2 {{ \App\Helpers\CustomHelper::getLeadStatusBadgeColor($lead_item->status) }}">
@@ -296,7 +328,10 @@
                                                     @php
                                                         $encryptedId = Crypt::encrypt($lead_item->itinerary->id);
                                                     @endphp
+
+                                                    @if($lead_item->status!=="Confirmed")
                                                     <a href="{{route('admin.cost_calculator.query_edit',$encryptedId)}}" class="ti-btn ti-btn-orange  mt-[0.375rem]" title="Edit Lead"><i class="fa-regular fa-pen-to-square"></i></a>
+                                                    @endif
 
                                                     {{-- Itinerary --}}
                                                     @if($lead_item->itinerary->night_journey &&                 $lead_item->itinerary->stay_by_journey)
@@ -318,6 +353,40 @@
                                                
                                                  <a href="{{route('website.trip.preference.form', $lead_item->unique_id)}}" target="_blank" class="ti-btn ti-btn-secondary ti-btn-border-start  mt-[0.375rem]" title="Itinerary">FB Form</a>
                                             </div>
+                                           <div>
+                                                <span class="badge bg-warning/10 text-warning" title="Assign Lead Member">
+                                                    <span class="text-black"><i class="fa-regular fa-user me-1"></i></span>
+                                                    <span class="text-black"> Assigned To:</span>
+                                                    <strong class="ms-1 text-black">
+                                                        @if($lead_item->assignee)
+                                                            {{ $lead_item->assignee->name }} ({{ $lead_item->assignee->email }})
+                                                        @else
+                                                            N/A
+                                                        @endif
+                                                    </strong>
+                                                </span>
+                                            </div>
+
+                                            @php
+                                                $confirmed_itinerary = $lead_item->sent_itinerary()->where('is_confirmed', 1)->first();
+                                            @endphp
+                                            @if($confirmed_itinerary)
+                                                <div>
+                                                    <span class="badge bg-success/10 text-warning" title="Assign Lead Member">
+                                                        <span class="text-black">
+                                                            <i class="fa-regular fa-user me-1"></i>
+                                                        </span>
+                                                        <span class="text-black"> Confirmed By:</span>
+                                                        <strong class="ms-1 text-black">
+                                                            @if($confirmed_itinerary && $confirmed_itinerary->confirmedBy)
+                                                                {{ $confirmed_itinerary->confirmedBy->name }} ({{ $confirmed_itinerary->confirmedBy->email }})
+                                                            @else
+                                                                N/A
+                                                            @endif
+                                                        </strong>
+                                                    </span>
+                                                </div>
+                                            @endif
                                         </td>
                                     </tr>
                                     @empty
@@ -598,24 +667,23 @@
                                     </div>
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                                    {{-- <div>
-                                        <label for="query_type"
-                                            class="block text-sm font-medium text-gray-700 modal_query_lable">Query
-                                            Type<span class="text-danger">*</span>
+                                    <div>
+                                        <label for="source_type"
+                                            class="block text-sm font-medium text-gray-700 modal_query_lable">Source Type<span class="text-danger">*</span>
                                         </label>
-                                        <select name="query_type" wire:model="query_type"
-                                            class="form-control font-12 {{ $errors->has('query_type') ? '!border-danger focus:border-danger focus:ring-danger' : '' }}">
-                                            <option value="" selected hidden>Select query type</option>
+                                        <select name="source_type" wire:model="source_type"
+                                            class="form-control font-12 {{ $errors->has('source_type') ? '!border-danger focus:border-danger focus:ring-danger' : '' }}">
+                                            <option value="" selected hidden>Select query source</option>
                                             @foreach ($queryTypes as $item_query)
                                             <option value="{{$item_query['name']}}"
-                                                {{ old('query_type') == $item_query['name'] ? 'selected' : '' }}>
+                                                {{ old('source_type') == $item_query['name'] ? 'selected' : '' }}>
                                                 {{$item_query['name']}}</option>
                                             @endforeach
                                         </select>
 
-                                        @error('query_type') <span
+                                        @error('source_type') <span
                                             class="text-danger text-sm font-12">{{ $message }}</span> @enderror
-                                    </div> --}}
+                                    </div>
                                     {{-- wire:click.away="$set('night_halt_status', 0)" --}}
                                     <div class="relative w-full">
                                         <div class="flex justify-between">
@@ -1154,13 +1222,39 @@
                             @endif
 
                             <div>
+                                <label for="select-1"
+                                        class="ti-form-select rounded-sm !py-2 !px-3-label text-sm text-textmuted custom_lable">Status</label>
                                 <select class="ti-form-select border-2 border-gray-300 rounded-sm !py-2 !px-3 !p-0"
-                                    autocomplete="off" wire:model="selected_status">
-                                    <option value="" hidden>Select a member...</option>
+                                    autocomplete="off" wire:model="selected_status" wire:change="assignLeadStatus">
+                                    <option value="" hidden>Select a status...</option>
                                         @foreach ($leads_status as $status_item)
                                             <option value="{{ $status_item->name }}">{{ ucwords($status_item->name)}}</option>
                                         @endforeach
                                 </select>
+                                @if($selected_status == "Confirmed")
+                                    <label for="select-1"
+                                        class="ti-form-select rounded-sm !py-2 !px-3-label text-sm text-textmuted custom_lable">Itinerary</label>
+
+                                    <select class="ti-form-select border-2 border-gray-300 rounded-sm !py-2 !px-3 !p-0"
+                                        autocomplete="off" wire:model="selected_itinerary">
+                                        <option value="" hidden>Select an itinerary...</option>
+
+                                        @foreach ($sent_lead_itineraries as $lead_itineraries)
+                                            @php
+                                                $title = "Code: {$lead_itineraries->itinerary_code}\n";
+                                                $title .= "Itinerary: {$lead_itineraries->itinerary_syntax}\n";
+                                                $title .= "Total Cost: ₹" . number_format($lead_itineraries->total_cost) . "\n";
+                                                $title .= "Destination: " . optional($lead_itineraries->destination)->name . "\n";
+                                                $title .= "Hotel Category: " . optional($lead_itineraries->category)->name;
+                                            @endphp
+
+                                            <option value="{{ $lead_itineraries->id }}" title="{{ $title }}">
+                                                {{ $lead_itineraries->itinerary_code }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                @endif
+
 
                                 @if($leadAssignError)
                                     <p class="text-red-600 text-sm font-medium mt-1">

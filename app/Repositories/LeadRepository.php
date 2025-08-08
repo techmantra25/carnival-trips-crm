@@ -41,7 +41,7 @@ class LeadRepository
         $lead->number_of_children = $data['number_of_children'];
         $lead->number_of_travellor = $data['number_of_adults']+$data['number_of_children'];
 
-        $lead->lead_type =$data['lead_type'];
+        $lead->source_type =$data['source_type'];
         $lead->lead_source =$data['lead_source'];
         $lead->user_id =$data['user_id'];
     

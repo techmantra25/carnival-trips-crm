@@ -15,8 +15,25 @@
                     <tbody>
                         @forelse ($logs as $log)
                             <tr>
-                                <td class="!text-center">
-                                    {{ $log->itinerary->itinerary_syntax ?? 'N/A' }}
+                               <td class="!text-center space-y-1">
+                                    @php
+                                        $isPreset = $log->itinerary_id !== null;
+                                        $label = $isPreset ? 'Preset' : 'Customized';
+                                        $badgeColor = $isPreset ? 'bg-warning/10 text-warning' : 'bg-success/10 text-success';
+                                        $syntax = $isPreset 
+                                            ? ($log->itinerary->itinerary_syntax ?? 'N/A') 
+                                            : ($log->sent_itinerary->itinerary_syntax ?? 'N/A');
+                                    @endphp
+
+                                    <div class="flex items-center justify-center gap-1">
+                                        <span class="badge !rounded-full {{ $badgeColor }} cursor-default" title="{{ $label }} Itinerary">
+                                            <i class="fa-solid fa-route me-1"></i> {{ $label }}
+                                        </span>
+                                    </div>
+
+                                    <div class="text-xs text-muted mt-1 truncate max-w-[150px]" title="{{ $syntax }}">
+                                        {{ $syntax }}
+                                    </div>
                                 </td>
                                 <td class="!text-center">
                                     {{ $log->sharedBy->name ?? 'System' }}<br>
