@@ -1,5 +1,5 @@
 # Use PHP 8.2 as the base image
-FROM php:8.2-fpm
+FROM php:8.3-fpm
 
 # Set the working directory to /var/www
 WORKDIR /var/www
@@ -8,18 +8,21 @@ WORKDIR /var/www
 RUN apt-get update && apt-get install -y \
     git \
     curl \
-    libpng-dev \
     zip \
     unzip \
+    libpng-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
     libonig-dev \
     libxml2-dev \
+    libzip-dev \
     gnupg2 \
     ca-certificates \
-    lsb-release && \
-    curl -sL https://deb.nodesource.com/setup_18.x | bash - && \
-    apt-get install -y nodejs && \
-    npm install -g npm && \
-    docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd
+    lsb-release \
+    && curl -sL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
 
 # Install Composer (PHP dependency manager)
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
