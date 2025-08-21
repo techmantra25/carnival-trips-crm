@@ -447,19 +447,8 @@
                             </div>
                             <div class="container mx-auto px-4 py-4">
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                                    <div>
-                                        <label for="customer_name"
-                                            class="block text-sm font-medium text-gray-700 modal_query_lable">Guest
-                                            name<span class="text-danger">*</span>
-                                        </label>
-                                        <input type="text" wire:model="customer_name" name="customer_name" value=""
-                                            placeholder="Full name of guest" aria-label="Full name of guest"
-                                            class="form-control form-control-lg placeholder:text-textmuted text-sm font-12 {{ $errors->has('customer_name') ? '!border-danger focus:border-danger focus:ring-danger' : '' }}">
-                                        @error('customer_name') <span
-                                            class="text-danger text-sm font-12">{{ $message }}</span> @enderror
-                                    </div>
                                     <div class="flex">
-                                        <div class="px-1">
+                                        <div class="px-1 w-full">
                                             <label
                                                 class="block text-sm font-medium text-gray-700 modal_query_lable">Total
                                                 Member<span class="text-danger">*</span>
@@ -470,7 +459,7 @@
                                             @error('total_members') <span
                                                 class="text-danger text-sm font-12">{{ $message }}</span> @enderror
                                         </div>
-                                        <div class="px-1">
+                                        <div class="px-1 w-full">
                                             <label
                                                 class="block text-sm font-medium text-gray-700 modal_query_lable">Number
                                                 of Adults<span class="text-danger">*</span>
@@ -479,6 +468,25 @@
                                                 value="" placeholder="Adults"
                                                 class="form-control form-control-lg placeholder:text-textmuted text-sm font-12 {{ $errors->has('number_of_adults') ? '!border-danger focus:border-danger focus:ring-danger' : '' }}">
                                             @error('number_of_adults') <span
+                                                class="text-danger text-sm font-12">{{ $message }}</span> @enderror
+                                        </div>
+                                    </div>
+                                    <div class="flex">
+                                        <div class="px-1 w-full">
+                                            <label class="block text-sm font-medium text-gray-700 modal_query_lable">Number
+                                                Of Rooms<span class="text-danger">*</span></label>
+                                            <input type="number" wire:model="number_of_rooms" name="number_of_rooms"
+                                                value="" placeholder="Rooms"
+                                                class="form-control form-control-lg placeholder:text-textmuted text-sm font-12 ">
+                                            @error("number_of_rooms") <span
+                                                class="text-danger text-sm font-12">{{ $message }}</span> @enderror
+                                        </div>
+                                        <div class="px-1 w-full">
+                                            <label class="block text-sm font-medium text-gray-700 modal_query_lable">Extra Mattress</label>
+                                            <input type="text" wire:model="extra_mattress" name="extra_mattress"
+                                                value="" placeholder="extra mattress"
+                                                class="form-control form-control-lg placeholder:text-textmuted text-sm font-12 ">
+                                            @error("extra_mattress") <span
                                                 class="text-danger text-sm font-12">{{ $message }}</span> @enderror
                                         </div>
                                         <div class="px-1">
@@ -551,6 +559,17 @@
 
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                    <div>
+                                        <label for="customer_name"
+                                            class="block text-sm font-medium text-gray-700 modal_query_lable">Guest
+                                            name<span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" wire:model="customer_name" name="customer_name" value=""
+                                            placeholder="Full name of guest" aria-label="Full name of guest"
+                                            class="form-control form-control-lg placeholder:text-textmuted text-sm font-12 {{ $errors->has('customer_name') ? '!border-danger focus:border-danger focus:ring-danger' : '' }}">
+                                        @error('customer_name') <span
+                                            class="text-danger text-sm font-12">{{ $message }}</span> @enderror
+                                    </div>
                                     <div>
                                         <label for="mobile_number"
                                             class="block text-sm font-medium text-gray-700 modal_query_lable">Mobile
@@ -783,25 +802,6 @@
                                             @error('nationality_type') <span
                                                 class="text-danger text-sm font-12">{{ $message }}</span> @enderror
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="flex justify-end">
-                                    <div class="px-1 w-3xs mb-2">
-                                        <label class="block text-sm font-medium text-gray-700 modal_query_lable">Number
-                                            Of Rooms<span class="text-danger">*</span></label>
-                                        <input type="number" wire:model="number_of_rooms" name="number_of_rooms"
-                                            value="" placeholder="Rooms"
-                                            class="form-control form-control-lg placeholder:text-textmuted text-sm font-12 ">
-                                        @error("number_of_rooms") <span
-                                            class="text-danger text-sm font-12">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="px-1 w-3xs mb-2">
-                                        <label class="block text-sm font-medium text-gray-700 modal_query_lable">Extra Mattress</label>
-                                        <input type="text" wire:model="extra_mattress" name="extra_mattress"
-                                            value="" placeholder="extra mattress"
-                                            class="form-control form-control-lg placeholder:text-textmuted text-sm font-12 ">
-                                        @error("extra_mattress") <span
-                                            class="text-danger text-sm font-12">{{ $message }}</span> @enderror
                                     </div>
                                 </div>
                             </div>

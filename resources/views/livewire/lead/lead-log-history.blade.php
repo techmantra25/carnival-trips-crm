@@ -83,7 +83,7 @@
                                 </div>
                             </div>
                         @empty
-                            <div class="text-gray-500">No logs available for selected date range.</div>
+                            <div class="text-gray-500">No logs available for selected customer.</div>
                         @endforelse
 
                     </div>
