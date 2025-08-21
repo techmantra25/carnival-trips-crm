@@ -81,7 +81,7 @@ class CommonRepository
     public function getALlActiveLeadSatus(){
         return DB::table('leads_status')->where('status', 1)->orderBy('position', 'ASC')->get();
     }
-    public function getAllState(int $perPage = 15, $state, $limit = 10,)
+    public function getAllState(int $perPage = 15, $state)
     {
         $query = State::orderBy('name', 'ASC');
     
@@ -98,7 +98,7 @@ class CommonRepository
             'totalRecords' => $totalRecords,  // Total records count
         ];
     }
-    public function getAllCabs(int $perPage = 15, $cab, $limit = 10,)
+    public function getAllCabs(int $perPage = 15, $cab)
     {
         $query = Cab::orderBy('title', 'ASC');
     
