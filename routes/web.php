@@ -26,15 +26,22 @@ use App\Http\Controllers\Auth\AdminAuthController;
 use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagementController,EmployeeManagement};
 
     Route::get('/', function () {
+        if (auth('admin')->check()) {
+            return redirect()->route('admin.dashboard');
+        }
         return redirect()->route('admin.login');
-    });
+    })->name('home');
+    
 
     // Route::get('admin/login', [RegisteredUserController::class, 'admin_login']);
 
-    Route::prefix('admin')->name('admin.')->group(function () {
-        // Admin login form
-        // sdbshgd
-        // xsnkjdshj
+    Route::prefix('/admin')->name('admin.')->group(function () {
+        Route::get('/', function () {
+            if (auth('admin')->check()) {
+                return redirect()->route('admin.dashboard');
+            }
+            return redirect()->route('admin.login');
+        })->name('home');
         Route::get('login', [AdminAuthController::class, 'showLoginForm'])->name('login');
         // Handle admin login
         Route::post('login', [AdminAuthController::class, 'login']);
