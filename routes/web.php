@@ -75,6 +75,15 @@ use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagem
             Route::post('/update/status/{id}', [LeadManagementController::class, 'update_status'])->name('admin.leads.update_status');
             // Additional CRUD routes
         });
+        // Whatsapp Campaign
+        Route::prefix('whatsapp-campaign')->group(function(){
+            Route::get('/', [LeadManagementController::class, 'whatsapp_campaign_index'])->name('admin.whatsapp.campaign.index');
+            // Route::get('/create', [WhatsappCampaignController::class, 'create'])->name('admin.whatsapp.campaign.create');
+            // Route::post('/store', [WhatsappCampaignController::class, 'store'])->name('admin.whatsapp.campaign.store');
+            // Route::get('/edit/{id}', [WhatsappCampaignController::class, 'edit'])->name('admin.whatsapp.campaign.edit');
+            // Route::post('/update/{id}', [WhatsappCampaignController::class, 'update'])->name('admin.whatsapp.campaign.update');
+            // Route::delete('/destroy/{id}', [WhatsappCampaignController::class, 'destroy'])->name('admin.whatsapp.campaign.destroy');
+        });
         Route::prefix('employee')->group(function (){
             Route::get('/', [EmployeeManagement::class, 'index'])->name('admin.employee.index');
             Route::get('/designations', [EmployeeManagement::class, 'designationIndex'])->name('admin.designation.index');
