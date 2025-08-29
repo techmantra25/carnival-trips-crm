@@ -781,7 +781,7 @@ function us(e) {
 }
 
 function mn(e, n, i) {
-    ie.call(this, e ? ? "canceled", ie.ERR_CANCELED, n, i), this.name = "CanceledError"
+    ie.call(this, e ?? "canceled", ie.ERR_CANCELED, n, i), this.name = "CanceledError"
 }
 D.inherits(mn, ie, {
     __CANCEL__: !0
@@ -1721,7 +1721,7 @@ function Qf(e, n, i, ...s) {
 }
 
 function hn(e, n, i = void 0) {
-    e = Object.assign(e ? ? {
+    e = Object.assign(e ?? {
         message: "No error message given."
     }, {
         el: n,
@@ -5791,7 +5791,7 @@ function Wl() {
                     return this
                 },
                 clone: function (t, r) {
-                    return t = t ? ? !1, r = r ? ? t, this.map(function () {
+                    return t = t ?? !1, r = r ?? t, this.map(function () {
                         return u.clone(this, t, r)
                     })
                 },
@@ -6349,7 +6349,7 @@ function Wl() {
                             }
                             return c && "set" in c && (a = c.set(t, o, r)) !== void 0 ? a : (t.setAttribute(r, o + ""), o)
                         }
-                        return c && "get" in c && (a = c.get(t, r)) !== null ? a : (a = u.find.attr(t, r), a ? ? void 0)
+                        return c && "get" in c && (a = c.get(t, r)) !== null ? a : (a = u.find.attr(t, r), a ?? void 0)
                     }
                 },
                 attrHooks: {
@@ -6483,14 +6483,14 @@ function Wl() {
                         this.nodeType === 1 && (a ? h = t.call(this, d, u(this).val()) : h = t, h == null ? h = "" : typeof h == "number" ? h += "" : Array.isArray(h) && (h = u.map(h, function (v) {
                             return v == null ? "" : v + ""
                         })), r = u.valHooks[this.type] || u.valHooks[this.nodeName.toLowerCase()], (!r || !("set" in r) || r.set(this, h, "value") === void 0) && (this.value = h))
-                    })) : c ? (r = u.valHooks[c.type] || u.valHooks[c.nodeName.toLowerCase()], r && "get" in r && (o = r.get(c, "value")) !== void 0 ? o : (o = c.value, typeof o == "string" ? o.replace(Xa, "") : o ? ? "")) : void 0
+                    })) : c ? (r = u.valHooks[c.type] || u.valHooks[c.nodeName.toLowerCase()], r && "get" in r && (o = r.get(c, "value")) !== void 0 ? o : (o = c.value, typeof o == "string" ? o.replace(Xa, "") : o ?? "")) : void 0
                 }
             }), u.extend({
                 valHooks: {
                     option: {
                         get: function (t) {
                             var r = u.find.attr(t, "value");
-                            return r ? ? gt(u.text(t))
+                            return r ?? gt(u.text(t))
                         }
                     },
                     select: {
@@ -6592,7 +6592,7 @@ function Wl() {
                 var o, a = [],
                     c = function (d, h) {
                         var v = j(h) ? h() : h;
-                        a[a.length] = encodeURIComponent(d) + "=" + encodeURIComponent(v ? ? "")
+                        a[a.length] = encodeURIComponent(d) + "=" + encodeURIComponent(v ?? "")
                     };
                 if (t == null) return "";
                 if (Array.isArray(t) || t.jquery && !u.isPlainObject(t)) u.each(t, function () {

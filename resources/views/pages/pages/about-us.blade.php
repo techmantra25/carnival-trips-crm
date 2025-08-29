@@ -461,7 +461,7 @@
 @section('scripts')
 	
         <!-- Simplebar JS -->
-        <script src="{{asset('build/assets/libs/simplebar/simplebar.min.js')}}"></script>
+        {{-- <script src="{{asset('build/assets/libs/simplebar/simplebar.min.js')}}"></script> --}}
 
         <!-- Preline JS -->
         <script src="{{asset('build/assets/libs/preline/preline.js')}}"></script>

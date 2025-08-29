@@ -917,8 +917,8 @@ input[type="checkbox"]:checked + .hotel-card .checkmark {
 
 .whatsapp-template-section .absolute-badge{
     position: absolute;
-    top: 25px;
-    right: 26px;
+    top: 11px;
+    right: 11px;
     font-size: 15px;
     cursor: pointer;
     background-color: #000;

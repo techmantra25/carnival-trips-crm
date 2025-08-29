@@ -18,6 +18,13 @@ class WhatsappCampaignDashboard extends Component
         'hotLeads' => [],
         'cnpLeads' => [],
     ];
+    public $previewTemplate = [
+        'title' => '',
+        'body' => '',
+        'image' => '',
+        'external_link' => '',
+    ];
+    public $messageType = 'custom';
     public $selectedCustomer = [], $selectedLeads = []; // store selected lead IDs
 
     public function mount()
@@ -41,17 +48,25 @@ class WhatsappCampaignDashboard extends Component
         $activeLeads = $leads->where('status', 'Active Lead');
         $hotLeads = $leads->where('status', 'Hot Leads');
         $cnpLeads = $leads->where('status', 'CNP');
+        
         $this->leads = [
             'allLeads' => $allLeads,
             'activeLeads' => $activeLeads,
             'hotLeads' => $hotLeads,
             'cnpLeads' => $cnpLeads,
         ];
+        $this->selectedCustomer = $this->leads['allLeads']->pluck('customer_whatsapp')->toArray();
     }
     public function selectTemplate($templateId){
         $this->selectedTemplateId = $templateId;
-        $this->selectedCustomerType = 'all';
-         $this->collectLead();
+        $template = WhatsappMessageTemplate::find($templateId);
+        $this->previewTemplate = [
+            'title' => $template->title,
+            'body' => $template->body,
+            'image' => $template->image,
+            'external_link' => $template->external_link,
+        ];
+        $this->toggleCustomerSelection($this->selectedCustomerType);
     }
     public function toggleCustomerSelection($type){
         // Logic to toggle customer selection based on the type
@@ -65,6 +80,9 @@ class WhatsappCampaignDashboard extends Component
         }elseif($type=='cnp'){
             $this->selectedCustomer = $this->leads['cnpLeads']->pluck('customer_whatsapp')->toArray();
         }
+        if($type=='select_customers'){
+             $this->selectedLeads = [];
+        }
 
         $this->selectedCustomerType = $type;
     }
@@ -73,6 +91,9 @@ class WhatsappCampaignDashboard extends Component
         $this->template_search = $query;
     }
 
+    public function messageContent($content){
+        $this->previewTemplate['body'] = $content;
+    }
      // Toggle selection when row clicked
     public function toggleLead($leadId)
     {
@@ -93,7 +114,22 @@ class WhatsappCampaignDashboard extends Component
                 $this->selectedCustomer[] = $lead->customer_whatsapp;
             }
         }
+        $this->dispatch('refreshComponent');
     }
+
+    public function selectMessageType($type)
+    {
+        $this->previewTemplate = [
+            'title' => '',
+            'body' => '',
+            'image' => '',
+            'external_link' => '',
+        ];
+        $this->template_search = '';
+        $this->messageType = $type;
+        $this->selectedTemplateId = null;
+    }
+
     public function render()
     {
         // Start query
@@ -101,11 +137,11 @@ class WhatsappCampaignDashboard extends Component
 
         // Apply search filter if provided
         if ($this->template_search) {
-            $query->where('title', 'like', '%' . $this->template_search . '%');
+            $query->where('template_name', 'like', '%' . $this->template_search . '%');
         }
 
         // Fetch templates (limit 4 for non-selected templates)
-        $templates = $query->orderBy('created_at', 'desc')->limit(4)->get();
+        $templates = $query->orderBy('created_at', 'desc')->limit(6)->get();
 
         // Ensure selected template is included
         if ($this->selectedTemplateId) {

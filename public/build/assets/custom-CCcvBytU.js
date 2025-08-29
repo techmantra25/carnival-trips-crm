@@ -1,28 +1,203 @@
-(function(){function o(){document.getElementById("loader_id").classList.add("!hidden")}window.addEventListener("load",o),document.getElementById("year").innerHTML=new Date().getFullYear();var l=document.getElementById("sidebar-scroll");new SimpleBar(l,{autoHide:!0});var l=document.getElementById("header-cart-items-scroll");new SimpleBar(l,{autoHide:!0});var l=document.getElementById("header-notification-scroll");new SimpleBar(l,{autoHide:!0}),document.addEventListener("DOMContentLoaded",function(){var e=document.querySelectorAll("[data-trigger]");for(let n=0;n<e.length;++n){var t=e[n];new Choices(t,{allowHTML:!0,placeholderValue:"This is a placeholder set in the config",searchPlaceholderValue:"Search"})}});let a=".box";document.querySelectorAll(".box-remove").forEach(e=>{e.addEventListener("click",function(t){return t.preventDefault(),this.closest(a).remove(),!1})}),document.querySelectorAll(".box-fullscreen").forEach(e=>{e.addEventListener("click",function(t){let r=this.closest(a);return r.classList.toggle("box-fullscreen"),r.classList.remove("box-collapsed"),t.preventDefault(),!1})}),document.querySelectorAll(".toggle").forEach(e=>e.addEventListener("click",()=>{e.classList.toggle("on")}));const c=document.querySelector(".scrollToTop"),s=document.documentElement;window.onscroll=()=>{s.scrollHeight-s.clientHeight,window.scrollY>100?c.style.display="flex":c.style.display="none"},c.onclick=()=>{window.scrollTo(0,0)},document.querySelectorAll(".header-remove-btn").forEach((e,t)=>{e.addEventListener("click",n=>{n.preventDefault(),n.stopPropagation(),e.parentNode.remove(),document.getElementById("allCartsContainer")&&(document.getElementById("cart-data").innerText=`${document.getElementById("allCartsContainer").children.length} Items`,document.getElementById("cart-data2").innerText=`${document.getElementById("allCartsContainer").children.length}`),document.getElementById("allNotifyContainer")&&(document.getElementById("notify-data").innerText=`${document.getElementById("allNotifyContainer").children.length}`),document.getElementById("allCartsContainer")&&document.getElementById("allCartsContainer").children.length==0&&(document.getElementById("allCartsContainer").parentNode.innerHTML=`
+
+(function () {
+    // 🔹 Loader
+    window.addEventListener("load", function () {
+        const loader = document.getElementById("loader_id");
+        if (loader) loader.classList.add("!hidden");
+    });
+
+    // 🔹 Current Year
+    const year = document.getElementById("year");
+    if (year) year.innerHTML = new Date().getFullYear();
+
+    // 🔹 Custom Scrollbars
+    const scrollIds = ["sidebar-scroll", "header-cart-items-scroll", "header-notification-scroll"];
+    scrollIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) new SimpleBar(el, { autoHide: true });
+    });
+
+    // 🔹 Choices.js Init
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll("[data-trigger]").forEach(el => {
+            new Choices(el, {
+                allowHTML: true,
+                placeholderValue: "This is a placeholder set in the config",
+                searchPlaceholderValue: "Search"
+            });
+        });
+    });
+
+    // 🔹 Box actions
+    const boxSelector = ".box";
+
+    document.querySelectorAll(".box-remove").forEach(btn => {
+        btn.addEventListener("click", function (e) {
+            e.preventDefault();
+            const box = this.closest(boxSelector);
+            if (box) box.remove();
+        });
+    });
+
+    document.querySelectorAll(".box-fullscreen").forEach(btn => {
+        btn.addEventListener("click", function (e) {
+            e.preventDefault();
+            const box = this.closest(boxSelector);
+            if (box) {
+                box.classList.toggle("box-fullscreen");
+                box.classList.remove("box-collapsed");
+            }
+        });
+    });
+
+    // 🔹 Toggle Button
+    document.querySelectorAll(".toggle").forEach(el => {
+        el.addEventListener("click", () => el.classList.toggle("on"));
+    });
+
+    // 🔹 Scroll To Top
+    const scrollBtn = document.querySelector(".scrollToTop");
+    const doc = document.documentElement;
+
+    window.addEventListener("scroll", () => {
+        if (!scrollBtn) return;
+        scrollBtn.style.display = window.scrollY > 100 ? "flex" : "none";
+    });
+
+    if (scrollBtn) {
+        scrollBtn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+    }
+
+    // 🔹 Cart & Notifications Remove
+    document.querySelectorAll(".header-remove-btn").forEach(btn => {
+        btn.addEventListener("click", e => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            btn.parentNode.remove();
+
+            // Cart update
+            const cartContainer = document.getElementById("allCartsContainer");
+            if (cartContainer) {
+                document.getElementById("cart-data").innerText = `${cartContainer.children.length} Items`;
+                document.getElementById("cart-data2").innerText = `${cartContainer.children.length}`;
+
+                if (cartContainer.children.length === 0) {
+                    cartContainer.parentNode.innerHTML = `
                         <div class="p-6 pb-8 text-center">
                           <div>
-                            <i class="ri ri-shopping-cart-2-line leading-none text-4xl avatar avatar-lg bg-primary/20 text-primary rounded-full p-3 align-middle flex justify-center mx-auto"></i>
+                            <i class="ri ri-shopping-cart-2-line leading-none text-4xl avatar avatar-lg bg-primary/20 text-primary rounded-full p-3 flex justify-center mx-auto"></i>
                             <div class="mt-5">
                               <p class="text-base font-semibold text-gray-800 dark:text-white mb-1">
                                 No Items In Cart
                               </p>
                               <p class="text-xs text-gray-500 dark:text-white/70">
-                              When you have Items added here , they will appear here.
+                                When you have Items added here, they will appear here.
                               </p>
-                              <a href="javascript:void(0);" class="m-0 ti-btn ti-btn-primary py-1 mt-5"><i class="ti ti-arrow-right text-base leading-none"></i>Continue Shopping</a>
+                              <a href="javascript:void(0);" class="m-0 ti-btn ti-btn-primary py-1 mt-5">
+                                <i class="ti ti-arrow-right text-base leading-none"></i> Continue Shopping
+                              </a>
                             </div>
                           </div>
-                        </div>`),document.getElementById("allNotifyContainer")&&document.getElementById("allNotifyContainer").children.length==0&&(document.getElementById("allNotifyContainer").parentNode.innerHTML=`
-          <div class="p-6 pb-8 text-center">
-          <div>
-            <i class="ri ri-notification-off-line leading-none text-4xl avatar avatar-lg bg-secondary/20 text-secondary rounded-full p-3 align-middle flex justify-center mx-auto"></i>
-            <div class="mt-5">
-              <p class="text-base font-semibold text-gray-800 dark:text-white mb-1">
-                No Notifications Found
-              </p>
-              <p class="text-xs text-gray-500 dark:text-white/70">
-              When you have notifications added here , they will appear here.
-              </p>
-            </div>
-          </div>
-        </div>`)})}),document.querySelectorAll(".dropdown-item-close").forEach(e=>{e.addEventListener("click",t=>{if(t.preventDefault(),t.stopPropagation(),e.parentNode.parentNode.parentNode.parentNode.parentNode.remove(),document.getElementById("cart-data").innerText=`${document.querySelectorAll(".dropdown-item-close").length} Items`,document.getElementById("cart-icon-badge").innerText=`${document.querySelectorAll(".dropdown-item-close").length}`,console.log(document.getElementById("header-cart-items-scroll").children.length),document.querySelectorAll(".dropdown-item-close").length==0){let n=document.querySelector(".empty-header-item"),r=document.querySelector(".empty-item");n.classList.add("hidden"),r.classList.remove("hidden")}})}),document.querySelectorAll(".dropdown-item-close1").forEach(e=>{e.addEventListener("click",t=>{if(t.preventDefault(),t.stopPropagation(),e.parentNode.parentNode.parentNode.parentNode.remove(),document.getElementById("notifiation-data").innerText=`${document.querySelectorAll(".dropdown-item-close1").length} Unread`,document.getElementById("notification-icon-badge").innerText=`${document.querySelectorAll(".dropdown-item-close1").length}`,document.querySelectorAll(".dropdown-item-close1").length==0){let n=document.querySelector(".empty-header-item1"),r=document.querySelector(".empty-item1");n.classList.add("hidden"),r.classList.remove("hidden")}})})})();var d=document.documentElement;window.openFullscreen=function(){let o=document.querySelector(".full-screen-open"),l=document.querySelector(".full-screen-close");!document.fullscreenElement&&!document.webkitFullscreenElement&&!document.msFullscreenElement?(d.requestFullscreen?d.requestFullscreen():d.webkitRequestFullscreen?d.webkitRequestFullscreen():d.msRequestFullscreen&&d.msRequestFullscreen(),l.classList.add("block"),l.classList.remove("hidden"),o.classList.add("hidden")):(document.exitFullscreen?document.exitFullscreen():document.webkitExitFullscreen?document.webkitExitFullscreen():document.msExitFullscreen&&document.msExitFullscreen(),l.classList.remove("block"),o.classList.remove("hidden"),l.classList.add("hidden"),o.classList.add("block"))};var i=1;setInterval(()=>{document.querySelectorAll(".count-up").forEach(o=>{o.getAttribute("data-count")>=i&&(i=i+1,o.innerText=i)})},10);
+                        </div>`;
+                }
+            }
+
+            // Notifications update
+            const notifyContainer = document.getElementById("allNotifyContainer");
+            if (notifyContainer) {
+                document.getElementById("notify-data").innerText = `${notifyContainer.children.length}`;
+                if (notifyContainer.children.length === 0) {
+                    notifyContainer.parentNode.innerHTML = `
+                        <div class="p-6 pb-8 text-center">
+                          <div>
+                            <i class="ri ri-notification-off-line leading-none text-4xl avatar avatar-lg bg-secondary/20 text-secondary rounded-full p-3 flex justify-center mx-auto"></i>
+                            <div class="mt-5">
+                              <p class="text-base font-semibold text-gray-800 dark:text-white mb-1">
+                                No Notifications Found
+                              </p>
+                              <p class="text-xs text-gray-500 dark:text-white/70">
+                                When you have notifications added here, they will appear here.
+                              </p>
+                            </div>
+                          </div>
+                        </div>`;
+                }
+            }
+        });
+    });
+
+    // 🔹 Cart dropdown item remove
+    document.querySelectorAll(".dropdown-item-close").forEach(btn => {
+        btn.addEventListener("click", e => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            btn.closest(".dropdown-item")?.remove();
+
+            const count = document.querySelectorAll(".dropdown-item-close").length;
+            document.getElementById("cart-data").innerText = `${count} Items`;
+            document.getElementById("cart-icon-badge").innerText = `${count}`;
+
+            if (count === 0) {
+                document.querySelector(".empty-header-item")?.classList.add("hidden");
+                document.querySelector(".empty-item")?.classList.remove("hidden");
+            }
+        });
+    });
+
+    // 🔹 Notification dropdown item remove
+    document.querySelectorAll(".dropdown-item-close1").forEach(btn => {
+        btn.addEventListener("click", e => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            btn.closest(".dropdown-item")?.remove();
+
+            const count = document.querySelectorAll(".dropdown-item-close1").length;
+            document.getElementById("notifiation-data").innerText = `${count} Unread`;
+            document.getElementById("notification-icon-badge").innerText = `${count}`;
+
+            if (count === 0) {
+                document.querySelector(".empty-header-item1")?.classList.add("hidden");
+                document.querySelector(".empty-item1")?.classList.remove("hidden");
+            }
+        });
+    });
+})();
+
+// 🔹 Fullscreen Toggle
+const docEl = document.documentElement;
+window.openFullscreen = function () {
+    const openBtn = document.querySelector(".full-screen-open"),
+          closeBtn = document.querySelector(".full-screen-close");
+
+    if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+        if (docEl.requestFullscreen) docEl.requestFullscreen();
+        else if (docEl.webkitRequestFullscreen) docEl.webkitRequestFullscreen();
+        else if (docEl.msRequestFullscreen) docEl.msRequestFullscreen();
+
+        closeBtn?.classList.replace("hidden", "block");
+        openBtn?.classList.add("hidden");
+    } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        else if (document.msExitFullscreen) document.msExitFullscreen();
+
+        closeBtn?.classList.replace("block", "hidden");
+        openBtn?.classList.remove("hidden");
+    }
+};
+
+// 🔹 Count Up
+let counter = 1;
+setInterval(() => {
+    document.querySelectorAll(".count-up").forEach(el => {
+        const target = parseInt(el.getAttribute("data-count"), 10);
+        if (counter <= target) {
+            el.innerText = counter;
+        }
+    });
+    counter++;
+}, 10);
+
