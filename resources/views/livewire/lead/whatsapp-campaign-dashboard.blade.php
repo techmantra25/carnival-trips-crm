@@ -258,7 +258,6 @@
                 });
             }
             window.addEventListener('refreshComponent', function (event) {
-                alert('hi')
                filterLeads.call(this);
             });
         </script>

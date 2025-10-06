@@ -23,8 +23,28 @@ use App\Livewire\Website\{FrontGetPresetItinerary,TripPreferenceForm,FrontGetCus
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\AdminAuthController;
+use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagementController,EmployeeManagement};
 
+
+    Route::get('/test-mail', function () {
+
+        $to = 'rajib.a@techmantra.co'; // replace with your email to receive test mail
+        $subject = 'Test SMTP Mail';
+        $body = 'This is a test email to check if G Suite SMTP is working in Laravel.';
+
+        try {
+            Mail::raw($body, function ($message) use ($to, $subject) {
+                $message->to($to)
+                        ->subject($subject);
+            });
+
+            return 'Test email sent successfully!';
+        } catch (\Exception $e) {
+            return 'Mail failed: ' . $e->getMessage();
+        }
+
+    });
     Route::get('/', function () {
         if (auth('admin')->check()) {
             return redirect()->route('admin.dashboard');
@@ -89,7 +109,7 @@ use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagem
             Route::get('/designations', [EmployeeManagement::class, 'designationIndex'])->name('admin.designation.index');
             Route::get('/hierarchy', [EmployeeManagement::class, 'employeeHierarchy'])->name('admin.employee-hierarchy');
         });
-
+        Route::get('/my/profile', [EmployeeManagement::class, 'employee_profile'])->name('admin.employee.index');
     
         // Hotel master
         Route::prefix('hotel')->group(function(){
