@@ -23,4 +23,9 @@ class EmployeeManagement extends Controller
         $common = CustomHelper::setHeadersAndTitle('Employee Management', 'Employee Hierarchy');
         return view('admin.employee.employee_hierarchy', compact('common'));
     }
+    public function employee_profile(){
+        $common = CustomHelper::setHeadersAndTitle('Employee Management', 'Employee Profile');
+        return view('admin.employee.profile', compact('common'));
+    }
+
 }

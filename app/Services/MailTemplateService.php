@@ -36,13 +36,11 @@ class MailTemplateService
                 $subject = str_replace('{{'.$sub_key.'}}', $sub_value, $subject);
             }
             // Create DynamicMail instance
-            $mail = new DynamicMail($to, $subject, $body, $fromAddress, $fromName);
-            // dd($mail);
-            Mail::raw($mail->html, function ($message) use ($to, $subject) {
+            Mail::send('emails.dynamic', ['html' => $body], function ($message) use ($to, $subject, $fromAddress, $fromName) {
                 $message->to($to)
-                        ->subject($subject);
+                        ->subject($subject)
+                        ->from($fromAddress, $fromName);
             });
-
             // Update log
             $log->update(['status' => 'success']);
             return true;

@@ -47,7 +47,6 @@ class DynamicMail extends Mailable implements ShouldQueue
                             $this->fromName ??  ENV('MAIL_FROM_NAME'))
                      ->subject($this->subject)
                      ->view('emails.dynamic', ['html' => $this->html]);
-
         return $mail;
     }
 

@@ -27,24 +27,24 @@ use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagementController,EmployeeManagement};
 
 
-    Route::get('/test-mail', function () {
+    // Route::get('/test-mail', function () {
 
-        $to = 'rajib.a@techmantra.co'; // replace with your email to receive test mail
-        $subject = 'Test SMTP Mail';
-        $body = 'This is a test email to check if G Suite SMTP is working in Laravel.';
+    //     $to = 'rajib.a@techmantra.co'; // replace with your email to receive test mail
+    //     $subject = 'Test SMTP Mail';
+    //     $body = 'This is a test email to check if G Suite SMTP is working in Laravel.';
 
-        try {
-            Mail::raw($body, function ($message) use ($to, $subject) {
-                $message->to($to)
-                        ->subject($subject);
-            });
+    //     try {
+    //         Mail::raw($body, function ($message) use ($to, $subject) {
+    //             $message->to($to)
+    //                     ->subject($subject);
+    //         });
 
-            return 'Test email sent successfully!';
-        } catch (\Exception $e) {
-            return 'Mail failed: ' . $e->getMessage();
-        }
+    //         return 'Test email sent successfully!';
+    //     } catch (\Exception $e) {
+    //         return 'Mail failed: ' . $e->getMessage();
+    //     }
 
-    });
+    // });
     Route::get('/', function () {
         if (auth('admin')->check()) {
             return redirect()->route('admin.dashboard');
@@ -65,13 +65,6 @@ use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagem
         Route::get('login', [AdminAuthController::class, 'showLoginForm'])->name('login');
         // Handle admin login
         Route::post('login', [AdminAuthController::class, 'login']);
-    });
-
-    Route::middleware('auth')->group(function () {
-        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
     });
 
     // Route::get('dashboard', [DashboardsController::class, 'index'])->name('admin.dashboard');
@@ -109,7 +102,7 @@ use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagem
             Route::get('/designations', [EmployeeManagement::class, 'designationIndex'])->name('admin.designation.index');
             Route::get('/hierarchy', [EmployeeManagement::class, 'employeeHierarchy'])->name('admin.employee-hierarchy');
         });
-        Route::get('/my/profile', [EmployeeManagement::class, 'employee_profile'])->name('admin.employee.index');
+        Route::get('/profile', [EmployeeManagement::class, 'employee_profile'])->name('admin.employee.profile');
     
         // Hotel master
         Route::prefix('hotel')->group(function(){
