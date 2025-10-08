@@ -8,6 +8,8 @@ use App\Models\State;
 use App\Models\Designation;
 use App\Helpers\CustomHelper;
 use Livewire\WithPagination;
+use App\Services\MailTemplateService;
+use App\Jobs\SendEmployeeWelcomeMail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -104,6 +106,22 @@ class EmployeeCrud extends Component
 
         $employee->destinations()->sync($this->destination_ids); // <-- Sync here
 
+        // Send welcome mail immediately
+         MailTemplateService::send(
+            $employee->email,
+            'employee_welcome',
+            [
+                'employee_name' => $employee->name,
+                'company_name' => 'TechOrigin Pvt. Ltd.',
+                'portal_link' => 'https://portal.techorigin.in/login',
+                'temporary_password' => $this->password,
+            ],
+              [ 'company_name' => ENV('MAIL_FROM_NAME')],
+            ENV('MAIL_FROM_ADDRESS'),     // From Email
+            ENV('MAIL_FROM_NAME')         // From Name
+        );
+        // SendEmployeeWelcomeMail::dispatch($employee, $this->password);
+
         $this->resetInput();
         session()->flash('success', 'Employee created successfully.');
     }
@@ -160,7 +178,22 @@ class EmployeeCrud extends Component
                 'password' => Hash::make($this->password)
             ]);
         }
+        // Send welcome mail immediately
+        MailTemplateService::send(
+            $employee->email,
+            'employee_welcome',
+            [
+                'employee_name' => $employee->name,
+                'company_name' => 'TechOrigin Pvt. Ltd.',
+                'portal_link' => 'https://portal.techorigin.in/login',
+                'temporary_password' => "123456",
+            ],
+            [ 'company_name' => ENV('MAIL_FROM_NAME')],
+            ENV('MAIL_FROM_ADDRESS'),     // From Email
+            ENV('MAIL_FROM_NAME')         // From Name
+        );
 
+        //  SendEmployeeWelcomeMail::dispatch($employee, $this->password);
         $employee->destinations()->sync($this->destination_ids); // <-- Sync here
 
         $this->resetInput();

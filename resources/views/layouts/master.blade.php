@@ -17,7 +17,6 @@
 
         <!-- Main Theme Js -->
         <script src="{{asset('build/assets/main.js')}}"></script>
-
         <!-- ICONS CSS -->
         <link href="{{asset('build/assets/iconfonts/icons.css')}}" rel="stylesheet">
       

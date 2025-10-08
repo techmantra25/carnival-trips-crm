@@ -359,7 +359,7 @@
    window.addEventListener('refreshComponent', function (event) {
         let chartData = event.detail[0].chartData;
         let chartMax = chartData.chartMax;
-        console.log(chartData);
+        // console.log(chartData);
 
         const canvas = document.getElementById('leadAnalytics');
 

@@ -915,6 +915,19 @@ input[type="checkbox"]:checked + .hotel-card .checkmark {
   text-transform: uppercase;
 }
 
+.whatsapp-template-section .absolute-badge{
+    position: absolute;
+    top: 11px;
+    right: 11px;
+    font-size: 15px;
+    cursor: pointer;
+    background-color: #000;
+    text-transform: uppercase;
+}
+.whatsapp-template-section .active_template{
+    border: 2px solid #06ca0d;
+}
+
 .delete-icon:hover {
   background-color: darkred;
 }

@@ -104,5 +104,10 @@ class LeadManagementController extends Controller
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
+
+    function whatsapp_campaign_index(){
+        $common = CustomHelper::setHeadersAndTitle('Campaign Management', 'WhatsApp Campaign');
+        return view('admin.leads.whatsapp_campaign_index', compact('common'));
+    }
 }
 
