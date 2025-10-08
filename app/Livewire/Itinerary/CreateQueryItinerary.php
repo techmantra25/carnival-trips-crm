@@ -2783,7 +2783,6 @@ class CreateQueryItinerary extends Component
             ->where('field', 'like', 'trip_highlights_%')
             ->where('value', $value)
             ->delete();
-
             // Remove from local array
             $this->selectedTriphighlight = array_filter($this->selectedTriphighlight, fn($v) => $v !== $value);
         } else {

@@ -9,6 +9,7 @@ use App\Models\Designation;
 use App\Helpers\CustomHelper;
 use Livewire\WithPagination;
 use App\Services\MailTemplateService;
+use App\Jobs\SendEmployeeWelcomeMail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -119,6 +120,7 @@ class EmployeeCrud extends Component
             ENV('MAIL_FROM_ADDRESS'),     // From Email
             ENV('MAIL_FROM_NAME')         // From Name
         );
+        // SendEmployeeWelcomeMail::dispatch($employee, $this->password);
 
         $this->resetInput();
         session()->flash('success', 'Employee created successfully.');
@@ -191,6 +193,7 @@ class EmployeeCrud extends Component
             ENV('MAIL_FROM_NAME')         // From Name
         );
 
+        //  SendEmployeeWelcomeMail::dispatch($employee, $this->password);
         $employee->destinations()->sync($this->destination_ids); // <-- Sync here
 
         $this->resetInput();

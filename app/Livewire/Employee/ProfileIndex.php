@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Services\MailTemplateService;
 use Illuminate\Support\Facades\Hash;
 
-
 class ProfileIndex extends Component
 {
     public $common,$authUser;
@@ -58,7 +57,6 @@ class ProfileIndex extends Component
             'password' => 'nullable|min:6|same:password_confirmation',
         ]);
 
-
         $user = $this->authUser;
         $user->name = $this->name;
         $user->email = $this->email;
@@ -80,9 +78,7 @@ class ProfileIndex extends Component
                 ENV('MAIL_FROM_NAME')         // From Name
             );
         }
-
         $user->save();
-
         session()->flash('success', 'Profile updated successfully.');
     }
     public function render()
