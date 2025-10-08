@@ -23,8 +23,28 @@ use App\Livewire\Website\{FrontGetPresetItinerary,TripPreferenceForm,FrontGetCus
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\AdminAuthController;
+use Illuminate\Support\Facades\Mail;
 use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagementController,EmployeeManagement};
 
+
+    // Route::get('/test-mail', function () {
+
+    //     $to = 'rajib.a@techmantra.co'; // replace with your email to receive test mail
+    //     $subject = 'Test SMTP Mail';
+    //     $body = 'This is a test email to check if G Suite SMTP is working in Laravel.';
+
+    //     try {
+    //         Mail::raw($body, function ($message) use ($to, $subject) {
+    //             $message->to($to)
+    //                     ->subject($subject);
+    //         });
+
+    //         return 'Test email sent successfully!';
+    //     } catch (\Exception $e) {
+    //         return 'Mail failed: ' . $e->getMessage();
+    //     }
+
+    // });
     Route::get('/', function () {
         if (auth('admin')->check()) {
             return redirect()->route('admin.dashboard');
@@ -45,13 +65,6 @@ use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagem
         Route::get('login', [AdminAuthController::class, 'showLoginForm'])->name('login');
         // Handle admin login
         Route::post('login', [AdminAuthController::class, 'login']);
-    });
-
-    Route::middleware('auth')->group(function () {
-        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
     });
 
     // Route::get('dashboard', [DashboardsController::class, 'index'])->name('admin.dashboard');
@@ -75,12 +88,21 @@ use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagem
             Route::post('/update/status/{id}', [LeadManagementController::class, 'update_status'])->name('admin.leads.update_status');
             // Additional CRUD routes
         });
+        // Whatsapp Campaign
+        Route::prefix('whatsapp-campaign')->group(function(){
+            Route::get('/', [LeadManagementController::class, 'whatsapp_campaign_index'])->name('admin.whatsapp.campaign.index');
+            // Route::get('/create', [WhatsappCampaignController::class, 'create'])->name('admin.whatsapp.campaign.create');
+            // Route::post('/store', [WhatsappCampaignController::class, 'store'])->name('admin.whatsapp.campaign.store');
+            // Route::get('/edit/{id}', [WhatsappCampaignController::class, 'edit'])->name('admin.whatsapp.campaign.edit');
+            // Route::post('/update/{id}', [WhatsappCampaignController::class, 'update'])->name('admin.whatsapp.campaign.update');
+            // Route::delete('/destroy/{id}', [WhatsappCampaignController::class, 'destroy'])->name('admin.whatsapp.campaign.destroy');
+        });
         Route::prefix('employee')->group(function (){
             Route::get('/', [EmployeeManagement::class, 'index'])->name('admin.employee.index');
             Route::get('/designations', [EmployeeManagement::class, 'designationIndex'])->name('admin.designation.index');
             Route::get('/hierarchy', [EmployeeManagement::class, 'employeeHierarchy'])->name('admin.employee-hierarchy');
         });
-
+        Route::get('/profile', [EmployeeManagement::class, 'employee_profile'])->name('admin.employee.profile');
     
         // Hotel master
         Route::prefix('hotel')->group(function(){
