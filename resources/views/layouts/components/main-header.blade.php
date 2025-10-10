@@ -473,8 +473,8 @@
 										</div>
 										</div>
 									</li>
-									<li><a class="dropdown-item text-defaulttextcolor flex " href="{{route('admin.employee.profile')}}"><i
-											class="bx bx-user-circle text-[1.125rem] me-2 opacity-[0.7]"></i>Profile</a></li>
+									{{-- <li><a class="dropdown-item text-defaulttextcolor flex " href="{{route('admin.employee.profile')}}"><i
+											class="bx bx-user-circle text-[1.125rem] me-2 opacity-[0.7]"></i>Profile</a></li> --}}
 									{{-- <li><a class="dropdown-item text-defaulttextcolor flex " href="{{url('profile')}}"><i
 											class="bx bx-cog text-[1.125rem] me-2 opacity-[0.7]"></i>Edit Profile </a></li>
 									<li><a class="dropdown-item text-defaulttextcolor flex  border-block-end" href="{{url('mail')}}"><i

@@ -102,7 +102,7 @@ use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagem
             Route::get('/designations', [EmployeeManagement::class, 'designationIndex'])->name('admin.designation.index');
             Route::get('/hierarchy', [EmployeeManagement::class, 'employeeHierarchy'])->name('admin.employee-hierarchy');
         });
-        Route::get('/profile', [EmployeeManagement::class, 'employee_profile'])->name('admin.employee.profile');
+        // Route::get('/profile', [EmployeeManagement::class, 'employee_profile'])->name('admin.employee.profile');
     
         // Hotel master
         Route::prefix('hotel')->group(function(){
