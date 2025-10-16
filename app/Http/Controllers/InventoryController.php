@@ -46,7 +46,6 @@ class InventoryController extends Controller
 
         // Set headers and title
         $common = CustomHelper::setHeadersAndTitle('Inventory Management', 'Inventories');
-        // dd($pageTitle);
         // Return view
         return view('admin.inventory.index', compact('data', 'common'));
     }

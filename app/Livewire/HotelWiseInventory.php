@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\State;
+use App\Services\MailTemplateService;
 use App\Models\City;
 use App\Repositories\CommonRepository;
 use App\Models\Category;
@@ -19,6 +20,7 @@ use App\Models\DateWiseHotelPrice;
 use Carbon\Carbon;
 use App\Helpers\CustomHelper;
 use Carbon\CarbonPeriod;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class HotelWiseInventory extends Component
@@ -78,7 +80,7 @@ class HotelWiseInventory extends Component
     public $activeViewSummary = 0;
     public $activeViewSummaryCallender = 0;
     public $summary_calendar = [];
-    public $requestId,$bulk_booking_email_body;
+    public $requestId,$bulk_booking_email_body, $fresh_booking_email_body;
     protected $commonRepository;
 
     public function mount(CommonRepository $commonRepository, $oldDivision = null, $oldDestination = null)
@@ -147,7 +149,7 @@ class HotelWiseInventory extends Component
         $this->hotels = Hotel::where('destination', $destinationId)
         ->pluck('name', 'id')
         ->toArray();
-        $this->dispatch('ChosenLoad', ['hotels'=>$this->hotels, 'start_date'=>$this->start_date, 'end_date'=>$this->end_date]);
+        $this->dispatch('ChosenLoad', ['hotels'=>$this->hotels]);
     }
 
     public function loadCategories($divisionId)
@@ -166,7 +168,7 @@ class HotelWiseInventory extends Component
             ->orderBy('categories.name', 'ASC')
             ->pluck('categories.name', 'categories.id')
             ->toArray();
-        $this->dispatch('ChosenLoad', ['hotels'=>$this->hotels, 'start_date'=>$this->start_date, 'end_date'=>$this->end_date]);
+        $this->dispatch('ChosenLoad', ['hotels'=>$this->hotels]);
     }
 
     public function loadHotels($categoryId)
@@ -176,7 +178,7 @@ class HotelWiseInventory extends Component
         $this->hotels = Hotel::where('hotel_category', $categoryId)
             ->pluck('name', 'id')
             ->toArray();
-        $this->dispatch('ChosenLoad', ['hotels'=>$this->hotels, 'start_date'=>$this->start_date, 'end_date'=>$this->end_date]);
+        $this->dispatch('ChosenLoad', ['hotels'=>$this->hotels]);
     }
     public function FilterDate($start_date, $end_date, $hotel_id){
         // Initialize dateRange as an empty array before populating it
@@ -184,7 +186,6 @@ class HotelWiseInventory extends Component
        
         $this->start_date = $start_date;
         $this->end_date = $end_date;
-
         $this->selectedHotel = $hotel_id;
         $hotel = Hotel::where('id', $hotel_id)->first();
         $this->selectedHotelName = $hotel ? $hotel->name : null;
@@ -221,7 +222,6 @@ class HotelWiseInventory extends Component
 
             // Get Release Trigger days
            $this->selected_trigger_point = Hotel::where('id', $this->selectedHotel)->value('release_trigger');
-        //    $this->dispatch('ChosenLoad', ['hotels'=>$this->hotels, 'start_date'=>$this->start_date, 'end_date'=>$this->end_date]);
         }else{
             session()->flash('error', '🚨 Oops! Start Date and End Date are required. Please select both to proceed.');
             return;
@@ -646,7 +646,6 @@ class HotelWiseInventory extends Component
                     ->whereIn('date', $filteredDates)
                     ->delete();
                     foreach($this->selected_room_item_checked[$room_id] as $k2=>$item_checked){
-                      
                         if ($item_checked==true) {
                             // Checking for null or 0
                             if (empty($this->selected_room_item[$room_id][$k2]) || $this->selected_room_item[$room_id][$k2] == 0) {
@@ -656,7 +655,6 @@ class HotelWiseInventory extends Component
                                 return;
                             }
                             // filter Date from ignore date
-                            // dd($filteredDates);
                             if(count($filteredDates)>0){
                                 // Insert or update section
                                 foreach($filteredDates as $date){
@@ -765,9 +763,20 @@ class HotelWiseInventory extends Component
         );
     }
 
-    public function GetRoomItemMaxPrice($index, $selected_plan_item_price, $room_id, $item_title){
-
-       $item_price = CustomHelper::GetHotelWiseMaxPrice($selected_plan_item_price, $room_id, $item_title, $this->start_date, $this->end_date);
+    public function GetRoomItemMaxPrice($index, $value, $selected_plan_item_price, $room_id, $item_title){
+        if ($value) {
+            // If checked, calculate max price
+            $item_price = CustomHelper::GetHotelWiseMaxPrice(
+                $selected_plan_item_price,
+                $room_id,
+                $item_title,
+                $this->start_date,
+                $this->end_date
+            );
+        } else {
+            //  If unchecked, set price empty
+            $item_price = '';
+        }
         // Update the Livewire property for the corresponding room item
         $this->selected_room_item[$room_id][$index] = $item_price;
        // Dispatch the event with the necessary data
@@ -782,7 +791,35 @@ class HotelWiseInventory extends Component
         $this->selected_inventory_type = $value;
     }
     public function SendMail($block_type){
-        dd($block_type,$this->bulk_booking_email_body);
+        $hotel = Hotel::find($this->selectedHotel);
+       $mailResponse = MailTemplateService::send(
+            $hotel->email1, //To
+            'hotel_availability_request_for_inventory', //Template Slug
+            [
+                'hotel_name' => $hotel->name,
+                'start_date' => $this->start_date,
+                'end_date' => $this->end_date,
+                'content' => $this->bulk_booking_email_body,
+            ],//Body Content
+            ['inquery_type'=>$block_type], //Subject Body
+            ENV('MAIL_FROM_ADDRESS'),     // From Email
+            ENV('MAIL_FROM_NAME')         // From Name
+        );
+
+       if ($mailResponse == true) {
+            $store = new HotelAvailabilityRequest;
+            $store->hotel_id = $this->selectedHotel;
+            $store->start_date = $this->start_date;
+            $store->end_date = $this->end_date;
+            $store->block_type = $block_type=="Bulk Booking"?"Bulk":"Fresh";
+            $store->email_sent = 1;
+            $store->sent_by = Auth::guard('admin')->id();
+            $store->save();
+
+            return ['status' => true, 'message' => 'Email sent successfully.'];
+        } else {
+            return ['status' => false, 'message' => 'Failed to send email.'];
+        }
     }
 
     public function render()

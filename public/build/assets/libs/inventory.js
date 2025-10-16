@@ -264,6 +264,36 @@ function validateSingleItems(input) {
 }
 
 function openModal(modalId) {
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+
+    const startDate = startDateInput ? startDateInput.value : null;
+    const endDate = endDateInput ? endDateInput.value : null;
+
+    // 3️⃣ Format the dates (e.g., "16 Oct 2025 – 20 Oct 2025")
+    if (startDate && endDate) {
+        const formattedStart = new Date(startDate).toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        });
+
+        const formattedEnd = new Date(endDate).toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        });
+
+        const dateRange = `${formattedStart} – ${formattedEnd}`;
+
+        // 4️⃣ Set this text inside the element with class "date_range"
+        const dateRangeElement = document.querySelector('.date_range');
+        if (dateRangeElement) {
+            dateRangeElement.textContent = dateRange;
+        }
+    } else {
+        console.warn('Start or End date not found!');
+    }
     document.getElementById(modalId).classList.remove('hidden');
     const editorIds = ['bulk_booking_email_body', 'fresh_booking_email_body'];
 
@@ -298,6 +328,12 @@ function openModal(modalId) {
 
             // ✅ Sync CKEditor content to Livewire property
             editor.on('change', function () {
+                const modal = document.getElementById('bulk_booking');
+                // 👇 Ensure the modal stays open (remove the 'hidden' class)
+                if (modal && modal.classList.contains('hidden')) {
+                    modal.classList.remove('hidden');
+                }
+
                 const content = editor.getData();
                 const componentId = document.querySelector('[wire\\:id]')?.getAttribute('wire:id');
                 if (componentId) {
@@ -308,7 +344,6 @@ function openModal(modalId) {
             console.error('CKEditor is not defined!');
         }
     });
-
 }
 
 function closeModal(modalId) {
