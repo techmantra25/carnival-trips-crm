@@ -10,6 +10,7 @@ use App\Models\Category;
 use App\Models\Hotel;
 use App\Models\Inventory;
 use App\Models\Room;
+use App\Models\HotelAvailabilityRequest;
 use App\Models\HotelPolicy;
 use App\Models\HotelSeasionTime;
 use App\Models\DestinationSeasonPeriod;
@@ -77,12 +78,18 @@ class HotelWiseInventory extends Component
     public $activeViewSummary = 0;
     public $activeViewSummaryCallender = 0;
     public $summary_calendar = [];
-
-
+    public $requestId,$bulk_booking_email_body;
     protected $commonRepository;
 
     public function mount(CommonRepository $commonRepository, $oldDivision = null, $oldDestination = null)
     {
+        $this->requestId = request()->get('request_id');
+        if($this->requestId){
+            $existingRequest = HotelAvailabilityRequest::findOrFail($this->requestId);
+            $this->start_date = $existingRequest->start_date;
+            $this->end_date = $existingRequest->end_date;
+        }
+
         $this->commonRepository = $commonRepository;
         $this->destinations = $this->commonRepository->getAllActiveState();
         $this->divisions = City::where('status', 1)
@@ -140,6 +147,7 @@ class HotelWiseInventory extends Component
         $this->hotels = Hotel::where('destination', $destinationId)
         ->pluck('name', 'id')
         ->toArray();
+        $this->dispatch('ChosenLoad', ['hotels'=>$this->hotels, 'start_date'=>$this->start_date, 'end_date'=>$this->end_date]);
     }
 
     public function loadCategories($divisionId)
@@ -158,6 +166,7 @@ class HotelWiseInventory extends Component
             ->orderBy('categories.name', 'ASC')
             ->pluck('categories.name', 'categories.id')
             ->toArray();
+        $this->dispatch('ChosenLoad', ['hotels'=>$this->hotels, 'start_date'=>$this->start_date, 'end_date'=>$this->end_date]);
     }
 
     public function loadHotels($categoryId)
@@ -167,6 +176,7 @@ class HotelWiseInventory extends Component
         $this->hotels = Hotel::where('hotel_category', $categoryId)
             ->pluck('name', 'id')
             ->toArray();
+        $this->dispatch('ChosenLoad', ['hotels'=>$this->hotels, 'start_date'=>$this->start_date, 'end_date'=>$this->end_date]);
     }
     public function FilterDate($start_date, $end_date, $hotel_id){
         // Initialize dateRange as an empty array before populating it
@@ -179,7 +189,6 @@ class HotelWiseInventory extends Component
         $hotel = Hotel::where('id', $hotel_id)->first();
         $this->selectedHotelName = $hotel ? $hotel->name : null;
         $this->selectedHotelDestination = $hotel ? $hotel->destination : null;
-
 
         if(!empty($this->start_date) && !empty($this->end_date)){
           
@@ -212,6 +221,7 @@ class HotelWiseInventory extends Component
 
             // Get Release Trigger days
            $this->selected_trigger_point = Hotel::where('id', $this->selectedHotel)->value('release_trigger');
+        //    $this->dispatch('ChosenLoad', ['hotels'=>$this->hotels, 'start_date'=>$this->start_date, 'end_date'=>$this->end_date]);
         }else{
             session()->flash('error', '🚨 Oops! Start Date and End Date are required. Please select both to proceed.');
             return;
@@ -667,7 +677,6 @@ class HotelWiseInventory extends Component
                                 return; 
                             } 
                         }
-        
                     }
                 }else{
                     // Flash the error message to the session
@@ -733,15 +742,27 @@ class HotelWiseInventory extends Component
         }
     }
     public function ReleaseTriggerUpdate($hotel_id, $value){
-        Hotel::updateOrCreate(
-            [
-                'id' => $hotel_id,  // Ensure the hotel_id is matched
-            ],
-            [
-                'release_trigger' => (int) $value,  // Add new value
-            ]
-        );
+        $hotel = Hotel::findOrFail($hotel_id);
+        $oldValue = $hotel->release_trigger;
+        $hotel->update([
+            'release_trigger' => (int) $value,
+        ]);
         $this->FilterDate($this->start_date, $this->end_date, $this->selectedHotel);
+
+        // Push Change log
+        CustomHelper::logChange(
+            'Release Trigger Day',                  // Generic title
+            json_encode([                           // Before value: include hotel info
+                'hotel_id' => $hotel->id,
+                'hotel_name' => $hotel->name,
+                'release_trigger' => $oldValue
+            ]),
+            json_encode([                           // After value: include updated info
+                'hotel_id' => $hotel->id,
+                'hotel_name' => $hotel->name,
+                'release_trigger' => (int) $value
+            ])
+        );
     }
 
     public function GetRoomItemMaxPrice($index, $selected_plan_item_price, $room_id, $item_title){
@@ -759,6 +780,9 @@ class HotelWiseInventory extends Component
 
     public function GetInventoryType($value){
         $this->selected_inventory_type = $value;
+    }
+    public function SendMail($block_type){
+        dd($block_type,$this->bulk_booking_email_body);
     }
 
     public function render()

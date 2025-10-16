@@ -193,7 +193,7 @@ class EmployeeCrud extends Component
             ENV('MAIL_FROM_NAME')         // From Name
         );
 
-        //  SendEmployeeWelcomeMail::dispatch($employee, $this->password);
+        // SendEmployeeWelcomeMail::dispatch($employee, $this->password);
         $employee->destinations()->sync($this->destination_ids); // <-- Sync here
 
         $this->resetInput();
@@ -205,7 +205,7 @@ class EmployeeCrud extends Component
         $this->dispatch('showConfirm', ['itemId' => $id]);
     }
 
-  public function deleteItem($id)
+    public function deleteItem($id)
     {
         $employee = Admin::find($id);
         if ($employee) {

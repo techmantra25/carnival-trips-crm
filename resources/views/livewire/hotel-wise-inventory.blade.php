@@ -38,17 +38,19 @@
             :selectedText="'Choose Category'"
         />
         <!-- Hotels Select -->
-        <x-form-field 
-            type="select" 
-            name="hotel" 
-            label="Hotel" 
-            :options="$hotels" 
-            :value="old('hotel', $selectedHotel)" 
-            wire:change="FilterDate(startDate.value, endDate.value, $event.target.value)"
-            wire:model="selectedHotel" 
-            class="placeholder:text-textmuted text-sm selected_seasion_type"
-            :selectedText="'Choose Hotel'"
-        />
+        <div style="width: 250px;" wire:ignore>
+            <x-form-field 
+                type="select" 
+                name="hotel" 
+                label="Hotel" 
+                :options="$hotels" 
+                :value="old('hotel', $selectedHotel)" 
+                {{-- wire:change="FilterDate(startDate.value, endDate.value, $event.target.value)" --}}
+                wire:model="selectedHotel" 
+                class="placeholder:text-textmuted text-sm selected_seasion_type choose_hotels"
+                :selectedText="'Choose Hotel'"
+            />
+        </div>
     </div>
 </div>
 
@@ -115,38 +117,52 @@
     <div id="step1" class="{{ $activeButtonid == 'second' ? 'active' : 'hidden' }}">
         <div class="top-cta-row">
             <div class="cta-block">
+                <div class="col1">
+                    <button type="button" class="btn-filter">
+                        <img src="{{asset('build/assets/images/inventory/calendar.png')}}" alt="calendar">
+                    </button>
+                </div>
                 <div class="col2">
                     <label class="cta-label">Bulk Blocking</label>
                     <div class="cta-row">
-                        <button type="button" class="yellow" id="button_test" onclick="openModal('bulk_booking')">Availability Mail</button>
-                        <div class="btn-dropdown">
-                            <button type="button" class="btn-drop yellow" onclick="BlockRequestItem('yellow')">
-                                Block Request
-                                <img src="{{asset('build/assets/images/inventory/down-angle.png')}}">
-                            </button>
-                            <div id="bulk_block_request"  class="dropbox yellow">
-                                <label for="yellowhardBlock1" class="radio-label">
-                                    <input type="radio" id="yellowhardBlock1" name="hsblock1">
-                                    Hard Block
-                                </label>
-                                <label for="yellowsoftBlock1" class="radio-label">
-                                    <input type="radio" id="yellowsoftBlock1" name="hsblock1">
-                                    Soft Block
-                                </label>
-                                <button type="button" class="btn-send">Send</button>
-                            </div>
-                        </div>
+                        <button type="button" class="yellow availability_mail" id="button_test" onclick="openModal('bulk_booking')">Availability Mail</button>
                     </div>
                 </div>
                 {{-- bulk booking mail --}}
-                <div id="bulk_booking" class="hs-overlay hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" onclick="closeModal('bulk_booking')">
-                    <div class="hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out lg:!max-w-4xl lg:w-full m-3 lg:!mx-auto modal_lg_width bg-white rounded-lg" onclick="event.stopPropagation()">
-                        <div class="ti-modal-content p-20">
-                            <div class="ti-modal-header">
-                                <h6 class="ti-modal-title">demo
+                <div id="bulk_booking" class="hs-overlay hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" wire:ignore>
+                    <div class="hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out lg:!max-w-4xl lg:w-full m-3 lg:!mx-auto modal_lg_width bg-white rounded-lg"
+                        onclick="event.stopPropagation()">
+                        <div class="ti-modal-content p-8">
+                            <!-- Modal Header -->
+                             <div>
+                                <h6 class="ti-modal-title text-xl font-semibold text-gray-800 flex items-center gap-2">
+                                    <i class="fas fa-hotel"></i>
+                                    Hotel Availability Mail – <span class="text-blue-700 font-bold">{{ $selectedHotelName }}</span>
                                 </h6>
+                                <p class="text-sm text-gray-600 mt-1">
+                                    <strong>Booking Type:</strong> Bulk Booking |
+                                    <strong>Date Range:</strong>
+                                    <span class="text-blue-600 font-medium">
+                                        {{ \Carbon\Carbon::parse($start_date)->format('d M Y') }}
+                                        –
+                                        {{ \Carbon\Carbon::parse($end_date)->format('d M Y') }}
+                                    </span>
+                                </p>
                             </div>
+
+                            <!-- Modal Body -->
                             <div class="ti-modal-body text-start">
+                                <!-- CKEditor -->
+                                <textarea id="bulk_booking_email_body" wire:model="bulk_booking_email_body">
+                                </textarea>
+                            </div>
+
+                            <!-- Modal Footer -->
+                            <div class="flex justify-end gap-2 mt-4">
+                                <button class="px-4 py-2 bg-red-400 text-white rounded"
+                                    onclick="closeModal('bulk_booking')">Cancel</button>
+                                <button class="px-4 py-2 bg-blue-600 text-white rounded"
+                                    onclick="sendHotelAvailabilityEmail('Bulk')">Send Email</button>
                             </div>
                         </div>
                     </div>
@@ -162,34 +178,31 @@
                     <label class="cta-label">Fresh Block</label>
                     <div class="cta-row">
                         <button type="button" class="green">Availability Mail</button>
-                        <div class="btn-dropdown">
-                            <button type="button" class="btn-drop green" onclick="BlockRequestItem('green')">
-                                Block Request
-                                <img src="{{asset('build/assets/images/inventory/down-angle.png')}}">
-                            </button>
-                            <div id="fresh_block_request" class="dropbox green">
-                                <label for="hardBlock1" class="radio-label">
-                                    <input type="radio" id="hardBlock1" name="hsblock1">
-                                    Hard Block
-                                </label>
-                                <label for="softBlock1" class="radio-label">
-                                    <input type="radio" id="softBlock1" name="hsblock1">
-                                    Soft Block
-                                </label>
-                                <button type="button" class="btn-send">Send</button>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 {{-- Fresh booking mail --}}
-                <div id="bulk_booking" class="hs-overlay hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" onclick="closeModal('bulk_booking')">
+                <div id="fresh_booking" class="hs-overlay hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" onclick="closeModal('fresh_booking')">
                     <div class="hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out lg:!max-w-4xl lg:w-full m-3 lg:!mx-auto modal_lg_width bg-white rounded-lg" onclick="event.stopPropagation()">
-                        <div class="ti-modal-content p-20">
-                            <div class="ti-modal-header">
-                                <h6 class="ti-modal-title">demo
-                                </h6>
+                         <div class="ti-modal-content p-8">
+                            <!-- Modal Header -->
+                            <div class="ti-modal-header mb-4 flex justify-between items-center">
+                                <h6 class="ti-modal-title text-lg font-bold">Send Hotel Availability Email</h6>
+                                <button onclick="closeModal('bulk_booking')" class="text-gray-500 hover:text-gray-700">✕</button>
                             </div>
+
+                            <!-- Modal Body -->
                             <div class="ti-modal-body text-start">
+                                <!-- CKEditor -->
+                                <textarea id="fresh_booking_email_body">
+                                </textarea>
+                            </div>
+
+                            <!-- Modal Footer -->
+                            <div class="flex justify-end gap-2 mt-4">
+                                <button class="px-4 py-2 bg-red-400 text-white rounded"
+                                    onclick="closeModal('bulk_booking')">Cancel</button>
+                                <button class="px-4 py-2 bg-blue-600 text-white rounded"
+                                    onclick="sendHotelAvailabilityEmail('Fresh')">Send Email</button>
                             </div>
                         </div>
                     </div>
@@ -203,8 +216,8 @@
                         <button type="button" class="yellow">D-
                             <x-input-field 
                                 type="text" 
-                                name="release_trigger_point" 
-                                wire:model="release_trigger_point" 
+                                name="release_trigger_point"
+                                wire:model.debounce.500ms="release_trigger_point" 
                                 wire:keyup="ReleaseTriggerUpdate({{$selectedHotel}}, $event.target.value)" 
                                 placeholder="0"
                                 class="release_trigger_point" 
@@ -820,7 +833,7 @@
         </div>
     @endif
 @endif
-<div wire:loading class="loader">
+<div wire:loading class="loader" wire:target="FilterDate">
     <div class="spinner">
     <img src="{{asset('build/assets/images/media/loader.svg')}}" alt="">
     </div>
@@ -828,5 +841,108 @@
 </div>
 
 @section('scripts')
-<script src="{{asset('build/assets/libs/inventory.js')}}"></script>
+ <script type="text/javascript" src="{{ asset('build/ckeditor/ckeditor.js') }}"></script>
+    <script src="{{asset('build/assets/libs/inventory.js')}}"></script>
+   
+
+
+ <!-- ✅ Include jQuery + Chosen CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
+
+    <script>
+        // Use jQuery safely
+        var jq = $.noConflict();
+
+        window.addEventListener('ChosenLoad', function (event) {
+            let hotels = event.detail[0].hotels;
+            let start_date = event.detail[0].start_date;
+            let end_date = event.detail[0].end_date;
+            // Define the function for initializing Chosen
+            const $hotelSelect = jq("#hotel");
+
+            // clean existing options
+            $hotelSelect.empty();
+
+            // add default placeholder option
+            $hotelSelect.append('<option value="">Choose Hotel</option>');
+
+            Object.keys(hotels).forEach(function(id) {
+                let name = hotels[id];
+                $hotelSelect.append('<option value="' + id + '">' + name + '</option>');
+            });
+
+            // ✅ 4. Re-initialize Chosen safely
+            if ($hotelSelect.data('chosen')) {
+                $hotelSelect.chosen('destroy');
+            }
+
+            $hotelSelect.chosen({
+                width: "100%",
+                placeholder_text_single: "Choose Hotel",
+            });
+
+            // ✅ 5. Handle change event
+            $hotelSelect.off('change').on('change', function () {
+                const selected = jq(this).val();
+                console.log("Selected hotel:", selected);
+
+                // Call Livewire method
+                @this.call('FilterDate', start_date, end_date, selected);
+            });
+        });
+
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+       function sendHotelAvailabilityEmail(block_type) {
+            Swal.fire({
+                title: "Send Availability Email?",
+                text: "This will send an availability notification email to the selected hotel. Do you want to continue?",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonColor: "#2563eb", // Blue
+                cancelButtonColor: "#6b7280",  // Gray
+                confirmButtonText: "Yes, send email",
+                cancelButtonText: "Cancel",
+                backdrop: true,
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: "Sending...",
+                        text: "Please wait while the email is being sent.",
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    // Call your Livewire method
+                    @this.call('SendMail', block_type)
+                        .then(() => {
+                            Swal.fire({
+                                title: "Email Sent!",
+                                text: "The hotel availability email has been sent successfully.",
+                                icon: "success",
+                                confirmButtonColor: "#2563eb"
+                            });
+                        })
+                        .catch(() => {
+                            Swal.fire({
+                                title: "Error!",
+                                text: "Something went wrong while sending the email. Please try again.",
+                                icon: "error",
+                                confirmButtonColor: "#ef4444"
+                            });
+                        });
+                }
+            });
+        }
+
+    </script>
+        
+    
 @endsection
