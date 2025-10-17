@@ -452,7 +452,6 @@
                         </p>
                     </div>
                 @endforelse
-                
             </div>
         </div>
     </div>
@@ -681,7 +680,7 @@
                                                                         <!-- Text Input -->
                                                                         @php
                                                                             $this->selected_room_item_name[$room->id][0] = '2 Person';
-                                                                            $wireKey = "room-{$room->id}-item-{0}";
+                                                                            $wireKey = "room-{$room->id}-item-0";
                                                                         @endphp
                                                                         <input 
                                                                             type="text" 
@@ -695,8 +694,8 @@
                                                                             name="selected_room_item_checked[{{ $room->id }}][0]" 
                                                                             class="accordion_check_input" 
                                                                             wire:model="selected_room_item_checked.{{ $room->id }}.0"
-                                                                            wire:change="GetRoomItemMaxPrice(0, $event.target.checked, {{$selected_plan_item_price}}, {{$room->id}}, '2 Person')"
-                                                                            wire:key="{{$wireKey}}"
+                                                                            onchange="RoomItemMaxPrice(this, 0, {{$selected_plan_item_price}}, {{$room->id}}, '2 Person')"
+                                                                            {{-- wire:key="{{$wireKey}}" --}}
                                                                         />
                                                                         
                                                                     </li>
@@ -706,7 +705,7 @@
                                                                         @php
                                                                         
                                                                             $this->selected_room_item_name[$room->id][1] = '1 Person';
-                                                                            $wireKey = "room-{$room->id}-item-{1}";
+                                                                            $wireKey = "room-{$room->id}-item-1";
                                                                         @endphp
                                                                         <input 
                                                                             type="text" 
@@ -720,8 +719,8 @@
                                                                             name="selected_room_item_checked[{{ $room->id }}][1]" 
                                                                             class="accordion_check_input" 
                                                                             wire:model="selected_room_item_checked.{{ $room->id }}.1" 
-                                                                            wire:change="GetRoomItemMaxPrice(1, $event.target.checked, {{$selected_plan_item_price}}, {{$room->id}}, '1 Person')"
-                                                                            wire:key="{{$wireKey}}"
+                                                                            onchange="RoomItemMaxPrice(this, 1, {{$selected_plan_item_price}}, {{$room->id}}, '1 Person')"
+                                                                            {{-- wire:key="{{$wireKey}}" --}}
                                                                         />
                                                                     </li>
                                                                 </ul>
@@ -789,8 +788,8 @@
                                                                                 type="checkbox" 
                                                                                 name="selected_room_item_checked[{{ $room->id }}][{{ $item_sl }}]" class="accordion_check_input" 
                                                                                 wire:model="selected_room_item_checked.{{ $room->id }}.{{ $item_sl }}"
-                                                                                wire:change="GetRoomItemMaxPrice({{$item_sl}}, $event.target.checked, 0, {{$room->id}}, '{{$addon_plan_titles}}')"
-                                                                                wire:key="{{$wireKey}}"
+                                                                                onchange="RoomItemMaxPrice(this, {{$item_sl}}, 0, {{$room->id}}, '{{$addon_plan_titles}}')"
+                                                                                {{-- wire:key="{{$wireKey}}" --}}
                                                                             />
                                                                         </li>
 
@@ -927,6 +926,8 @@
             });
         });
 
+
+
     </script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -982,6 +983,13 @@
                         });
                 }
             });
+        }
+
+        function RoomItemMaxPrice(element, value1, selectedPlanItemPrice, roomId, personType) {
+            const isChecked = element.checked;
+
+            // Call the Livewire method securely
+            @this.call('GetRoomItemMaxPrice', value1, isChecked, selectedPlanItemPrice, roomId, personType);
         }
 
     </script>

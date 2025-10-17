@@ -1,7 +1,5 @@
 @extends('layouts.master')
 @section('styles')
-<link rel="stylesheet" href="{{asset('build/assets/libs/inventory.css')}}">
-
 @endsection
 @section('title', $common['pageTitle']) <!-- This sets the page title dynamically -->
 @section('content')
@@ -10,10 +8,9 @@
         <h5 class="page-title text-[1.3125rem] font-medium text-defaulttextcolor mb-0 uppercase">{{$common['childHeader']}}</h5>
         <nav>
             <ol class="flex items-center whitespace-nowrap min-w-0">
-                <li class="text-[12px]"> <a class="flex items-center text-primary hover:text-primary"
-                            class="ti ti-chevrons-right flex-shrink-0 mx-3 overflow-visible text-textmuted rtl:rotate-180"></i>
+                <li class="text-[12px]"> <a class="flex items-center text-primary hover:text-primary" href="javascript:void(0);"> {{$common['parentHeader']}} <i class="ti ti-chevrons-right flex-shrink-0 mx-3 overflow-visible text-textmuted rtl:rotate-180"></i>
                     </a> </li>
-                <li class="text-[12px]"> <a class="flex items-center text-textmuted" href="javascript:void(0);">{{$common['parentHeader']}}
+                <li class="text-[12px]"> <a class="flex items-center text-textmuted" href="javascript:void(0);">{{$common['childHeader']}}
                     </a> </li>
             </ol>
         </nav>
@@ -24,7 +21,7 @@
     <div class="xl:col-span-12 col-span-12">
         <div class="box custom-box">
             <div class="box-body">
-                <livewire:hotel-wise-inventory/>
+                <livewire:inventory-hotel-booking-request/>
             </div>
         </div>
     </div>

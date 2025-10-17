@@ -173,6 +173,8 @@
 									<li class="slide {{ request()->is('admin/inventory*')? 'active' : '' }}">
 										<a href="{{route('admin.inventory.index')}}" class="side-menu__item">Inventories</a>
 									</li>
+									<li class="slide {{ request()->is('admin/inventory/hotel-booking-request*')? 'active' : '' }}">
+										<a href="{{route('admin.inventory.hotel-booking-request')}}" class="side-menu__item">Hotel Booking Request</a>
 									</li>
 								</ul>
 							</li>

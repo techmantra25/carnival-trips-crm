@@ -30,9 +30,13 @@ class MailTemplateService
                 $body = str_replace('{{'.$key.'}}', $value, $body);
             }
             // Now inject CKEditor content
-            if(isset($data['content'])) {
-                $body = str_replace('{!! content !!}', $data['content'], $body);
+            if (isset($data['content'])) {
+                $content = !empty($data['content']) ? $data['content'] : '';
+                $body = str_replace('{!! content !!}', $content, $body);
+            } else {
+                $body = str_replace('{!! content !!}', '', $body);
             }
+
             // Replace placeholders in template subject
             $subject = $template->subject;
             foreach ($subject_data as $sub_key => $sub_value) {

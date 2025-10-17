@@ -144,6 +144,7 @@ use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagem
         
         Route::prefix('inventory')->group(function(){
             Route::get('/', [InventoryController::class, 'index'])->name('admin.inventory.index');
+            Route::get('/hotel-booking-request', [InventoryController::class, 'hotel_booking_request'])->name('admin.inventory.hotel-booking-request');
             Route::get('/page1', [InventoryController::class, 'page1'])->name('admin.inventory.page1');
             Route::get('/page2', [InventoryController::class, 'page2'])->name('admin.inventory.page2');
             Route::get('get-divisions/{destination}', [InventoryController::class, 'getDivisions'])->name('admin.inventory.get.divisions');
