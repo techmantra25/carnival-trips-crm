@@ -20,7 +20,6 @@ class MailTemplateService
         $log = MailLog::create([
             'email' => $to,
             'template_slug' => $templateSlug,
-            'subject' => $template->subject,
             'status' => 'pending',
         ]);
 
@@ -30,6 +29,14 @@ class MailTemplateService
             foreach ($data as $key => $value) {
                 $body = str_replace('{{'.$key.'}}', $value, $body);
             }
+            // Now inject CKEditor content
+            if (isset($data['content'])) {
+                $content = !empty($data['content']) ? $data['content'] : '';
+                $body = str_replace('{!! content !!}', $content, $body);
+            } else {
+                $body = str_replace('{!! content !!}', '', $body);
+            }
+
             // Replace placeholders in template subject
             $subject = $template->subject;
             foreach ($subject_data as $sub_key => $sub_value) {
@@ -42,7 +49,13 @@ class MailTemplateService
                         ->from($fromAddress, $fromName);
             });
             // Update log
-            $log->update(['status' => 'success']);
+            $log->update(
+                [
+                    'status' => 'success',
+                    'subject' => $subject,
+                    'mail_body' => $body,
+                ]
+            );
             return true;
 
         } catch (\Exception $e) {

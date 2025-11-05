@@ -264,7 +264,86 @@ function validateSingleItems(input) {
 }
 
 function openModal(modalId) {
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+
+    const startDate = startDateInput ? startDateInput.value : null;
+    const endDate = endDateInput ? endDateInput.value : null;
+
+    // 3️⃣ Format the dates (e.g., "16 Oct 2025 – 20 Oct 2025")
+    if (startDate && endDate) {
+        const formattedStart = new Date(startDate).toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        });
+
+        const formattedEnd = new Date(endDate).toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        });
+
+        const dateRange = `${formattedStart} – ${formattedEnd}`;
+
+        // 4️⃣ Set this text inside the element with class "date_range"
+        const dateRangeElement = document.querySelector('.date_range');
+        if (dateRangeElement) {
+            dateRangeElement.textContent = dateRange;
+        }
+    } else {
+        console.warn('Start or End date not found!');
+    }
     document.getElementById(modalId).classList.remove('hidden');
+    const editorIds = ['bulk_booking_email_body', 'fresh_booking_email_body'];
+
+    editorIds.forEach(editorId => {
+        const textarea = document.getElementById(editorId);
+
+        if (!textarea) {
+            console.warn(`Textarea with id="${editorId}" not found!`);
+            return;
+        }
+
+        // ✅ Destroy existing CKEditor instance (if it exists)
+        if (CKEDITOR.instances[editorId]) {
+            CKEDITOR.instances[editorId].destroy(true);
+        }
+
+        // ✅ Initialize CKEditor
+        if (typeof CKEDITOR !== 'undefined') {
+            const editor = CKEDITOR.replace(editorId, {
+                height: 400,
+                removeButtons: 'PasteFromWord',
+                extraPlugins: 'colorbutton,colordialog,font,justify',
+                toolbar: [
+                    { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike'] },
+                    { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'JustifyLeft', 'JustifyCenter', 'JustifyRight'] },
+                    { name: 'links', items: ['Link', 'Unlink'] },
+                    { name: 'colors', items: ['TextColor', 'BGColor'] },
+                    { name: 'styles', items: ['Font', 'FontSize'] },
+                    { name: 'document', items: ['Source'] }
+                ]
+            });
+
+            // ✅ Sync CKEditor content to Livewire property
+            editor.on('change', function () {
+                const modal = document.getElementById('bulk_booking');
+                // 👇 Ensure the modal stays open (remove the 'hidden' class)
+                if (modal && modal.classList.contains('hidden')) {
+                    modal.classList.remove('hidden');
+                }
+
+                const content = editor.getData();
+                const componentId = document.querySelector('[wire\\:id]')?.getAttribute('wire:id');
+                if (componentId) {
+                    Livewire.find(componentId).set(editorId, content);
+                }
+            });
+        } else {
+            console.error('CKEditor is not defined!');
+        }
+    });
 }
 
 function closeModal(modalId) {

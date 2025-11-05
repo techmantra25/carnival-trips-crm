@@ -21,6 +21,8 @@ use App\Models\LeadUrlShare;
 use App\Models\ItineraryTemplate;
 use App\Models\LeadUrlClick;
 use App\Models\Itinerary;
+use App\Models\ChangeLog;
+use Illuminate\Support\Facades\Auth;
 
 class CustomHelper
 {
@@ -547,6 +549,16 @@ class CustomHelper
         }
 
         return $stats;
+    }
+    public static function logChange(string $title, $beforeValue = null, $afterValue = null){
+        $adminId = Auth::guard('admin')->id();
+
+        $store = new ChangeLog;
+        $store->title = $title;
+        $store->before_value = $beforeValue;
+        $store->after_value = $afterValue;
+        $store->admin_id = $adminId;
+        $store->save();
     }
 
     

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Repositories\CommonRepository;
 use App\Repositories\HotelRepository;
 use App\Repositories\LeadRepository;
+use App\Models\City;
 use App\Repositories\InventoryRepository;
 use App\Helpers\CustomHelper;
 // use App\Models\HotelImage;
@@ -46,7 +47,6 @@ class InventoryController extends Controller
 
         // Set headers and title
         $common = CustomHelper::setHeadersAndTitle('Inventory Management', 'Inventories');
-        // dd($pageTitle);
         // Return view
         return view('admin.inventory.index', compact('data', 'common'));
     }
@@ -54,6 +54,10 @@ class InventoryController extends Controller
     {
         $divisions = City::where('state_id', $destinationId)->pluck('name', 'id'); // Adjust relationship if needed
         return response()->json($divisions);
+    }
+    public function hotel_booking_request(){
+        $common = CustomHelper::setHeadersAndTitle('Inventory Management', 'Hotel Booking Request');
+        return view('admin.inventory.hotel-booking-request', compact('common'));
     }
     public function page1(){
         $common = CustomHelper::setHeadersAndTitle('Inventory Management', 'page1');

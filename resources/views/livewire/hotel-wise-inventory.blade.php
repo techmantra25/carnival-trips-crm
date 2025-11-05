@@ -38,17 +38,19 @@
             :selectedText="'Choose Category'"
         />
         <!-- Hotels Select -->
-        <x-form-field 
-            type="select" 
-            name="hotel" 
-            label="Hotel" 
-            :options="$hotels" 
-            :value="old('hotel', $selectedHotel)" 
-            wire:change="FilterDate(startDate.value, endDate.value, $event.target.value)"
-            wire:model="selectedHotel" 
-            class="placeholder:text-textmuted text-sm selected_seasion_type"
-            :selectedText="'Choose Hotel'"
-        />
+        <div style="width: 250px;" wire:ignore>
+            <x-form-field 
+                type="select" 
+                name="hotel" 
+                label="Hotel" 
+                :options="$hotels" 
+                :value="old('hotel', $selectedHotel)" 
+                {{-- wire:change="FilterDate(startDate.value, endDate.value, $event.target.value)" --}}
+                wire:model="selectedHotel" 
+                class="placeholder:text-textmuted text-sm selected_seasion_type choose_hotels"
+                :selectedText="'Choose Hotel'"
+            />
+        </div>
     </div>
 </div>
 
@@ -115,42 +117,59 @@
     <div id="step1" class="{{ $activeButtonid == 'second' ? 'active' : 'hidden' }}">
         <div class="top-cta-row">
             <div class="cta-block">
+                <div class="col1">
+                    <button type="button" class="btn-filter">
+                        <img src="{{asset('build/assets/images/inventory/calendar.png')}}" alt="calendar">
+                    </button>
+                </div>
                 <div class="col2">
                     <label class="cta-label">Bulk Blocking</label>
                     <div class="cta-row">
-                        <button type="button" class="yellow" id="button_test" onclick="openModal('bulk_booking')">Availability Mail</button>
-                        <div class="btn-dropdown">
-                            <button type="button" class="btn-drop yellow" onclick="BlockRequestItem('yellow')">
-                                Block Request
-                                <img src="{{asset('build/assets/images/inventory/down-angle.png')}}">
-                            </button>
-                            <div id="bulk_block_request"  class="dropbox yellow">
-                                <label for="yellowhardBlock1" class="radio-label">
-                                    <input type="radio" id="yellowhardBlock1" name="hsblock1">
-                                    Hard Block
-                                </label>
-                                <label for="yellowsoftBlock1" class="radio-label">
-                                    <input type="radio" id="yellowsoftBlock1" name="hsblock1">
-                                    Soft Block
-                                </label>
-                                <button type="button" class="btn-send">Send</button>
-                            </div>
-                        </div>
+                        <button type="button" class="yellow availability_mail" id="button_test" onclick="openModal('bulk_booking')">Availability Mail</button>
                     </div>
                 </div>
                 {{-- bulk booking mail --}}
-                <div id="bulk_booking" class="hs-overlay hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" onclick="closeModal('bulk_booking')">
-                    <div class="hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out lg:!max-w-4xl lg:w-full m-3 lg:!mx-auto modal_lg_width bg-white rounded-lg" onclick="event.stopPropagation()">
-                        <div class="ti-modal-content p-20">
-                            <div class="ti-modal-header">
-                                <h6 class="ti-modal-title">demo
-                                </h6>
-                            </div>
-                            <div class="ti-modal-body text-start">
+                <div wire:ignore>
+                    <div id="bulk_booking" class="hs-overlay hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                        <div class="hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out lg:!max-w-4xl lg:w-full m-3 lg:!mx-auto modal_lg_width bg-white rounded-lg"
+                            onclick="event.stopPropagation()">
+                            <div class="ti-modal-content p-8">
+                                <!-- Modal Header -->
+                                <div>
+                                    <h6 class="ti-modal-title text-xl font-semibold text-gray-800 flex items-center gap-2">
+                                        <i class="fas fa-hotel"></i>
+                                        Hotel Availability Mail – <span class="text-blue-700 font-bold selected_hotel_name">{{ $selectedHotelName }}</span>
+                                    </h6>
+                                    <p class="text-sm text-gray-600 mt-1">
+                                        <strong>Booking Type:</strong> Bulk Booking |
+                                        <strong>Date Range:</strong>
+                                        <span class="text-blue-600 font-medium date_range">
+                                            {{ \Carbon\Carbon::parse($start_date)->format('d M Y') }}
+                                            –
+                                            {{ \Carbon\Carbon::parse($end_date)->format('d M Y') }}
+                                        </span>
+                                    </p>
+                                </div>
+
+                                <!-- Modal Body -->
+                                <div class="ti-modal-body text-start">
+                                    <!-- CKEditor -->
+                                    <textarea id="bulk_booking_email_body" wire:model="bulk_booking_email_body">
+                                    </textarea>
+                                </div>
+
+                                <!-- Modal Footer -->
+                                <div class="flex justify-end gap-2 mt-4">
+                                    <button class="px-4 py-2 bg-red-400 text-white rounded"
+                                        onclick="closeModal('bulk_booking')">Cancel</button>
+                                    <button class="px-4 py-2 bg-blue-600 text-white rounded"
+                                        onclick="sendHotelAvailabilityEmail('Bulk Booking')">Send Email</button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                
             </div>
             <div class="cta-block">
                 <div class="col1">
@@ -161,37 +180,45 @@
                 <div class="col2">
                     <label class="cta-label">Fresh Block</label>
                     <div class="cta-row">
-                        <button type="button" class="green">Availability Mail</button>
-                        <div class="btn-dropdown">
-                            <button type="button" class="btn-drop green" onclick="BlockRequestItem('green')">
-                                Block Request
-                                <img src="{{asset('build/assets/images/inventory/down-angle.png')}}">
-                            </button>
-                            <div id="fresh_block_request" class="dropbox green">
-                                <label for="hardBlock1" class="radio-label">
-                                    <input type="radio" id="hardBlock1" name="hsblock1">
-                                    Hard Block
-                                </label>
-                                <label for="softBlock1" class="radio-label">
-                                    <input type="radio" id="softBlock1" name="hsblock1">
-                                    Soft Block
-                                </label>
-                                <button type="button" class="btn-send">Send</button>
-                            </div>
-                        </div>
+                        <button type="button" class="green" onclick="openModal('fresh_booking')">Availability Mail</button>
                     </div>
                 </div>
                 {{-- Fresh booking mail --}}
-                <div id="bulk_booking" class="hs-overlay hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" onclick="closeModal('bulk_booking')">
+                <div id="fresh_booking" class="hs-overlay hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50" onclick="closeModal('fresh_booking')">
                     <div class="hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out lg:!max-w-4xl lg:w-full m-3 lg:!mx-auto modal_lg_width bg-white rounded-lg" onclick="event.stopPropagation()">
-                        <div class="ti-modal-content p-20">
-                            <div class="ti-modal-header">
-                                <h6 class="ti-modal-title">demo
-                                </h6>
+                            <div class="ti-modal-content p-8">
+                                <!-- Modal Header -->
+                                <div>
+                                    <h6 class="ti-modal-title text-xl font-semibold text-gray-800 flex items-center gap-2">
+                                        <i class="fas fa-hotel"></i>
+                                        Hotel Availability Mail – <span class="text-blue-700 font-bold selected_hotel_name">{{ $selectedHotelName }}</span>
+                                    </h6>
+                                    <p class="text-sm text-gray-600 mt-1">
+                                        <strong>Booking Type:</strong> Fresh Booking |
+                                        <strong>Date Range:</strong>
+                                        <span class="text-blue-600 font-medium date_range">
+                                            {{ \Carbon\Carbon::parse($start_date)->format('d M Y') }}
+                                            –
+                                            {{ \Carbon\Carbon::parse($end_date)->format('d M Y') }}
+                                        </span>
+                                    </p>
+                                </div>
+
+                                <!-- Modal Body -->
+                                <div class="ti-modal-body text-start">
+                                    <!-- CKEditor -->
+                                    <textarea id="fresh_booking_email_body" wire:model="fresh_booking_email_body">
+                                    </textarea>
+                                </div>
+
+                                <!-- Modal Footer -->
+                                <div class="flex justify-end gap-2 mt-4">
+                                    <button class="px-4 py-2 bg-red-400 text-white rounded"
+                                        onclick="closeModal('fresh_booking')">Cancel</button>
+                                    <button class="px-4 py-2 bg-blue-600 text-white rounded"
+                                        onclick="sendHotelAvailabilityEmail('Fresh Booking')">Send Email</button>
+                                </div>
                             </div>
-                            <div class="ti-modal-body text-start">
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -203,8 +230,8 @@
                         <button type="button" class="yellow">D-
                             <x-input-field 
                                 type="text" 
-                                name="release_trigger_point" 
-                                wire:model="release_trigger_point" 
+                                name="release_trigger_point"
+                                wire:model.debounce.500ms="release_trigger_point" 
                                 wire:keyup="ReleaseTriggerUpdate({{$selectedHotel}}, $event.target.value)" 
                                 placeholder="0"
                                 class="release_trigger_point" 
@@ -234,14 +261,16 @@
                         </div>
                         <div class="ti-modal-body text-start">
                             <div id="single_block_request">
-                                <label for="singlehardBlock" class="radio-label">
-                                    <input type="radio" name="fresh_block_request_type" id="singlehardBlock"  wire:model="fresh_block_request_type" value="1" {{$fresh_block_request_type==1?"checked":""}}  wire:change="handleBlockTypeChange(1)">
-                                    Hard Block
-                                </label>
-                                <label for="singlesoftBlock" class="radio-label">
-                                    <input type="radio" name="fresh_block_request_type" id="singlesoftBlock" wire:model="fresh_block_request_type" value="2" {{$fresh_block_request_type==2?"checked":""}}  wire:change="handleBlockTypeChange(2)">
-                                    Soft Block
-                                </label>
+                                <div class="my-3">
+                                    <label for="singlehardBlock" class="radio-label">
+                                        <input type="radio" name="fresh_block_request_type" id="singlehardBlock"  wire:model="fresh_block_request_type" value="1" {{$fresh_block_request_type==1?"checked":""}}  wire:change="handleBlockTypeChange(1)">
+                                        Hard Block
+                                    </label>
+                                    <label for="singlesoftBlock" class="radio-label">
+                                        <input type="radio" name="fresh_block_request_type" id="singlesoftBlock" wire:model="fresh_block_request_type" value="2" {{$fresh_block_request_type==2?"checked":""}}  wire:change="handleBlockTypeChange(2)">
+                                        Soft Block
+                                    </label>
+                                </div>
                                 <input type="text" wire:model="fresh_single_value" id="single_appended_value" value="{{$fresh_single_value}}" onkeyup="validateSingleItems(this)">
                                 <button type="button" class="btn-save" id="single_request_submit" wire:click="DateWiseInventoryUpdate({{$single_selected_room_id}},'{{$single_selected_date}}', {{$fresh_single_value}})">Save</button>
                             </div>
@@ -276,7 +305,7 @@
             <div class="accordion">
                 @forelse ($room_category as $room)
                     <div class="accordion-item">
-                        <div class="accordion-header {{ $activeAccordionId == $room->id ? 'active' : '' }}">
+                        <div class="accordion-header {{ $activeAccordionId == $room->id ? 'active' : '' }}" wire:key="accordian-header-list-room-{{$room->id}}">
                             <div class="header-left" wire:click="accordionItem({{$room->id}})">
                                 <span class="badge bg-primary/10 text-primary">{{$room->room_name}}</span>
                                 <img src="{{asset('build/assets/images/inventory/up-arrow.png')}}" alt="">
@@ -295,7 +324,7 @@
                                 </ul>
                             </div>
                         </div>
-                        <div class="accordion-body {{ $activeAccordionId == $room->id ? 'active' : '' }}">
+                        <div class="accordion-body {{ $activeAccordionId == $room->id ? 'active' : '' }}" wire:key="accordian-body-list-room-{{$room->id}}">
                             <div class="content-wrap">
                                 {{-- Checking first seasion time asigned or not --}}
                                 @if($hotel_seasion_times)
@@ -423,7 +452,6 @@
                         </p>
                     </div>
                 @endforelse
-                
             </div>
         </div>
     </div>
@@ -596,32 +624,37 @@
                         <div class="bottom-content">
                             <div class="accordion">
                                 @forelse ($room_category as $index=> $room)
-                                    <div class="accordion-item">
-                                        <div class="accordion-header {{ $activeSecondAccordionId == $room->id ? 'active' : '' }}">
-                                            <span class="badge bg-primary/10 text-primary" wire:click="SecondAccordionItem({{$room->id}})">{{$room->room_name}} <img src="{{asset('build/assets/images/inventory/up-arrow.png')}}" alt=""></span>
-                                            @if(in_array($room->id, $selected_room_id))
-                                                <x-input-field 
-                                                    type="text" 
-                                                    name="room_wise_quantity[{{$room->id}}]" 
-                                                    class="green" 
-                                                    id="room_wise_quantity_{{ $room->id }}" 
-                                                    wire:model="room_wise_quantity.{{ $room->id }}" 
-                                                    placeholder="0"
-                                                    onkeyup="validateNumber(this)"
-                                                    value=""
-                                                />
-                                            @endif
-                                        <!-- Checkbox -->
-                                            <x-input-field 
-                                            type="checkbox" 
-                                            name="selected_room_id[]" 
-                                            value="{{ $room->id }}" 
-                                            class="accordion_check_input" 
-                                            wire:model="selected_room_id" 
-                                            wire:change="toggleRoomWiseQuantity({{ $room->id }}, {{ $index }})" />
-
+                                    <div class="accordion-item" >
+                                        <div class="accordion-header {{ $activeSecondAccordionId == $room->id ? 'active' : '' }} justify-between" wire:key="accordion-room-{{ $room->id }}">
+                                            <div class="flex w-full">
+                                                <span class="badge bg-primary/10 text-primary">{{$room->room_name}} </span>
+                                                    @if(in_array($room->id, $selected_room_id))
+                                                        <x-input-field 
+                                                            type="text" 
+                                                            name="room_wise_quantity[{{$room->id}}]" 
+                                                            class="green" 
+                                                            id="room_wise_quantity_{{ $room->id }}" 
+                                                            wire:model="room_wise_quantity.{{ $room->id }}" 
+                                                            placeholder="0"
+                                                            onkeyup="validateNumber(this)"
+                                                            value=""
+                                                        />
+                                                    @endif
+                                                    <!-- Checkbox -->
+                                                    <x-input-field 
+                                                    type="checkbox" 
+                                                    name="selected_room_id[]" 
+                                                    value="{{ $room->id }}" 
+                                                    class="accordion_check_input" 
+                                                    wire:model="selected_room_id" 
+                                                    wire:change="toggleRoomWiseQuantity({{ $room->id }}, {{ $index }})"
+                                                    wire:key="checkbox-room-{{ $room->id }}" />
+                                            </div>
+                                            <div>
+                                                <img src="{{asset('build/assets/images/inventory/up-arrow.png')}}" wire:click="SecondAccordionItem({{$room->id}})" wire:key="toggle-accordion-{{ $room->id }}" alt="">
+                                            </div>
                                         </div>
-                                        <div class="accordion-body {{ $activeSecondAccordionId == $room->id ? 'active' : '' }}">
+                                        <div class="accordion-body {{ $activeSecondAccordionId == $room->id ? 'active' : '' }}" wire:key="accordion-room-body-{{ $room->id }}">
                                             @if($hotel_seasion_times)
                                                 @if(count($room_plan_items)>0)
                                                     <h3><span class="badge bg-primary text-white">Price Chart</span></h3>
@@ -637,7 +670,7 @@
                                                             </td>
                                                             <td>
                                                                 <div class="badges-wrapper">
-                                                                    <label><span class="badge bg-outline-primary">2<img src="{{asset('build/assets/images/inventory/user.png')}}" alt="person"></span></label>
+                                                                    <label><span class="badge bg-outline-primary">2<img src="{{asset('build/assets/images/inventory/double-user.png')}}" alt="person"></span></label>
                                                                     <label><span class="badge bg-outline-primary">1<img src="{{asset('build/assets/images/inventory/user.png')}}" alt="person"></span></label>
                                                                 </div>
                                                             </td>
@@ -647,6 +680,7 @@
                                                                         <!-- Text Input -->
                                                                         @php
                                                                             $this->selected_room_item_name[$room->id][0] = '2 Person';
+                                                                            $wireKey = "room-{$room->id}-item-0";
                                                                         @endphp
                                                                         <input 
                                                                             type="text" 
@@ -660,8 +694,10 @@
                                                                             name="selected_room_item_checked[{{ $room->id }}][0]" 
                                                                             class="accordion_check_input" 
                                                                             wire:model="selected_room_item_checked.{{ $room->id }}.0"
-                                                                            wire:change="GetRoomItemMaxPrice(0, {{$selected_plan_item_price}}, {{$room->id}}, '2 Person')"
+                                                                            onchange="RoomItemMaxPrice(this, 0, {{$selected_plan_item_price}}, {{$room->id}}, '2 Person')"
+                                                                            {{-- wire:key="{{$wireKey}}" --}}
                                                                         />
+                                                                        
                                                                     </li>
                                                                 
                                                                     <li>
@@ -669,6 +705,7 @@
                                                                         @php
                                                                         
                                                                             $this->selected_room_item_name[$room->id][1] = '1 Person';
+                                                                            $wireKey = "room-{$room->id}-item-1";
                                                                         @endphp
                                                                         <input 
                                                                             type="text" 
@@ -682,7 +719,8 @@
                                                                             name="selected_room_item_checked[{{ $room->id }}][1]" 
                                                                             class="accordion_check_input" 
                                                                             wire:model="selected_room_item_checked.{{ $room->id }}.1" 
-                                                                            wire:change="GetRoomItemMaxPrice(1, {{$selected_plan_item_price}}, {{$room->id}}, '1 Person')"
+                                                                            onchange="RoomItemMaxPrice(this, 1, {{$selected_plan_item_price}}, {{$room->id}}, '1 Person')"
+                                                                            {{-- wire:key="{{$wireKey}}" --}}
                                                                         />
                                                                     </li>
                                                                 </ul>
@@ -734,6 +772,7 @@
                                                                     @forelse ($hotel_addon_plan_title as $k => $addon_plan_titles)
                                                                     @php
                                                                         $this->selected_room_item_name[$room->id][$item_sl] = $addon_plan_titles;
+                                                                        $wireKey = "room-{$room->id}-item-{$item_sl}";
                                                                     @endphp
                                                                         <li>
                                                                             <!-- Text Input -->
@@ -749,7 +788,8 @@
                                                                                 type="checkbox" 
                                                                                 name="selected_room_item_checked[{{ $room->id }}][{{ $item_sl }}]" class="accordion_check_input" 
                                                                                 wire:model="selected_room_item_checked.{{ $room->id }}.{{ $item_sl }}"
-                                                                                wire:change="GetRoomItemMaxPrice({{$item_sl}}, 0, {{$room->id}}, '{{$addon_plan_titles}}')"
+                                                                                onchange="RoomItemMaxPrice(this, {{$item_sl}}, 0, {{$room->id}}, '{{$addon_plan_titles}}')"
+                                                                                {{-- wire:key="{{$wireKey}}" --}}
                                                                             />
                                                                         </li>
 
@@ -820,7 +860,7 @@
         </div>
     @endif
 @endif
-<div wire:loading class="loader">
+<div wire:loading class="loader" wire:target="FilterDate,accordionItem,GetDivisions,loadCategories,loadHotels,OpenViewSummary,TabChange,CloseBlockSingleModal,BlockSingleRequestItem,toggleExtraDays,updateMonth,toggleRoomWiseQuantity,SecondAccordionItem,GetRoomItemMaxPrice,UpdateInventory">
     <div class="spinner">
     <img src="{{asset('build/assets/images/media/loader.svg')}}" alt="">
     </div>
@@ -828,5 +868,131 @@
 </div>
 
 @section('scripts')
-<script src="{{asset('build/assets/libs/inventory.js')}}"></script>
+ <script type="text/javascript" src="{{ asset('build/ckeditor/ckeditor.js') }}"></script>
+    <script src="{{asset('build/assets/libs/inventory.js')}}"></script>
+   
+
+
+ <!-- ✅ Include jQuery + Chosen CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.min.js"></script>
+
+    <script>
+        // Use jQuery safely
+        var jq = $.noConflict();
+
+        window.addEventListener('ChosenLoad', function (event) {
+            let hotels = event.detail[0].hotels;
+            // let start_date = event.detail[0].start_date;
+            // let end_date = event.detail[0].end_date;
+            // Define the function for initializing Chosen
+            const $hotelSelect = jq("#hotel");
+
+            // clean existing options
+            $hotelSelect.empty();
+
+            // add default placeholder option
+            $hotelSelect.append('<option value="">Choose Hotel</option>');
+
+            Object.keys(hotels).forEach(function(id) {
+                let name = hotels[id];
+                $hotelSelect.append('<option value="' + id + '">' + name + '</option>');
+            });
+
+            // ✅ 4. Re-initialize Chosen safely
+            if ($hotelSelect.data('chosen')) {
+                $hotelSelect.chosen('destroy');
+            }
+
+            $hotelSelect.chosen({
+                width: "100%",
+                placeholder_text_single: "Choose Hotel",
+            });
+
+            // ✅ 5. Handle change event
+            $hotelSelect.off('change').on('change', function () {
+                const selected = jq(this).val();
+                const selectedText  = jq(this).find('option:selected').text();
+                var start_date = jq('#startDate').val();
+                var end_date = jq('#endDate').val();
+
+                const hotelNameElement = document.querySelector('.selected_hotel_name');
+                if (hotelNameElement) {
+                    hotelNameElement.textContent = selectedText;
+                }
+                // Call Livewire method
+                @this.call('FilterDate', start_date, end_date, selected);
+            });
+        });
+
+
+
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function sendHotelAvailabilityEmail(block_type) {
+            Swal.fire({
+                title: "Send Availability Email?",
+                text: "This will send an availability notification email to the selected hotel. Do you want to continue?",
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonColor: "#2563eb", // Blue
+                cancelButtonColor: "#6b7280",  // Gray
+                confirmButtonText: "Yes, send email",
+                cancelButtonText: "Cancel",
+                backdrop: true,
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: "Sending...",
+                        text: "Please wait while the email is being sent.",
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    // Call your Livewire method
+                    @this.call('SendMail', block_type)
+                        .then((response) => {
+                            if (response.status) {
+                                Swal.fire({
+                                    title: "Email Sent!",
+                                    text: response.message,
+                                    icon: "success",
+                                    confirmButtonColor: "#2563eb"
+                                });
+
+                                // Close the modals
+                                const bulkModal = document.getElementById('bulk_booking');
+                                const freshModal = document.getElementById('fresh_booking');
+
+                                if (bulkModal) bulkModal.classList.add('hidden');
+                                if (freshModal) freshModal.classList.add('hidden');
+                            } else {
+                                Swal.fire({
+                                    title: "Error!",
+                                    text: response.message,
+                                    icon: "error",
+                                    confirmButtonColor: "#ef4444"
+                                });
+                            }
+                        });
+                }
+            });
+        }
+
+        function RoomItemMaxPrice(element, value1, selectedPlanItemPrice, roomId, personType) {
+            const isChecked = element.checked;
+
+            // Call the Livewire method securely
+            @this.call('GetRoomItemMaxPrice', value1, isChecked, selectedPlanItemPrice, roomId, personType);
+        }
+
+    </script>
+        
+    
 @endsection

@@ -608,7 +608,7 @@
             height: 30px;
             max-width: 40px;
             padding: 3px; 
-            margin-left: 20px;
+            /* margin-left: 20px; */
         }
         .accordion-header input.green {
             background: #7bdd7b;

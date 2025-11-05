@@ -40,6 +40,10 @@ class Hotel extends Model
     {
         return $this->hasMany(HotelPriceChart::class, 'hotel_id', 'id');
     }
+    public function bookingRequest(): HasMany
+    {
+        return $this->hasMany(HotelAvailabilityRequest::class, 'hotel_id', 'id');
+    }
     public function priority_rooms(): HasMany
     {
         return $this->hasMany(Room::class, 'hotel_id', 'id')->orderBy('positions', 'ASC');

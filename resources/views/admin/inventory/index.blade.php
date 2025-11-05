@@ -13,7 +13,7 @@
                 <li class="text-[12px]"> <a class="flex items-center text-primary hover:text-primary"
                             class="ti ti-chevrons-right flex-shrink-0 mx-3 overflow-visible text-textmuted rtl:rotate-180"></i>
                     </a> </li>
-                <li class="text-[12px]"> <a class="flex items-center text-textmuted" href="javascript:void(0);">{{$common['childHeader']}}
+                <li class="text-[12px]"> <a class="flex items-center text-textmuted" href="javascript:void(0);">{{$common['parentHeader']}}
                     </a> </li>
             </ol>
         </nav>
