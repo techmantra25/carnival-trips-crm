@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Repositories\CommonRepository;
 use App\Helpers\CustomHelper;
+use App\Models\CountryCode;
 use Illuminate\Validation\Rule;
 
 class CommonController extends Controller
@@ -348,14 +349,83 @@ class CommonController extends Controller
 
 
 
-        public function country_index(Request $request){
+        // public function country_index(Request $request){
           
-            $country = $request->country??"";
-            $get_countries = $this->commonRepository->getAllCountry(10,$country);
-            $country_codes = $get_countries['country_codes'];  // Paginated data
-            $common = CustomHelper::setHeadersAndTitle('Master Management', 'Countries');
-            return view('admin.country.index', array_merge(compact('country_codes'), $common));
+        //     $country = $request->country??"";
+        //     $get_countries = $this->commonRepository->getAllCountry(10,$country);
+        //     $country_codes = $get_countries['country_codes'];  // Paginated data
+        //     $common = CustomHelper::setHeadersAndTitle('Master Management', 'Countries');
+        //     return view('admin.country.index', array_merge(compact('country_codes'), $common));
+        // }
+         public function country_index(Request $request)
+        {
+            $search = $request->country ?? '';
+            $update_id = $request->update_id ?? "";
+            $update_item = CountryCode::find($update_id);
+            $query = CountryCode::query();
+
+            if($search) {
+                $query->where('country_code', 'like', "%$search%")
+                    ->orWhere('country_name', 'like', "%$search%");
+            }
+
+            $country_codes = $query->orderBy('country_name', 'asc')->paginate(10);
+
+            $pageTitle = 'Master Management';
+            $childHeader = 'Countries';
+            $parentHeader = 'Master Management';
+
+            return view('admin.country.index', compact('update_item', 'country_codes', 'pageTitle', 'childHeader', 'parentHeader'));
         }
+
+        // Store a new country
+        public function country_store(Request $request)
+        {
+            
+            $validatedData = $request->validate([
+                'country_code' => 'required|string|max:5|unique:country_codes,country_code,NULL,id',
+                'country_name' => 'required|string|max:255|unique:country_codes,country_name,NULL,id',
+                'phone_code'   => 'required|string|max:10',
+                'phone_length' => 'required|integer|min:1',
+            ], [
+                'country_code.required' => 'Please enter the country code.',
+                'country_code.unique'   => 'This country code already exists.',
+                'country_name.required' => 'Please enter the country name.',
+                'country_name.unique'   => 'This country name already exists.',
+                'phone_code.required'   => 'Please enter the phone code.',
+                'phone_length.required' => 'Please enter the phone length.',
+            ]);
+
+            try {
+                CountryCode::create($validatedData);
+                return redirect()->back()->with('success', 'Country created successfully.');
+            } catch (\Exception $e) {
+                // dd($e->getMessage());
+                return redirect()->back()->with('error', $e->getMessage());
+            }
+        }
+
+
+        // Update a country
+        public function country_update(Request $request)
+        {
+            $validatedData = $request->validate([
+                'id'           => 'required|exists:country_codes,id',
+                'country_code' => ['required', 'string', 'max:5', Rule::unique('country_codes','country_code')->ignore($request->id)],
+                'country_name' => ['required', 'string', 'max:255', Rule::unique('country_codes','country_name')->ignore($request->id)],
+                'phone_code'   => 'required|string|max:10',
+                'phone_length' => 'required|integer|min:1',
+            ]);
+
+            try {
+                $country = CountryCode::findOrFail($request->id);
+                $country->update($validatedData);
+                return redirect()->route('admin.country.index')->with('success', 'Country updated successfully.');
+            } catch (\Exception $e) {
+                return redirect()->back()->with('error', $e->getMessage());
+            }
+        }
+
 
         // Cab Master
         public function cab_index(Request $request){

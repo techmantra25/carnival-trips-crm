@@ -5,11 +5,11 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="Author" content="Spruko Technologies Private Limited">
-        <meta name="description" content="A Tailwind CSS admin template is a pre-designed web page for an admin dashboard. Optimizing it for SEO includes using meta descriptions and ensuring it's responsive and fast-loading.">
-        <meta name="keywords" content="laravel template, laravel, laravel admin, laravel admin template, dashboard, admin panel template, laravel framework, tailwind, admin template, laravel admin panel, admin, laravel dashboard, dashboard for laravel, admin panel for laravel, laravel tailwind, tailwind dashboard.">
+        <meta name="description" content="">
+        <meta name="keywords" content="">
 
 		<!-- TITLE -->
-        <title> Valex - Laravel Tailwind Admin Template </title>
+        <title> CTH Master Admin </title>
 
         <!-- Favicon -->
         <link rel="shortcut icon" href="{{asset('build/assets/images/brand-logos/favicon.ico')}}">
