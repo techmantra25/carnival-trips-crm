@@ -153,6 +153,8 @@ use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagem
         Route::prefix('master')->group(function(){
             Route::prefix('country')->group(function(){
                 Route::get('/', [CommonController::class, 'country_index'])->name('admin.country.index');
+                Route::post('/country_store', [CommonController::class,'country_store'])->name('admin.country.store');
+                Route::post('/country_update', [CommonController::class,'country_update'])->name('admin.country.update');
             });
             Route::prefix('cab')->group(function(){
                 Route::get('/', [CommonController::class,'cab_index'])->name('admin.cab.index');

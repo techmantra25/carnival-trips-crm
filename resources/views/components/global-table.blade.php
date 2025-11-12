@@ -5,9 +5,7 @@
             @foreach ($fields as $field)
                 <th scope="col" class="!text-center">{{ strtoupper(str_replace('_', ' ', $field)) }}</th>
             @endforeach
-            @if($dataType!='country_codes')
             <th scope="col" class="!text-center">ACTIONS</th>
-            @endif
         </tr>
     </thead>
     <tbody>
@@ -99,10 +97,23 @@
             @elseif($dataType=='country_codes')
                 <tr class="text-grey" id="delete{{$item->id}}">
                     <td scope="row" style="text-align: center;" class="border-b border-defaultborder !text-center !p-1"><span class="badge bg-primary/10 text-primary">{{ $index + 1 }}</span></td>
-                    <td scope="row" style="text-align: center;" class="border-b border-defaultborder !text-center !p-1">{{$item->country_code}}</td>
+                    {{-- <td scope="row" style="text-align: center;" class="border-b border-defaultborder !text-center !p-1">{{$item->country_code}}</td> --}}
                     <td scope="row" style="text-align: center;" class="border-b border-defaultborder !text-center !p-1">{{$item->country_name}}</td>
                     <td scope="row" style="text-align: center;" class="border-b border-defaultborder !text-center !p-1">{{$item->phone_code}}</td>
                     <td scope="row" style="text-align: center;" class="border-b border-defaultborder !text-center !p-1">{{$item->phone_length}}</td>
+                    <td scope="row" class="border-b border-defaultborder !text-center !p-1">
+                        <livewire:master-status-toggle 
+                            modelName="CountryCode" 
+                            :item="$item" 
+                            wire:key="status-toggle-{{ $item->id }}" 
+                        />
+                    </td>
+                    <td scope="row" class="border-b border-defaultborder !text-center !p-1" width="10%">
+                        <div>
+                            <x-action-button type="edit" url="{{ route('admin.country.index',['update_id'=>$item->id]) }}" itemId="{{ $item->id }}" />
+                            {{-- <x-action-button type="delete" url="{{ route('admin.country.destroy', $item->id) }}" itemId="{{ $item->id }}" /> --}}
+                        </div>
+                    </td>
                 </tr>
             @elseif($dataType=='states')
                 <tr class="text-grey" id="delete{{$item->id}}">
