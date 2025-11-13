@@ -17,6 +17,7 @@ class CountryCode extends Model
         'country_name',
         'phone_code',
         'phone_length',
+        'status',
     ];
 
     
