@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('room_categories', function (Blueprint $table) {
-            $table->id(); // Primary key (bigint unsigned)
+            $table->bigIncrements('id');
             $table->string('name');
             $table->integer('status')->default(1)->comment('1 = active, 0 = inactive');
             $table->timestamps();

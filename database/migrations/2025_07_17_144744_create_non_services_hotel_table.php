@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('non_services_hotel', function (Blueprint $table) {
-            $table->id(); // Auto-increment primary key
+            $table->bigIncrements('id');
             $table->unsignedBigInteger('city_id'); // Reference to cities table
 
             $table->string('hotel_name');

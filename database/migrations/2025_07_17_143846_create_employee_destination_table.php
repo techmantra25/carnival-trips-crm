@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('employee_destination', function (Blueprint $table) {
-            $table->unsignedBigInteger('id')->primary(); // Manual primary key
+            $table->bigIncrements('id'); // Manual primary key
             $table->unsignedBigInteger('employee_id');   // Refers to `admins.id`
             $table->unsignedBigInteger('state_id');
             $table->timestamp('created_at')->nullable();

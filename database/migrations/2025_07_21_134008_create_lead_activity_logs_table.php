@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('lead_activity_logs', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->unsignedBigInteger('lead_id');
             $table->unsignedBigInteger('updated_by');
             $table->json('message')->nullable(); // To store action details

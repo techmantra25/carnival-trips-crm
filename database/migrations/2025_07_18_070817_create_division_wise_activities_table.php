@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('division_wise_activities', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->unsignedBigInteger('division_id');
             $table->string('name');
             $table->text('description')->nullable();

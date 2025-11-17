@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('trip_preference_question_options', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->unsignedBigInteger('trip_question_id'); // FK column
             $table->string('option_text');
             $table->timestamps();

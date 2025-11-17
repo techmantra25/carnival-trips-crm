@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
        Schema::create('destination_season_periods', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->unsignedBigInteger('destination_id')->nullable();
             $table->unsignedBigInteger('season_type_id')->nullable();
             $table->string('start_date')->nullable()->comment('Format: "MM-DD"');

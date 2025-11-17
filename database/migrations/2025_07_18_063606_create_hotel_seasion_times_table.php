@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('hotel_seasion_times', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->string('seasion_type')->nullable(); // Note: raw string, for display or legacy compatibility
             $table->unsignedBigInteger('seasion_type_id');
             $table->unsignedBigInteger('hotel_id');
