@@ -84,15 +84,20 @@
                                 <thead class="bg-gray-100 text-xs">
                                     @php
                                         $main_plan_colspan = count($season_main_plan);
-                                        foreach($season_main_plan as $main_plan){
+                                        foreach($season_main_plan as $main_k=>$main_plan){
                                             $plan_items = explode(', ',$main_plan['plan_item']);
-                                            $main_plan_colspan += count($plan_items);
+                                            if(count($plan_items)>1){
+                                                $main_plan_colspan += count($plan_items);
+                                            }
                                         }
                                         $addon_plan_colspan = count($season_addon_plan);
                                         foreach($season_addon_plan as $addon_plan){
                                             $plan_items = explode(', ',$addon_plan['plan_item']);
-                                            $addon_plan_colspan += count($plan_items);
+                                            if(count($plan_items)>1){
+                                                $addon_plan_colspan += count($plan_items);
+                                            }
                                         }
+                                      
                                     @endphp
                                     <tr>
                                         <th rowspan="2" class="border border-gray-300 p-2 text-center align-middle">HOTELS</th>
@@ -143,7 +148,7 @@
                                         @endphp
                                         @if(isset($item['room']) && is_array($item['room']))
                                             @foreach ($item['room'] as $roomIndex => $room)
-                                                <tr>
+                                                <tr wire:key="hotel-room-{{$roomIndex}}">
                                                     @if ($sl === 0)
                                                         <td rowspan="{{ $roomCount }}" class="border border-gray-300 p-2 font-bold text-blue-900 align-middle">
                                                             <p class="mb-1 uppercase">{{ $item['hotel_name'] }} 

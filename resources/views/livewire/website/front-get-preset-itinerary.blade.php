@@ -31,7 +31,9 @@
             </div>
         </div>
     </section>
-
+@php
+    $about_destination_slider_image = [];
+@endphp
     @if($template && $template->detail)
         @php
             $great_experience_title = $template->detail->where('header','great_experience')->where('field','great_experience_title')->first();

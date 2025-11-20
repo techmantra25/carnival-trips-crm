@@ -297,8 +297,11 @@ class CostCalculatorQueryList extends Component
     }
 
     public function updateJourneyDivision($index, $value){
+        $last_index = $index+1;
         $this->itinerary_journey_divisions[$index] = $value;
-        $this->nightHalt['night_distribution'] = CustomHelper::formatDayJourney($this->itinerary_journey_divisions);
+        if($last_index !== count($this->itinerary_journey)){
+            $this->nightHalt['night_distribution'] = CustomHelper::formatDayJourney($this->itinerary_journey_divisions);
+        }
     }
     // public function validateNightDistribution(){
     //     if(!$this->selectedCategory){

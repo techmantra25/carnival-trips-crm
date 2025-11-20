@@ -11,6 +11,7 @@ use App\Models\SeasionPlan;
 use App\Models\HotelPriceChart;
 use App\Models\Hotel;
 use App\Models\Category;
+use App\Models\EmailTemplate;
 use App\Models\DivisionWiseSightseeingImage;
 use App\Models\DivisionWiseActivityImage;
 use App\Models\DivisionWiseActivity;
@@ -36,6 +37,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Services\MailTemplateService;
+use App\Services\WhatsAppService;
 
 use App\Models\ItineraryBanner;
 
@@ -117,6 +119,11 @@ class CreateQueryItinerary extends Component
     public $send_whatsapp = false;
     public $send_email = false;
     public $send_sms = false;
+
+    protected $whatsapp;
+    public function __construct(){
+        $this->whatsapp = app(WhatsAppService::class);
+    }
 
     public function mount($encryptedId){
 
@@ -2924,6 +2931,7 @@ class CreateQueryItinerary extends Component
             ]);
 
         DB::commit();
+
         // Mailing section
         if ($this->send_email) {
           MailTemplateService::send(
@@ -2940,11 +2948,26 @@ class CreateQueryItinerary extends Component
                 ENV('MAIL_FROM_NAME')         // From Name
             );
         }
+
+        // Whatspp Section
+        if($this->send_whatsapp){
+            $whatsapp_response = $this->whatsapp->sendTemplate(
+                phone: "8617207525",
+                templateName: "template-name",
+                languageCode: env('WHATSAPP_DEFAULT_TEMPLATE_LANGUAGE'),
+                headerParams: [],
+                bodyParams: ["John"] // Fills {{1}}
+            );
+            dd($whatsapp_response);
+        }
+        
+
             session()->flash('success', 'Itinerary sent and details saved successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
+                dd('Transaction failed: ' . $e->getMessage());
             session()->flash('error', 'Failed to send itinerary. Please try again.');
-            // dd('Transaction failed: ' . $e->getMessage());
+        
         }
     }
     public function render()

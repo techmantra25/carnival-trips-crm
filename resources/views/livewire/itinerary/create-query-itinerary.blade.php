@@ -1039,7 +1039,7 @@
                                                                                                 @endif
                                                                                             @endforeach
                                                                                         </div>
-                                                                                        @forelse ($division_item['day_hotel'] as $division_hotel_item_index=>$division_hotel_item)
+                                                                                            @forelse ($division_item['day_hotel'] as $division_hotel_item_index=>$division_hotel_item)
                                                                                                 @if($activeTab[$division_index]==$division_hotel_item_index)
                                                                                                     <div class="custom-card mt-2">
                                                                                                         {{-- <div>
@@ -1515,10 +1515,10 @@
                                 <input type="checkbox" wire:model="send_email" wire:change="messageChannelChanged" class="form-checkbox h-5 w-5 text-blue-600 focus:ring-blue-500">
                                 <span class="text-gray-800 font-medium cursor-pointer">Email</span>
                             </label>
-                            <label class="flex items-center gap-2">
+                            {{-- <label class="flex items-center gap-2">
                                 <input type="checkbox" wire:model="send_sms" wire:change="messageChannelChanged" class="form-checkbox h-5 w-5 text-blue-500 focus:ring-blue-500">
                                 <span class="text-gray-800 font-medium cursor-pointer">SMS</span>
-                            </label>
+                            </label> --}}
                         </div>
 
                         <!-- Status Badge -->
