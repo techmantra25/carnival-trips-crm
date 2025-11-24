@@ -96,7 +96,7 @@ class LeadManagementController extends Controller
     }
     public function update_status(Request $request){
         $data = $request->except('_token');
-        dd($data);
+        // dd($data);
         try {
             $this->leadRepository->updateLeadStatus($data);
             return redirect()->back()->with('success', 'Lead status updated successfully.');

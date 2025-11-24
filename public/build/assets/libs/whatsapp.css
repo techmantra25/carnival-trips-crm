@@ -14,7 +14,7 @@
     background-color: rgb(59 114 68) !important;
 }
 body{
-  font-family: monospace !important;
+  /* font-family: monospace !important; */
 }
 #whatsapp-message-preview .container {
     display: flex;

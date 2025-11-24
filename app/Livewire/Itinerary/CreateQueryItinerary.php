@@ -1437,9 +1437,8 @@ class CreateQueryItinerary extends Component
                 $totalPrice = round((float) $ticket_price * $number_of_travellers);
             }
             if($field=='cab'){
-                $totalPrice = round((float) $price * $number_of_travellers);
+                $totalPrice = round((float) $price);
             }
-           
             // Update or create itinerary detail
             ItineraryDetail::updateOrCreate(
                 [
@@ -2960,8 +2959,6 @@ class CreateQueryItinerary extends Component
             );
             dd($whatsapp_response);
         }
-        
-
             session()->flash('success', 'Itinerary sent and details saved successfully!');
         } catch (\Exception $e) {
             DB::rollBack();
