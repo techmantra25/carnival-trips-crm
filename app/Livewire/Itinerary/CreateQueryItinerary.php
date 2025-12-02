@@ -2933,19 +2933,19 @@ class CreateQueryItinerary extends Component
 
         // Mailing section
         if ($this->send_email) {
-          MailTemplateService::send(
-                $this->leadData->customer_email,//mail to
-                'customer_customized_itinerary_link', //mail template slug
-                [
-                    'customer_name' => $this->leadData->customer_name,
-                    'itinerary_link' => $leadUrlShare->links,
-                    'estimated_amount' => env('DEFAULT_CURRENCY_SYMBOL').number_format($this->total_amount,2),
-                    'admin_name' => Auth::guard('admin')->user()->name,
-                ], // mail body data
-                ['customer_name' => $this->leadData->customer_name,], //mail subject data
-                ENV('MAIL_FROM_ADDRESS'),     // From Email
-                ENV('MAIL_FROM_NAME')         // From Name
-            );
+        //   MailTemplateService::send(
+        //         $this->leadData->customer_email,//mail to
+        //         'customer_customized_itinerary_link', //mail template slug
+        //         [
+        //             'customer_name' => $this->leadData->customer_name,
+        //             'itinerary_link' => $leadUrlShare->links,
+        //             'estimated_amount' => env('DEFAULT_CURRENCY_SYMBOL').number_format($this->total_amount,2),
+        //             'admin_name' => Auth::guard('admin')->user()->name,
+        //         ], // mail body data
+        //         ['customer_name' => $this->leadData->customer_name,], //mail subject data
+        //         ENV('MAIL_FROM_ADDRESS'),     // From Email
+        //         ENV('MAIL_FROM_NAME')         // From Name
+        //     );
         }
 
         // Whatspp Section

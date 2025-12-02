@@ -83,6 +83,9 @@ class HotelWiseInventory extends Component
     public $requestId,$bulk_booking_email_body, $fresh_booking_email_body;
     protected $commonRepository;
 
+    public function __construct(){
+        $this->mailTemplateService = app(MailTemplateService::class);
+    }
     public function mount(CommonRepository $commonRepository, $oldDivision = null, $oldDestination = null)
     {
         $this->requestId = request()->get('request_id');
@@ -792,18 +795,20 @@ class HotelWiseInventory extends Component
     }
     public function SendMail($block_type){
         $hotel = Hotel::find($this->selectedHotel);
-       $mailResponse = MailTemplateService::send(
-            $hotel->email1, //To
-            'hotel_availability_request_for_inventory', //Template Slug
-            [
-                'hotel_name' => $hotel->name,
-                'start_date' => $this->start_date,
-                'end_date' => $this->end_date,
-                'content' => $this->bulk_booking_email_body,
-            ],//Body Content
-            ['inquery_type'=>$block_type], //Subject Body
-            ENV('MAIL_FROM_ADDRESS'),     // From Email
-            ENV('MAIL_FROM_NAME')         // From Name
+        $content = "
+            <p>Hotel Name: {$hotel->name}</p>
+            <p>Start Date: {$this->start_date}</p>
+            <p>End Date: {$this->end_date}</p>
+            <br>
+            {$this->bulk_booking_email_body}
+        ";
+
+        $mailResponse = $this->mailTemplateService->send(
+            $hotel->email1,
+            'Hotel Availability Request',
+            $content,
+            env('MAIL_FROM_ADDRESS'),
+            env('MAIL_FROM_NAME')
         );
 
        if ($mailResponse == true) {

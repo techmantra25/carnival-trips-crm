@@ -78,7 +78,12 @@ class EmployeeCrud extends Component
     {
         $this->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:admins,email',
+            'email' => [
+                'required',
+                'email',
+                'unique:admins,email',
+                'regex:/^[A-Za-z0-9._%+-]+@carrnivaltrips\.com$/i'
+            ],
             'role' => 'required|in:admin,team_lead,member',
             'phone' => 'required|string|max:10',
             'whatsapp' => 'nullable|string|max:10',
@@ -88,6 +93,8 @@ class EmployeeCrud extends Component
             'team_lead' => 'required|exists:admins,id',
             'destination_ids' => 'array',
             'destination_ids.*' => 'exists:states,id',
+        ],[
+            'email.regex' => 'The email must be a valid email address ending with @carrnivaltrips.com',
         ]);
 
         $password = $this->password ? Hash::make($this->password) : null;
@@ -147,9 +154,14 @@ class EmployeeCrud extends Component
 
     public function updateData()
     {
-         $this->validate([
+        $this->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:admins,email,' . $this->employee_id,
+            'email' => [
+                'required',
+                'email',
+                'regex:/^[A-Za-z0-9._%+-]+@carrnivaltrips\.com$/i',
+                'unique:admins,email,'.$this->employee_id,
+            ],
             'phone' => 'required|string|max:10',
             'role' => 'required|in:admin,team_lead,member',
             'whatsapp' => 'nullable|string|max:10',
@@ -158,6 +170,8 @@ class EmployeeCrud extends Component
             'team_lead' => 'required|exists:admins,id',
             'destination_ids' => 'array',
             'destination_ids.*' => 'exists:states,id',
+        ],[
+            'email.regex' => 'The email must be a valid email address ending with @carrnivaltrips.com',
         ]);
 
         $employee = Admin::findOrFail($this->employee_id);

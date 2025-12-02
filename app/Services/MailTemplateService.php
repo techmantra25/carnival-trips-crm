@@ -1,71 +1,51 @@
 <?php
 namespace App\Services;
 
-use App\Mail\DynamicMail;
-use App\Models\EmailTemplate;
 use App\Models\MailLog;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Log;
 
 class MailTemplateService
 {
-    public static function send($to, $templateSlug, $data = [], $subject_data = [], $fromAddress = null, $fromName = null)
+    public function send($to, $subject, $content, $fromAddress = null, $fromName = null)
     {
-        // Fetch the template
-        $template = EmailTemplate::where('slug', $templateSlug)
-                        ->where('active', true)
-                        ->firstOrFail();
-
-        // Create mail log
+        // Create mail log (pending)
         $log = MailLog::create([
             'email' => $to,
-            'template_slug' => $templateSlug,
+            'template_slug' => 'mail_send',    // No template slug anymore
             'status' => 'pending',
         ]);
 
         try {
-            // Replace placeholders in template body
-            $body = $template->body;
-            foreach ($data as $key => $value) {
-                $body = str_replace('{{'.$key.'}}', $value, $body);
-            }
-            // Now inject CKEditor content
-            if (isset($data['content'])) {
-                $content = !empty($data['content']) ? $data['content'] : '';
-                $body = str_replace('{!! content !!}', $content, $body);
-            } else {
-                $body = str_replace('{!! content !!}', '', $body);
-            }
-
-            // Replace placeholders in template subject
-            $subject = $template->subject;
-            foreach ($subject_data as $sub_key => $sub_value) {
-                $subject = str_replace('{{'.$sub_key.'}}', $sub_value, $subject);
-            }
-            // Create DynamicMail instance
-            Mail::send('emails.dynamic', ['html' => $body], function ($message) use ($to, $subject, $fromAddress, $fromName) {
+            // Send email using your static email wrapper view
+            Mail::send('emails.dynamic', ['html' => $content], function ($message) use ($to, $subject, $fromAddress, $fromName) {
                 $message->to($to)
-                        ->subject($subject)
-                        ->from($fromAddress, $fromName);
+                        ->subject($subject);
+
+                if ($fromAddress) {
+                    $message->from($fromAddress, $fromName);
+                }
             });
-            // Update log
-            $log->update(
-                [
-                    'status' => 'success',
-                    'subject' => $subject,
-                    'mail_body' => $body,
-                ]
-            );
+
+            // Update log after success
+            $log->update([
+                'status' => 'success',
+                'subject' => $subject,
+                'mail_body' => $content,
+            ]);
+
             return true;
 
         } catch (\Exception $e) {
-            \Log::error('Mail send error: '.$e->getMessage());
+
+            // Log the failure
             $log->update([
                 'status' => 'failed',
-                'error_message' => $e->getMessage()
+                'error_message' => $e->getMessage(),
             ]);
+
+            \Log::error('Mail send error: '.$e->getMessage());
+
             return false;
         }
     }
-
 }
