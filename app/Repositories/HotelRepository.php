@@ -121,6 +121,7 @@ class HotelRepository
                     $room->mattress = $mattress;
                     // $room->capacity = $bed + $extra + $mattress;
                     $room->capacity = $capacity;
+                    $room->positions = $key+1;
                     
                       // Safely handle amenities (ensure it's an array)
                     $room->ammenities = isset($roomData['amenities']) ? implode(',', (array) $roomData['amenities']) : null;
@@ -222,6 +223,7 @@ class HotelRepository
                     $room->mattress = $mattress;
                     // $room->capacity = $bed + $extra + $mattress;
                     $room->capacity = $capacity;
+                    $room->positions = $key+1;
                     
                       // Safely handle amenities (ensure it's an array)
                     $room->ammenities = isset($roomData['amenities']) ? implode(',', (array) $roomData['amenities']) : null;

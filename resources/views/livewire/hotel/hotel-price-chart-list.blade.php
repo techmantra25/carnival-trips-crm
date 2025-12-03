@@ -281,6 +281,10 @@
         });
         $('#hotel_list').on('change', function (e) {
             var value = $(this).select2("val");
+            // RESET ALL PRICE INPUTS
+            $('.price_chart_value')
+                .val('')            // clear field
+                .trigger('input');  // notify Livewire
             @this.call('getHotel', value);
         });
         $('#room_list').on('change', function (e) {

@@ -203,7 +203,7 @@
                                         <table class="table min-w-full new-activity !mb-3" style="border-collapse: separate;border-spacing: 0;">
                                             <thead class="bg-primary/20">
                                                 <tr>
-                                                    <th class="border !border-warning bg-orange-300 rounded-t-md !text-center uppercase" style="border-top-left-radius: .5rem; border-top-right-radius: .5rem;"><span class="text-xl text-defaulttextcolor">Day {{$division_index}} ({{$division_item['division_name']}})</span></th>
+                                                    <th class="border !border-warning bg-orange-300 rounded-t-md !text-center uppercase" style="border-top-left-radius: .5rem; border-top-right-radius: .5rem;"><span class="text-xl text-defaulttextcolor">Day {{$division_index}} ({{$division_item['division_name']}})({{$division_item['division_date']}})</span></th>
                                                 </tr>
                                             </thead>
                                             <tbody>

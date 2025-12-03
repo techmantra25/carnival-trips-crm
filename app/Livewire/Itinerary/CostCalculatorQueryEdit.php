@@ -494,7 +494,6 @@ class CostCalculatorQueryEdit extends Component
             foreach ($childs as $child_item) {
                 $quantity += (int) $child_item['quantity'];
             }
-        
             $total_member = $this->number_of_adults + $quantity;
         } else {
             $total_member = $this->number_of_adults;
@@ -554,7 +553,7 @@ class CostCalculatorQueryEdit extends Component
             $lead->number_of_rooms =$this->number_of_rooms;
             $lead->extra_mattress =$this->extra_mattress;
             $lead->created_by = Auth::guard('admin')->user()->id;
-        
+            $number_of_travellor = $lead->number_of_travellor;
             // Save the model to the database
             $lead->save();
 
@@ -579,7 +578,7 @@ class CostCalculatorQueryEdit extends Component
                     $create->stay_by_journey = $fetch->stay_by_journey;
                     $create->itinerary_journey = $fetch->itinerary_journey;
                     $create->save();
-                    $this->cloneItineraryDetails($this->night_halt, $create->id);
+                    // $this->cloneItineraryDetails($this->night_halt, $create->id);
                     $itinerary_id = $create->id;
 
 
@@ -618,8 +617,9 @@ class CostCalculatorQueryEdit extends Component
                         ]);
                     }
                 }
+
+                $this->resetItineraryDetails($itinerary_id);
                 DB::commit();
-            
                 $encryptedId = Crypt::encrypt($itinerary_id);
                 return redirect()->route('admin.itinerary.query.build', $encryptedId);
             }
@@ -628,6 +628,9 @@ class CostCalculatorQueryEdit extends Component
             session()->flash('error', $e->getMessage());
             // session()->flash('error', 'Failed to save itinerary: ' . $e->getMessage());
         }
+    }
+    public function resetItineraryDetails($itinerary_id){
+        ItineraryDetail::where('itinerary_id', $itinerary_id)->delete();
     }
      public function cloneItineraryDetails($old_itinerary_id, $new_itinerary_id){
         $fetchDetails = ItineraryDetail::where('itinerary_id', $old_itinerary_id)->whereNotNull('route_service_summary_id')->orderBy('id', 'ASC')->get();

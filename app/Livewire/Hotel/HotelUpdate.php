@@ -66,7 +66,7 @@ class HotelUpdate extends Component
     public function existingRoom($hotel_id)
     {
         $this->reset(['rooms']);
-        $rooms = Room::where('hotel_id', $hotel_id)->get();
+        $rooms = Room::where('hotel_id', $hotel_id)->orderBy('positions', 'ASC')->get();
 
         foreach ($rooms as $room) {
             $this->rooms[] = [
@@ -143,7 +143,7 @@ class HotelUpdate extends Component
             'hotel_category' => ['required', 'integer'],
             'mobile' => ['required', 'string', 'min:10', 'max:10', 'regex:/^\d{10}$/'], // Regex to ensure only numbers
             'whatsapp' => ['required', 'string', 'min:10', 'max:10', 'regex:/^\d{10}$/'], // Regex for valid number format
-            'email' => ['required', 'email', 'max:255'],
+            'email' => ['nullable', 'email', 'max:255'],
             'secndary_email' => ['nullable', 'email', 'max:255'], // Secondary email is nullable
         
             // Seasion Type

@@ -113,7 +113,7 @@
                             <div class="grid lg:grid-cols-2 gap-3 mt-4"> 
                                 <div class="space-y-2">
                                     <div class="form-group">
-                                        <label for="email" class="form_custom_lable">Email<span class="text-danger">*</span></label>
+                                        <label for="email" class="form_custom_lable">Email</label>
                                         <input type="text" name="email" id="email" value="" class="form-control !bg-gray-100 form-control-sm placeholder:text-textmuted" wire:model="email" placeholder="Enter email">
                                         @error('email')
                                             <span class="text-red-500 text-sm">{{ $message }}</span>

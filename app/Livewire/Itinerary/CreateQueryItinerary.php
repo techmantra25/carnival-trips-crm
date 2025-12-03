@@ -34,7 +34,7 @@ use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Services\MailTemplateService;
 use App\Services\WhatsAppService;
@@ -176,15 +176,25 @@ class CreateQueryItinerary extends Component
          $stay_by_journey = explode(',',$this->stay_by_journey);
         if(count($stay_by_journey)>0){
             $days_journey = [];
+            $startDate = Carbon::parse($this->leadData->arrival_date);
+            $endDate   = Carbon::parse($this->leadData->departure_date);
             foreach($stay_by_journey as $k=>$journey){
                 // Set Itinerary Wise Data 
                 $day = $k+1;
+                // Calculate date for this day
+                $currentDate = $startDate->copy()->addDays($k)->format('d-m-Y');
+
+                // If exceeds arrival date, keep arrival date or blank
+                if ($currentDate > $endDate->format('d-m-Y')) {
+                    $currentDate = $endDate->format('d-m-Y');
+                }
                 $this->SetHotel($day, $journey);
                
                 $destination_route = RouteServiceSummary::with('route')->where('destination_id', $this->destinationId)->where('service_type', 'Route Wise')->get()->toArray();
                 $city = City::find($journey);
                 $days_journey[$k+1]['division_id'] = $journey;
                 $days_journey[$k+1]['division_name'] = $city?$city->name:"N/A";
+                $days_journey[$k+1]['division_date'] = $currentDate;
                 // $days_journey[$k+1]['division_hotels'] =$hotels;
                 $days_journey[$k+1]['division_routes'] =$destination_route;
                 $days_journey[$k+1]['day_hotel'] =$this->loadDayHotels($k+1);
@@ -229,7 +239,6 @@ class CreateQueryItinerary extends Component
                             : $day_hotel['id'];
                     }
                 }
-
                 $selected_hotel = Hotel::with('priority_rooms', 'rooms')
                     ->join('hotel_price_charts', 'hotels.id', '=', 'hotel_price_charts.hotel_id')
                     ->when($this->loadDayHotelsTime == 2, function ($query) use ($selectedDayHotelsId) {
@@ -247,7 +256,7 @@ class CreateQueryItinerary extends Component
                     ->orderBy('hotels.priority', 'ASC')
                     ->select('hotels.*')
                     ->first();
-                    // dd($this->budgetSortOrder);
+                    
                 // Fallback: without hotel_category
                 if (!$selected_hotel) {
                     $selected_hotel = Hotel::with('priority_rooms', 'rooms')
@@ -263,9 +272,14 @@ class CreateQueryItinerary extends Component
                         ->orderBy('hotels.priority', 'ASC')
                         ->select('hotels.*')
                         ->first();
+                       
                 }
+                
                 if($selected_hotel){
-                    $this->generateHotelData($index,$selected_hotel->id,$season);
+                    $check_hotel = ItineraryDetail::where('itinerary_id', $this->itinerary_id)->where('header', "day_$index")->where('field', 'day_hotel')->first();
+                    // if(!$check_hotel){
+                        $this->generateHotelData($index,$selected_hotel->id,$season);
+                    // }
                 }else{
                     $existing_hotel_data = ItineraryDetail::where('itinerary_id', $this->itinerary_id)->where('header', 'day_' . $index)->whereNotNull('hotel_id')->get();
                     if (count($existing_hotel_data)>0) {
@@ -276,49 +290,49 @@ class CreateQueryItinerary extends Component
                 }
             }
             // Fetch Per day Cab
-            $total_member = $this->leadData->number_of_travellor;
-            $RouteServiceSummary = RouteServiceSummary::with('cabs')->where('destination_id', $this->destinationId)->where('service_type', 'Per Day')->first();
-            $existing_cabs = [];
-            if($RouteServiceSummary){
-                // // Existing Cabs
-                foreach($RouteServiceSummary->cabs as $cab_index =>$cab_item){
-                    $cab = optional(optional($cab_item->divisionCab)->cab);
-                    $existing_cabs[] = [
-                        'name'     => $cab->title ? $cab->title . ' (' . $cab->capacity . 'S)' : 'N/A',
-                        'capacity' => $cab->capacity ?? null,
-                        'id'       => $cab->id ?? '',
-                        'price'    => $cab_item->cab_price ?? 0,
-                    ];
-                }
-                // Filter cabs where capacity >= total_member
-                $filtered_cabs = array_filter($existing_cabs, function ($cab) use ($total_member) {
-                    return $cab['capacity'] >= $total_member;
-                });
+            // $total_member = $this->leadData->number_of_travellor;
+            // $RouteServiceSummary = RouteServiceSummary::with('cabs')->where('destination_id', $this->destinationId)->where('service_type', 'Per Day')->first();
+            // $existing_cabs = [];
+            // if($RouteServiceSummary){
+            //     // // Existing Cabs
+            //     foreach($RouteServiceSummary->cabs as $cab_index =>$cab_item){
+            //         $cab = optional(optional($cab_item->divisionCab)->cab);
+            //         $existing_cabs[] = [
+            //             'name'     => $cab->title ? $cab->title . ' (' . $cab->capacity . 'S)' : 'N/A',
+            //             'capacity' => $cab->capacity ?? null,
+            //             'id'       => $cab->id ?? '',
+            //             'price'    => $cab_item->cab_price ?? 0,
+            //         ];
+            //     }
+            //     // Filter cabs where capacity >= total_member
+            //     $filtered_cabs = array_filter($existing_cabs, function ($cab) use ($total_member) {
+            //         return $cab['capacity'] >= $total_member;
+            //     });
             
-                // Sort by capacity ASC (to get smallest that fits)
-                usort($filtered_cabs, function ($a, $b) {
-                    return $a['capacity'] <=> $b['capacity'];
-                });
-                $best_match_cab = $filtered_cabs[0] ?? null;
-                if($best_match_cab){
-                    $totalPrice = round((float) $best_match_cab['price']);
-                    // Update or create itinerary detail
-                    ItineraryDetail::updateOrCreate(
-                        [
-                            'itinerary_id' => $this->itinerary_id,
-                            'header' => "day_$index", // Using a dynamic day header
-                            'field' => 'per_day_cab',
-                            'value' => $best_match_cab['name'],
-                        ],
-                        [
-                            'value' => $best_match_cab['name'], // Store the activity name or ID
-                            'price' => $totalPrice, // Store calculated price
-                            'value_quantity' => 1,
-                            'cab_id' => $best_match_cab['id'],
-                        ]
-                    );
-                }
-            }
+            //     // Sort by capacity ASC (to get smallest that fits)
+            //     usort($filtered_cabs, function ($a, $b) {
+            //         return $a['capacity'] <=> $b['capacity'];
+            //     });
+            //     $best_match_cab = $filtered_cabs[0] ?? null;
+            //     if($best_match_cab){
+            //         $totalPrice = round((float) $best_match_cab['price']);
+            //         // Update or create itinerary detail
+            //         ItineraryDetail::updateOrCreate(
+            //             [
+            //                 'itinerary_id' => $this->itinerary_id,
+            //                 'header' => "day_$index", // Using a dynamic day header
+            //                 'field' => 'per_day_cab',
+            //                 'value' => $best_match_cab['name'],
+            //             ],
+            //             [
+            //                 'value' => $best_match_cab['name'], // Store the activity name or ID
+            //                 'price' => $totalPrice, // Store calculated price
+            //                 'value_quantity' => 1,
+            //                 'cab_id' => $best_match_cab['id'],
+            //             ]
+            //         );
+            //     }
+            // }
             
             DB::commit();
 
@@ -352,23 +366,61 @@ class CreateQueryItinerary extends Component
             // Room Add
             // Fetch room by lowest price
             $capacity = $this->getCapacity();
-            $lowest_price = HotelPriceChart::where('hotel_id', $selected_hotel->id)
-                ->where('type', 2)
-                ->where('plan_title', $season)
-                ->where('plan_item', $this->leadData->meal_type)
-                ->where('item_price', '>', 0)
+            
+            // $lowest_price = HotelPriceChart::where('hotel_id', $selected_hotel->id)
+            //     ->where('type', 2)
+            //     ->where('plan_title', $season)
+            //     ->where('plan_item', $this->leadData->meal_type)
+            //     ->where('item_price', '>', 0)
+            //     ->whereHas('room', function ($query) use ($capacity) {
+            //         $query->where('capacity', '>=', $capacity);
+            //     })
+            //     ->orderBy('item_price', $this->budgetSortOrder)
+            //     ->first();
+            //final priority order becomes:
+            // Exact capacity = pax
+            // Smallest capacity >= pax
+            // Lowest room position
+            // Finally order by price
+
+            $lowest_price = HotelPriceChart::where('hotel_price_charts.hotel_id', $selected_hotel->id)
+                ->where('hotel_price_charts.type', 2)
+                ->where('hotel_price_charts.plan_title', $season)
+                ->where('hotel_price_charts.plan_item', $this->leadData->meal_type)
+                ->where('hotel_price_charts.item_price', '>', 0)
+
+                // capacity filter
                 ->whereHas('room', function ($query) use ($capacity) {
                     $query->where('capacity', '>=', $capacity);
                 })
-                ->orderBy('item_price', $this->budgetSortOrder)
+
+                ->with('room')
+                ->select('hotel_price_charts.*')
+
+                ->join('rooms', 'rooms.id', '=', 'hotel_price_charts.room_id')
+
+                // Priority 1: exact capacity match
+                ->orderByRaw("CASE WHEN rooms.capacity = $capacity THEN 0 ELSE 1 END")
+
+                // Priority 2: among non-exact matches, choose smallest capacity >= pax
+                ->orderBy('rooms.capacity', 'ASC')
+
+                // ⭐ Priority 3: sort by room position
+                ->orderBy('rooms.positions', 'ASC')
+
+                // Priority 4: price order
+                ->orderBy('hotel_price_charts.item_price', $this->budgetSortOrder)
+
                 ->first();
+
 
             $priority_room = $selected_hotel->priority_rooms()
                 ->where('capacity', '>=', $capacity)
                 ->orderBy('positions', 'ASC')
                 ->first();
+     
             $selected_room = $lowest_price ? $lowest_price->room : $priority_room;
-            // dd($selected_room);
+           
             if ($selected_room) {
                 $room_data = ItineraryDetail::where('itinerary_id', $this->itinerary_id)->where('header', 'day_' . $index)->whereNotNull('room_id')->get();
                 if (count($room_data)>0) {
@@ -391,6 +443,7 @@ class CreateQueryItinerary extends Component
                 );
 
                 // Get Main Plan
+                //  dd($selected_room->id);
                 $room_single_price = HotelPriceChart::where('hotel_id', $selected_hotel->id)->where('room_id',$selected_room->id)
                 ->where('type', 2)
                 ->where('plan_title', $season)
@@ -442,7 +495,6 @@ class CreateQueryItinerary extends Component
         if($this->leadData->number_of_children>0){
             $children_data = json_decode($this->leadData->children_data);
             foreach($children_data as $child_index=>$child_item){
-            
                 $room_addon_cwm = HotelPriceChart::where('hotel_id', $selected_hotel->id)
                 ->where('type', 2)
                 ->where('room_id', $selected_room->id)
@@ -871,13 +923,13 @@ class CreateQueryItinerary extends Component
         $results = [];
        // Loop through each itinerary detail and extract hotel data
         foreach ($data as $item) {
+            $this->getDayRoutes($index,$item->route_service_summary_id);
 
             $day_activity = ItineraryDetail::where('itinerary_id', $this->itinerary_id)
             ->where('route_service_summary_id', $item->route_service_summary_id)
             ->where('header', 'day_' . $index)
             ->where('field', 'day_activity')
             ->get()->toArray();
-
             $day_sightseing = ItineraryDetail::where('itinerary_id', $this->itinerary_id)
             ->where('route_service_summary_id', $item->route_service_summary_id)
             ->where('header', 'day_' . $index)
@@ -889,9 +941,11 @@ class CreateQueryItinerary extends Component
             ->where('header', 'day_' . $index)
             ->where('field', 'day_cab')
             ->get()->toArray();
-
+           
             if ($item->route_service) {
+                
                 $RouteServiceSummary = RouteServiceSummary::with('activities', 'sightseeings', 'cabs')->find($item->route_service_summary_id);
+                
                 $existing_activities = [];
                 $existing_sightseeings = [];
                 $existing_cabs = [];
@@ -940,7 +994,6 @@ class CreateQueryItinerary extends Component
         }
         // dd($results);
         return $results;
-        // Merge and assign the updated values
     }
     public function ReloadDayRoute($index){
         // Fetch itinerary detail with hotel relation
@@ -1049,7 +1102,8 @@ class CreateQueryItinerary extends Component
                 }
             }
             $results[] = [
-                'day_cab' => $day_cab,
+                // 'day_cab' => $day_cab,
+                'day_cab' => [],
                 'per_day_existing_cabs' => $existing_cabs,
             ];
        return $results;
@@ -1388,25 +1442,86 @@ class CreateQueryItinerary extends Component
                 );
             }
             // cabs
-            // foreach($summary->cabs as $cab_index =>$cab_item){
-            //     $cab = optional(optional($cab_item->divisionCab)->cab);
+            $travellers = (int) $this->leadData->number_of_travellor;
 
-            //     $totalPrice = (float) ($cab_item->cab_price ?? 0);
-            //     ItineraryDetail::updateOrCreate(
-            //         [
-            //             'itinerary_id' => $this->itinerary_id,
-            //             'route_service_summary_id' => $cab_item->service_summary_id,
-            //             'header' => "day_$index", // Using a dynamic day header
-            //             'field' => "day_cab",
-            //             'value' => $cab->title ? $cab->title . ' (' . $cab->capacity . 'S)' : 'N/A',
-            //         ],
-            //         [
-            //             'value' => $cab->title ? $cab->title . ' (' . $cab->capacity . 'S)' : 'N/A', // Store the activity name or ID
-            //             'price' => $totalPrice,
-            //             'cab_id' => $cab->id,
-            //         ]
-            //     );
-            // }
+            /*
+            |--------------------------------------------------------------------------
+            | Build clean cab collection with cab + price + service_summary_id
+            |--------------------------------------------------------------------------
+            */
+            $cabs = collect($summary->cabs)->map(function ($item) {
+                return (object) [
+                    'cab'         => optional(optional($item->divisionCab)->cab),
+                    'price'       => (float) ($item->cab_price ?? 0),
+                    'summary_id'  => $item->service_summary_id,
+                ];
+            })->filter(fn($x) => $x->cab);  // remove null cabs
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | 1️⃣ Try to find ONE cab that fits all travellers
+            |--------------------------------------------------------------------------
+            */
+            $singleCab = $cabs
+                ->filter(fn($x) => $x->cab->capacity >= $travellers)
+                ->sortBy(fn($x) => $x->cab->capacity)
+                ->first();
+
+            if ($singleCab) {
+
+                // Insert one cab record
+                ItineraryDetail::updateOrCreate(
+                    [
+                        'itinerary_id'              => $this->itinerary_id,
+                        'route_service_summary_id'  => $singleCab->summary_id,
+                        'header'                    => "day_$index",
+                        'field'                     => "day_cab",
+                    ],
+                    [
+                        'value'   => $singleCab->cab->title . ' (' . $singleCab->cab->capacity . 'S)',
+                        'price'   => $singleCab->price,
+                        'cab_id'  => $singleCab->cab->id,
+                    ]
+                );
+
+            } else {
+
+                /*
+                |--------------------------------------------------------------------------
+                | 2️⃣ No single cab fits — split travellers into multiple cabs
+                |--------------------------------------------------------------------------
+                */
+                $sortedCabs = $cabs->sortByDesc(fn($x) => $x->cab->capacity);
+                $remaining = $travellers;
+                $cabCount = 1;
+
+                foreach ($sortedCabs as $item) {
+
+                    if ($remaining <= 0) break;
+
+                    $remaining -= $item->cab->capacity;
+
+                    // Insert multiple cab records
+                    ItineraryDetail::updateOrCreate(
+                        [
+                            'itinerary_id'              => $this->itinerary_id,
+                            'route_service_summary_id'  => $item->summary_id,
+                            'header'                    => "day_$index",
+                            'field'                     => "day_cab",
+                            'cab_id'  => $item->cab->id,
+                        ],
+                        [
+                            'value'   => $item->cab->title . ' (' . $item->cab->capacity . 'S)',
+                            'price'   => $item->price,
+                        ]
+                    );
+
+                    $cabCount++;
+                }
+            }
+
+
 
             // Commit transaction
             DB::commit();
@@ -1420,6 +1535,189 @@ class CreateQueryItinerary extends Component
             // dd($e->getMessage());
             // Store error message for Livewire validation
             $this->errorRoute[$index] = $e->getMessage();
+        }
+    }
+    public function getDayRoutes($index,$id){
+        try {
+            if (!$id) {
+                throw new \Exception("Invalid hotel ID");
+            }
+    
+            // Find the hotel
+            $summary = RouteServiceSummary::find($id);
+            if (!$summary) {
+                throw new \Exception("Route Service not found");
+            }
+    
+            // Start database transaction
+            DB::beginTransaction();
+    
+            // Update or create itinerary detail
+            ItineraryDetail::updateOrCreate(
+                [
+                    'itinerary_id' => $this->itinerary_id,
+                    'route_service_summary_id' => $summary->id,
+                    'header' => "day_$index", // Assuming you meant to use 'day_{index}'
+                    'field' => 'day_route',
+                ],
+                [
+                    'value' => $summary->route?$summary->route->route_name:"N/A", // Store the hotel ID
+                ]
+            );
+    
+            // sightseeings
+            foreach($summary->sightseeings as $sight_index =>$sight_item){
+
+                // Get ticket price based on nationality
+                $ticket_price = (float)($this->leadData->nationality_type=="Indian"?(optional($sight_item->sightseeing)->ticket_price??0):(optional($sight_item->sightseeing)->ticket_price_nri??0));
+
+                // Quantity logic: If ticket exists, use number of travelers, else default to 1
+                $value_quantity = $ticket_price > 0 ? $this->leadData->number_of_travellor : 1;
+
+                // Optional base sightseeing price (if exists)
+                $base_price = (float)(optional($sight_item->sightseeing)->price ?? 0);
+
+                // Calculate total ticket cost
+                $total_ticket_price = $ticket_price > 0 ? $ticket_price * $this->leadData->number_of_travellor : 0;
+
+                // Total combined price
+                $totalPrice = round($base_price + $total_ticket_price);
+
+                ItineraryDetail::updateOrCreate(
+                    [
+                        'itinerary_id' => $this->itinerary_id,
+                        'route_service_summary_id' => $sight_item->service_summary_id,
+                        'header' => "day_$index", // Using a dynamic day header
+                        'field' => "day_sightseeing",
+                        'value' => optional($sight_item->sightseeing)->name,
+                    ],
+                    [
+                        'value' => optional($sight_item->sightseeing)->name, // Store the activity name or ID
+                        'value_quantity' => $value_quantity,
+                        'price' => $totalPrice,
+                        'ticket_price' => round((float) $ticket_price * $this->leadData->number_of_travellor),
+                    ]
+                );
+            }
+            // activities
+            foreach($summary->activities as $act_index =>$act_item){
+
+                $ticket_price = (float) ($this->leadData->nationality_type == "Indian" 
+                        ? (optional($act_item->activity)->ticket_price ?? 0) 
+                        : (optional($act_item->activity)->ticket_price_nri ?? 0));
+
+                $total_ticket_price = $ticket_price>0?$ticket_price*$this->leadData->number_of_travellor:0;
+                $value_quantity = $ticket_price>0?$this->leadData->number_of_travellor:1;
+                $totalPrice = round(
+                    (float) (optional($act_item->activity)->price ?? 0) +$total_ticket_price
+                );
+
+                ItineraryDetail::updateOrCreate(
+                    [
+                        'itinerary_id' => $this->itinerary_id,
+                        'route_service_summary_id' => $act_item->service_summary_id,
+                        'header' => "day_$index", // Using a dynamic day header
+                        'field' => "day_activity",
+                        'value' => optional($act_item->activity)->name,
+                    ],
+                    [
+                        'value' => optional($act_item->activity)->name, // Store the activity name or ID
+                        'value_quantity' => $value_quantity,
+                        'price' => $totalPrice,
+                        'rate' => (float) (optional($act_item->activity)->price ?? 0),
+                        'ticket_price' => round((float) $ticket_price * $this->leadData->number_of_travellor),
+                    ]
+                );
+            }
+            // cabs
+            $travellers = (int) $this->leadData->number_of_travellor;
+
+            /*
+            |--------------------------------------------------------------------------
+            | Build clean cab collection with cab + price + service_summary_id
+            |--------------------------------------------------------------------------
+            */
+            $cabs = collect($summary->cabs)->map(function ($item) {
+                return (object) [
+                    'cab'         => optional(optional($item->divisionCab)->cab),
+                    'price'       => (float) ($item->cab_price ?? 0),
+                    'summary_id'  => $item->service_summary_id,
+                ];
+            })->filter(fn($x) => $x->cab);  // remove null cabs
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | 1️⃣ Try to find ONE cab that fits all travellers
+            |--------------------------------------------------------------------------
+            */
+            $singleCab = $cabs
+                ->filter(fn($x) => $x->cab->capacity >= $travellers)
+                ->sortBy(fn($x) => $x->cab->capacity)
+                ->first();
+
+            if ($singleCab) {
+
+                // Insert one cab record
+                ItineraryDetail::updateOrCreate(
+                    [
+                        'itinerary_id'              => $this->itinerary_id,
+                        'route_service_summary_id'  => $singleCab->summary_id,
+                        'header'                    => "day_$index",
+                        'field'                     => "day_cab",
+                    ],
+                    [
+                        'value'   => $singleCab->cab->title . ' (' . $singleCab->cab->capacity . 'S)',
+                        'price'   => $singleCab->price,
+                        'cab_id'  => $singleCab->cab->id,
+                    ]
+                );
+
+            } else {
+
+                /*
+                |--------------------------------------------------------------------------
+                | 2️⃣ No single cab fits — split travellers into multiple cabs
+                |--------------------------------------------------------------------------
+                */
+                $sortedCabs = $cabs->sortByDesc(fn($x) => $x->cab->capacity);
+                $remaining = $travellers;
+                $cabCount = 1;
+
+                foreach ($sortedCabs as $item) {
+
+                    if ($remaining <= 0) break;
+
+                    $remaining -= $item->cab->capacity;
+
+                    // Insert multiple cab records
+                    ItineraryDetail::updateOrCreate(
+                        [
+                            'itinerary_id'              => $this->itinerary_id,
+                            'route_service_summary_id'  => $item->summary_id,
+                            'header'                    => "day_$index",
+                            'field'                     => "day_cab",
+                            'cab_id'  => $item->cab->id,
+                        ],
+                        [
+                            'value'   => $item->cab->title . ' (' . $item->cab->capacity . 'S)',
+                            'price'   => $item->price,
+                        ]
+                    );
+
+                    $cabCount++;
+                }
+            }
+
+
+
+            // Commit transaction
+            DB::commit();
+          
+        } catch (\Exception $e) {
+            // Rollback transaction if there's an error
+            DB::rollBack();
+            // dd($e->getMessage());
         }
     }
     public function getActivityOrSightseeing($field, $index, $route_index, $route_service_summary_id, $value, $price, $ticket_price,$cab_id){
