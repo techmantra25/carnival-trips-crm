@@ -507,6 +507,21 @@
                                                     <div class="w-[45%]">
                                                         @if($index==0)
                                                         <label for=""
+                                                            class="block text-sm font-medium text-gray-700 modal_query_lable">Addon Type</label>
+                                                        @endif
+                                                        <select wire:model="childs.{{ $index }}.addon_type"
+                                                            class="form-control form-control-sm" wire:change="changeAddonType($event.target.value)">
+                                                            <option value="" hidden>Type</option>
+                                                            <option value="CNB">CNB</option>
+                                                            <option value="CNB">CWM</option>
+                                                        </select>
+                                                        @error("childs.$index.addon_type") <span
+                                                            class="text-danger text-sm font-12">{{ $message }}</span>
+                                                        @enderror
+                                                    </div>
+                                                    <div class="w-[45%]">
+                                                        @if($index==0)
+                                                        <label for=""
                                                             class="block text-sm font-medium text-gray-700 modal_query_lable">Quantity</label>
                                                         @endif
                                                         <select wire:model="childs.{{ $index }}.quantity"

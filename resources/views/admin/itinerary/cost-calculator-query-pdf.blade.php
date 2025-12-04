@@ -309,7 +309,7 @@
                                                                         <tr>
                                                                             <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">Plan</th>
                                                                             <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">Meal Plan</th>
-                                                                            <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">CWNB</th>
+                                                                            <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">CNB</th>
                                                                             <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">CWM</th>
                                                                         </tr>
                                                                     </thead>
@@ -596,7 +596,7 @@
                                                                         <tr>
                                                                             <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">Plan</th>
                                                                             <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">Meal Plan</th>
-                                                                            <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">CWNB</th>
+                                                                            <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">CNB</th>
                                                                             <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">CWM</th>
                                                                         </tr>
                                                                     </thead>

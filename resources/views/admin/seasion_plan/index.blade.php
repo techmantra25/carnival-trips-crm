@@ -1,6 +1,11 @@
 @extends('layouts.master')
 @section('styles')
 <link rel="stylesheet" href="{{ asset('build/assets/libs/dragula/dragula.min.css') }}">
+<style>
+    .bg-custom_card {
+        background-color: rgb(229 248 255) !important;
+    }
+</style>
 @endsection
 @section('title', $pageTitle) <!-- This sets the page title dynamically -->
 @section('content')
@@ -40,15 +45,37 @@
                 <form action="{{route('admin.hotel_seasion_plan_update')}}" method="post" id="update_plan">
                     @csrf
                     <div class="xl:col-span-4 lf:col-span-6 md:col-span-6 sm:col-span-12 col-span-12">
-                        <x-form-field 
-                        type="text" 
-                        name="title" 
-                        label="Title" 
-                        :options="[]" 
-                        :value="old('title', $update_item->title ?? '')"
-                    />                    
+                        <div class="form-group px-1">
+                            <label for="title" class="block text-gray-700 font-semibold mb-1">
+                                Title
+                            </label>
+                            <input 
+                                type="text" 
+                                name="title" 
+                                id="title" 
+                                value="{{ old('title', $update_item->title ?? '') }}" 
+                                class="form-control border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-red-400 focus:border-red-400 transition"
+                                placeholder="Enter title"
+                            />
+
+                            <div class="mt-2 text-xs text-gray-600">
+                                <p class="text-xs mb-1">Applicable only for Addon Season Plans:</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-2 py-1 bg-red-100 text-red-600 rounded-md text-[10px] font-semibold uppercase">
+                                        CNB
+                                    </span>
+                                    <span class="px-2 py-1 bg-red-100 text-red-600 rounded-md text-[10px] font-semibold uppercase">
+                                        CWM
+                                    </span>
+                                    <span class="px-2 py-1 bg-red-100 text-red-600 rounded-md text-[10px] font-semibold uppercase">
+                                        Extra Mattress
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
                         @error('title')
-                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                            <span class="text-red-500 text-xs">{{ $message }}</span>
                         @enderror
                     </div>
                      <!-- Dynamic plan_item fields container -->
@@ -77,6 +104,13 @@
                                     @endif
                                 </div>
                             @endforeach
+                            @error('plan_item')
+                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                            @enderror
+
+                            @error('plan_item.*')
+                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                            @enderror
                         @else
                             @php
                                 $value = explode(', ',$update_item->plan_item);
@@ -91,6 +125,10 @@
                                         :options="[]" 
                                          :value="old('plan_item.0', $value[0] ?? '')"
                                     />
+                                    @error('plan_item')
+                                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                                    @enderror
+
                                     @error('plan_item.*')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>
                                     @enderror
@@ -133,17 +171,41 @@
                     <form action="{{route('admin.hotel_seasion_plan_store')}}" method="post" id="create_plan">
                         @csrf
                         <div class="xl:col-span-4 lf:col-span-6 md:col-span-6 sm:col-span-12 col-span-12">
-                            <x-form-field 
-                                type="text" 
-                                name="title" 
-                                label="title" 
-                                :options="[]"
-                                :value="old('title')"
+                            <div class="form-group px-1">
+                                <label for="title" class="block text-gray-700 font-semibold mb-1">
+                                    Title
+                                </label>
+
+                                <input 
+                                    type="text" 
+                                    name="title" 
+                                    id="title" 
+                                    value="{{ old('title') }}" 
+                                    class="form-control border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-red-400 focus:border-red-400 transition"
+                                    placeholder="Enter title"
                                 />
+
+                                <div class="mt-2 text-xs text-gray-600">
+                                    <p class="font-medium mb-1">Applicable only for Addon Season Plans:</p>
+                                    <div class="flex flex-wrap gap-2">
+                                        <span class="px-2 py-1 bg-red-100 text-red-600 rounded-md text-[10px] font-semibold uppercase">
+                                            CNB
+                                        </span>
+                                        <span class="px-2 py-1 bg-red-100 text-red-600 rounded-md text-[10px] font-semibold uppercase">
+                                            CWM
+                                        </span>
+                                        <span class="px-2 py-1 bg-red-100 text-red-600 rounded-md text-[10px] font-semibold uppercase">
+                                            Extra Mattress
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
                             @error('title')
-                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                                <span class="text-red-500 text-xs">{{ $message }}</span>
                             @enderror
                         </div>
+
                         <!-- Dynamic plan_item fields container -->
                         <div id="plan-items-container">
                             @if(old('plan_item'))
@@ -156,7 +218,7 @@
                                         <div class="col-span-10">
                                             <input type="text" name="plan_item[]" class="form-control form-control-sm" placeholder="Enter Plan Item" value="{{$item}}">
                                             @error("plan_item.$index")
-                                                <span class="text-red-500 text-sm">{{ $message }}</span>
+                                                <span class="text-red-500 text-xs">{{ $message }}</span>
                                             @enderror
                                         </div>
                                         @if($index==0)
@@ -183,7 +245,7 @@
                                             class="form-control-sm"
                                         />
                                         @error('plan_item.*')
-                                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                                            <span class="text-red-500 text-xs">{{ $message }}</span>
                                         @enderror
                                     </div>
                                     <div class="col-span-2 flex items-end">

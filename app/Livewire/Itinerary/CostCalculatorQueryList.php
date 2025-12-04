@@ -95,22 +95,6 @@ class CostCalculatorQueryList extends Component
         $this->mealTypes = SeasionPlan::where('status', 1)->where('type', 'main')->orderBy('position', 'ASC')->first();
         $this->categories = Category::where('status', 1)->orderBy('name', 'ASC')->get();
         $this->fetchItinerary();
-        $rawItems = SeasionPlan::where('status', 1)
-        ->where('type', 'addon')
-        ->where('plan_item', 'like', '%YEAR%')
-        ->pluck('plan_item')
-        ->toArray();
-
-        $flattened = collect($rawItems)
-            ->flatMap(function ($item) {
-                return array_map('trim', explode(',', $item));
-            })
-            ->unique()
-            ->values()
-            ->toArray();
-
-        $this->childsData = $flattened;
-
     }
 
 
@@ -201,8 +185,50 @@ class CostCalculatorQueryList extends Component
         ->get();
     }
 
+    public function changeAddonType($value){
+        $this->reset(['childsData']);
+        $rawItems = SeasionPlan::where('status', 1)
+        ->where('type', 'addon')
+        ->where('title', $value)
+        ->pluck('plan_item')
+        ->toArray();
+
+        $flattened = collect($rawItems)
+        ->flatMap(function ($item) {
+            return array_map('trim', explode(',', $item));
+        })
+        ->filter(function ($item) {
+            return str_contains($item, "[{$this->meal_type}]");
+        })
+        ->unique()
+        ->values()
+        ->toArray();
+        $this->childsData = $flattened;
+    }
     public function NewPresetItinerary($value){
-        // $this->reset([]);
+       // Make sure $this->mealTypes exists and has plan_item
+        $planItemString = $this->mealTypes->plan_item ?? '';
+
+        // Convert to array
+        $items = array_filter(array_map('trim', explode(',', $planItemString)));
+        // Set first index value if exists, else null
+        $this->meal_type = $items[0] ?? null;
+
+        $rawItems = SeasionPlan::where('status', 1)
+        ->where('type', 'addon')
+        ->whereIn('title', ['CWM','CNB'])
+        ->pluck('plan_item')
+        ->toArray();
+
+        $flattened = collect($rawItems)
+            ->flatMap(function ($item) {
+                return array_map('trim', explode(',', $item));
+            })
+            ->unique()
+            ->values()
+            ->toArray();
+        $this->childsData = $flattened;
+
         $this->active_assign_new_modal = $value=="yes"?1:0;
         $this->dispatch('refreshComponent');
     }
@@ -466,6 +492,7 @@ class CostCalculatorQueryList extends Component
             'total_members' => 'required|numeric|min:1',
             'number_of_adults' => 'required|numeric|min:1',
             // 'number_of_childs' => 'nullable|numeric',
+            'childs.*.addon_type' => 'required_if:enableChildren,true',
             'childs.*.quantity' => 'required_if:enableChildren,true',
             'childs.*.age' => 'required_if:enableChildren,true',
 
@@ -504,6 +531,7 @@ class CostCalculatorQueryList extends Component
             'night_halt_details.required' => 'Night halt is required.',
             'meal_type.required' => 'Meal type is required.',
             'nationality_type.required' => 'Nationality type is required.',
+            'childs.*.addon_type.required_if' => 'Addon type is required.',
             'childs.*.quantity.required_if' => 'Quantity is required.',
             'childs.*.age.required_if' => 'Child age is required.',
             'number_of_rooms.required' => 'Number of rooms required.',
@@ -534,7 +562,6 @@ class CostCalculatorQueryList extends Component
         //     $total_member = $total_member+$this->extra_mattress;
         // }
 
-        
         if ($this->total_members != $total_member) {
             session()->flash('error', 'The total number of travelers does not match the number of adults and children. Please review and update.');
             return false;

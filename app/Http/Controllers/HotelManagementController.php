@@ -327,15 +327,29 @@ class HotelManagementController extends Controller
                 'required',
                 'string',
                 'max:255',
+                Rule::in(['CNB', 'CWM', 'Extra Mattress']),
                 Rule::unique('seasion_plans', 'title')->whereNull('deleted_at'),
             ],
-            'plan_item' => 'required|array|min:1',
+            'plan_item' => [
+                'required',
+                'array',
+                'min:1',
+                function ($attribute, $value, $fail) use ($request) {
+                    // Allow only 1 plan_item when title = Extra Mattress
+                    if ($request->title === 'Extra Mattress' && count($value) > 3) {
+                        $fail('Only one plan item is allowed for the Extra Mattress plan.');
+                    }
+                }
+            ],
             'plan_item.*' => 'required|string|max:255',
+
         ], [
             'title.required' => 'The title field is required.',
+            'title.in' => 'The title must be one of the allowed Addon Season Plans: CNB, CWM, Extra Mattress.',
             'plan_item.required' => 'At least one plan item is required.',
             'plan_item.*.required' => 'This field is required.',
         ]);
+
           // After validation, proceed to save the data
         try {
             $this->commonRepository->storeHotelSeasionPlan($validatedData);
@@ -345,18 +359,35 @@ class HotelManagementController extends Controller
         }
     }
     public function hotel_seasion_plan_update(Request $request){
-        // dd($request->all());
         $validatedData = $request->validate([
             'title' => [
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('seasion_plans', 'title')->ignore($request->id)->whereNull('deleted_at'),
+                Rule::in(['Normal Season','Peak Season','Off Season','CNB', 'CWM', 'Extra Mattress']),
+                Rule::unique('seasion_plans', 'title')
+                    ->ignore($request->id)
+                    ->whereNull('deleted_at'),
             ],
-            'plan_item' => 'required|array|min:1',
+
+            'plan_item' => [
+                'required',
+                'array',
+                'min:1',
+
+                // ✅ Allow only 1 item when title = Extra Mattress
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->title === 'Extra Mattress' && count($value) > 3) {
+                        $fail('Only one plan item is allowed for the Extra Mattress plan.');
+                    }
+                },
+            ],
+
             'plan_item.*' => 'required|string|max:255',
+
         ], [
             'title.required' => 'The title field is required.',
+            'title.in' => 'The title must be one of the allowed Season Plans: Normal Season, Peak Season, Off Season, CNB, CWM, Extra Mattress.',
             'plan_item.required' => 'At least one plan item is required.',
             'plan_item.*.required' => 'This field is required.',
         ]);

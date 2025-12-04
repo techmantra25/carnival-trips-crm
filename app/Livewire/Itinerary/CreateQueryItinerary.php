@@ -494,11 +494,12 @@ class CreateQueryItinerary extends Component
 
         if($this->leadData->number_of_children>0){
             $children_data = json_decode($this->leadData->children_data);
+            
             foreach($children_data as $child_index=>$child_item){
                 $room_addon_cwm = HotelPriceChart::where('hotel_id', $selected_hotel->id)
                 ->where('type', 2)
                 ->where('room_id', $selected_room->id)
-                ->where('plan_title', 'CWM')
+                ->where('plan_title', $child_item->addon_type)
                 ->where('plan_item', $child_item->age)
                 // ->where('item_price', '>', 0)
                 ->orderBy('item_price', 'ASC')
@@ -506,7 +507,7 @@ class CreateQueryItinerary extends Component
 
                 if($room_addon_cwm){
                     // Child with Mattress
-                    $field_data = "day_room_addon_plan_cwm";
+                    $field_data = "day_room_addon_plan_" . strtolower($child_item->addon_type);
                     ItineraryDetail::updateOrCreate(
                         [
                             'itinerary_id' => $this->itinerary_id,
@@ -540,13 +541,13 @@ class CreateQueryItinerary extends Component
                 $room_addon_mattress = HotelPriceChart::where('hotel_id', $selected_hotel->id)
                 ->where('type', 2)
                 ->where('room_id', $selected_room->id)
-                ->where('plan_title', 'Mattress')
+                ->where('plan_item', 'like', "%[{$this->leadData->meal_type}]%")
+                ->where('plan_title', 'Extra Mattress')
                 ->where('item_price', '>', 0)
-                ->orderBy('item_price', 'ASC')
                 ->first();
                 if($room_addon_mattress){
                     // Child with Mattress
-                    $field_data = "day_room_addon_plan_mattress";
+                    $field_data = "day_room_addon_plan_extra_mattress";
                     ItineraryDetail::updateOrCreate(
                         [
                             'itinerary_id' => $this->itinerary_id,
@@ -1876,7 +1877,7 @@ class CreateQueryItinerary extends Component
             DB::beginTransaction();
             // Update or create itinerary detail
             $field_data = "day_room_addon_plan_" . str_replace(' ', '_', strtolower($field));
-            if($field_data == 'day_room_addon_plan_mattress'){
+            if($field_data == 'day_room_addon_plan_extra_mattress'){
                 if($this->leadData->extra_mattress ==null){
                     $this->errorRoom[$index] = 'Sorry! you have not selected any extra mattress.';
                     return false;
@@ -2436,12 +2437,22 @@ class CreateQueryItinerary extends Component
         $AddonSeasionPlan = SeasionPlan::where('type', 'addon')->orderBy('position', 'ASC')
         ->get()
         ->toArray();
-
+         
         if(count($AddonSeasionPlan)>0){
             $addon_plans = [];
             foreach ($AddonSeasionPlan as $item) {
-                $plan_types = explode(', ', $item['plan_item']); // Split plan types
-
+                // $plan_types = explode(', ', $item['plan_item']); // Split plan types
+                $plan_types = collect($item['plan_item'])
+                ->flatMap(function ($item) {
+                    return array_map('trim', explode(',', $item));
+                })
+                ->filter(function ($item) {
+                    return str_contains($item, "[{$this->leadData->meal_type}]");
+                })
+                ->unique()
+                ->values()
+                ->toArray();
+             
                 // Fetch all prices at once (avoiding N+1 queries)
                 $prices = HotelPriceChart::where('room_id', $roomId)
                 ->whereHas('priceChartType', function ($query){
@@ -2452,10 +2463,7 @@ class CreateQueryItinerary extends Component
                 ->pluck('item_price', 'plan_item') // Fetch as key-value pair (plan_item => item_price)
                 ->toArray();
 
-
-                
                 $field_data = "day_room_addon_plan_" . str_replace(' ', '_', strtolower($item['title']));
-
                 $selected_addon_plan = ItineraryDetail::where('itinerary_id', $this->itinerary_id)
                 ->where('header', 'day_' . $index)
                 ->where('room_id', $roomId)
@@ -2879,7 +2887,7 @@ class CreateQueryItinerary extends Component
                             ->value('item_price');
     
                             $price = (int)$room_single_price*$hotel_details['value_quantity'];
-                    }elseif($hotel_details['field']==="day_room_addon_plan_mattress"){
+                    }elseif($hotel_details['field']==="day_room_addon_plan_extra_mattress"){
                         $room_single_price = HotelPriceChart::where('hotel_id', $new_hotel_id)
                             ->where('type', 2) // 2 = Selling Price
                             ->where('room_id', $room->id)

@@ -102,22 +102,39 @@ class CostCalculatorQueryEdit extends Component
         $this->mealTypes = SeasionPlan::where('status', 1)->where('type', 'main')->orderBy('position', 'ASC')->first();
         $this->categories = Category::where('status', 1)->orderBy('name', 'ASC')->get();
         $this->fetchItinerary();
+
+        // $rawItems = SeasionPlan::where('status', 1)
+        // ->where('type', 'addon')
+        // ->where('plan_item', 'like', '%YEAR%')
+        // ->pluck('plan_item')
+        // ->toArray();
+
+        // $flattened = collect($rawItems)
+        //     ->flatMap(function ($item) {
+        //         return array_map('trim', explode(',', $item));
+        //     })
+        //     ->unique()
+        //     ->values()
+        //     ->toArray();
+
+        // $this->childsData = $flattened;
         $rawItems = SeasionPlan::where('status', 1)
         ->where('type', 'addon')
-        ->where('plan_item', 'like', '%YEAR%')
+        ->where('title', 'CNB')
         ->pluck('plan_item')
         ->toArray();
 
         $flattened = collect($rawItems)
-            ->flatMap(function ($item) {
-                return array_map('trim', explode(',', $item));
-            })
-            ->unique()
-            ->values()
-            ->toArray();
-
+        ->flatMap(function ($item) {
+            return array_map('trim', explode(',', $item));
+        })
+        ->filter(function ($item) {
+            return str_contains($item, "[{$this->meal_type}]");
+        })
+        ->unique()
+        ->values()
+        ->toArray();
         $this->childsData = $flattened;
-
     }
     public function EditQuery($lead_id){
         $leadExists = Lead::find($lead_id);
@@ -153,13 +170,14 @@ class CostCalculatorQueryEdit extends Component
                 $this->childs[$index]=[
                     'quantity'=>$child_item->quantity,
                     'age'=>$child_item->age,
+                    'addon_type'=>$child_item->addon_type,
                 ];
            }
         } 
        
     }
     public function addExtraChild(){
-        $this->childs[] = ['quantity'=>'', 'age'=>''];
+        $this->childs[] = ['addon_type'=>'','quantity'=>'', 'age'=>''];
     }
     public function removeExtraChild($index){
         unset($this->childs[$index]);
@@ -178,12 +196,33 @@ class CostCalculatorQueryEdit extends Component
         $this->dispatch('refreshComponent');
     }
     public function changeMealPlan($value){
+        $this->reset(['childs']);
         $this->meal_type = $value;
     }
     public function changeNationalityType($value){
         $this->nationality_type = $value;
     }
 
+    public function changeAddonType($value){
+        $this->reset(['childsData']);
+        $rawItems = SeasionPlan::where('status', 1)
+        ->where('type', 'addon')
+        ->where('title', $value)
+        ->pluck('plan_item')
+        ->toArray();
+
+        $flattened = collect($rawItems)
+        ->flatMap(function ($item) {
+            return array_map('trim', explode(',', $item));
+        })
+        ->filter(function ($item) {
+            return str_contains($item, "[{$this->meal_type}]");
+        })
+        ->unique()
+        ->values()
+        ->toArray();
+        $this->childsData = $flattened;
+    }
     public function fetchItinerary(){
         $this->existing_night_halt_details = Itinerary::select('id', 'itinerary_journey')
         // ->whereIn('type', ['post_inquiry', 'query'])
@@ -436,6 +475,7 @@ class CostCalculatorQueryEdit extends Component
             'total_members' => 'required|numeric|min:1',
             'number_of_adults' => 'required|numeric|min:1',
             // 'number_of_childs' => 'nullable|numeric',
+            'childs.*.addon_type' => 'required_if:enableChildren,true',
             'childs.*.quantity' => 'required_if:enableChildren,true',
             'childs.*.age' => 'required_if:enableChildren,true',
 
@@ -474,6 +514,7 @@ class CostCalculatorQueryEdit extends Component
             'night_halt_details.required' => 'Night halt is required.',
             'meal_type.required' => 'Meal type is required.',
             'nationality_type.required' => 'Nationality type is required.',
+            'childs.*.addon_type.required_if' => 'Type is required.',
             'childs.*.quantity.required_if' => 'Quantity is required.',
             'childs.*.age.required_if' => 'Child age is required.',
             'number_of_rooms.required' => 'Number of rooms required.',
