@@ -27,143 +27,79 @@
     }
     </style>
 
-    <div class="form-section">
-    <!-- Nav Tabs -->
-    <ul class="nav nav-tabs mb-3" id="formTabs" role="tablist">
-      <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#step1" type="button">1</button></li>
-      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#step2" type="button">2</button></li>
-      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#step3" type="button">3</button></li>
-      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#step4" type="button">4</button></li>
-      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#step5" type="button">5</button></li>
-      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#step6" type="button">6</button></li>
-      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#step7" type="button">7</button></li>
-      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#step8" type="button">8</button></li>
-      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#step9" type="button">9</button></li>
-    </ul>
+    <div class="container py-4">
+      <div class="form-section">
+        <!-- NAV TABS (Livewire-controlled) -->
+        <ul class="nav nav-tabs mb-3" id="formTabs" role="tablist">
+            @foreach($questions as $index => $q)
+                @php $step = $index + 1; @endphp
+                <li class="nav-item">
+                    <button
+                        type="button"
+                        class="nav-link {{ $currentStep == $step ? 'active' : '' }}"
+                        wire:click.prevent="goToStep({{ $step }})"
+                    >
+                        {{ $step }}
+                    </button>
+                </li>
+            @endforeach
+        </ul>
 
-    <!-- Tab Content -->
-    <div class="tab-content" id="formTabsContent">
-      <!-- Step 1 -->
-      <div class="tab-pane fade show active" id="step1">
-        <div class="progress-line"></div>
-        <h6>Are you looking for a Personal trip or Join other Groups?</h6>
-        <button class="btn btn-outline-secondary btn-option">Personal Trip</button>
-        <button class="btn btn-outline-secondary btn-option">Joining other Groups</button>
-        <div class="nav-controls justify-content-end">
-          <button class="btn btn-primary next-btn" data-next="#step2">Next</button>
-        </div>
-      </div>
+        <!-- TAB CONTENT -->
+        <div class="tab-content" id="formTabsContent">
+          @foreach($questions as $index => $q)
+            @php $step = $index + 1; @endphp
+            <div class="tab-pane fade {{ $currentStep == $step ? 'show active' : '' }}">
+                <div class="progress-line"></div>
 
-      <!-- Step 2 -->
-      <div class="tab-pane fade" id="step2">
-        <div class="progress-line"></div>
-        <h6>Select Duration of Package</h6>
-        <button class="btn btn-outline-secondary btn-option">4N 5D</button>
-        <button class="btn btn-outline-secondary btn-option">5N 6D</button>
-        <button class="btn btn-outline-secondary btn-option">6N 7D</button>
-        <div class="nav-controls">
-          <button class="btn btn-secondary back-btn" data-back="#step1">Back</button>
-          <button class="btn btn-primary next-btn" data-next="#step3">Next</button>
-        </div>
-      </div>
+                <h6>{{ $q->title }}</h6>
 
-      <!-- Step 3 -->
-      <div class="tab-pane fade" id="step3">
-        <div class="progress-line"></div>
-        <h6>Select Travelers Count</h6>
-        <div class="row row-cols-3 g-2">
-          <!-- JS will add 1 to 10 -->
-        </div>
-        <button class="btn btn-outline-secondary btn-option mt-2">More than 10</button>
-        <div class="nav-controls">
-          <button class="btn btn-secondary back-btn" data-back="#step2">Back</button>
-          <button class="btn btn-primary next-btn" data-next="#step4">Next</button>
-        </div>
-      </div>
+                @foreach($q->options as $opt)
+                    @php $optText = e($opt->option_text); @endphp
+                    <button
+                        class="btn btn-option w-100 mb-2 {{ ($selected[$step] ?? '') == $opt->option_text ? 'btn-primary text-white' : 'btn-outline-secondary' }}"
+                        wire:click="storeAnswer({{ $step }}, '{!! addslashes($opt->option_text) !!}')"
+                        type="button"
+                    >
+                        {!! $optText !!}
+                    </button>
+                @endforeach
 
-      <!-- Step 4 -->
-      <div class="tab-pane fade" id="step4">
-        <div class="progress-line"></div>
-        <h6>Select a Tentative Month</h6>
-        <button class="btn btn-outline-secondary btn-option">JULY 2025</button>
-        <button class="btn btn-outline-secondary btn-option">AUGUST 2025</button>
-        <button class="btn btn-outline-secondary btn-option">SEPTEMBER 2025</button>
-        <button class="btn btn-outline-secondary btn-option">OCTOBER</button>
-        <button class="btn btn-outline-secondary btn-option">NOVEMBER</button>
-        <button class="btn btn-outline-secondary btn-option">DECEMBER</button>
-        <div class="nav-controls">
-          <button class="btn btn-secondary back-btn" data-back="#step3">Back</button>
-          <button class="btn btn-primary next-btn" data-next="#step5">Next</button>
-        </div>
-      </div>
+                <div class="nav-controls {{ $step == 1 ? 'justify-content-end' : '' }}">
+                    @if($step > 1)
+                        <button wire:click.prevent="goToStep({{ $step - 1 }})" class="btn btn-secondary">Back</button>
+                    @endif
 
-      <!-- Step 5 -->
-      <div class="tab-pane fade" id="step5">
-        <div class="progress-line"></div>
-        <h6>Select Per Person Budget</h6>
-        <button class="btn btn-outline-secondary btn-option">₹15,500</button>
-        <button class="btn btn-outline-secondary btn-option">₹18,500</button>
-        <button class="btn btn-outline-secondary btn-option">₹24,500</button>
-        <div class="nav-controls">
-          <button class="btn btn-secondary back-btn" data-back="#step4">Back</button>
-          <button class="btn btn-primary next-btn" data-next="#step6">Next</button>
-        </div>
-      </div>
+                    @if($step < $totalSteps)
+                        <button wire:click.prevent="goToStep({{ $step + 1 }})" class="btn btn-primary">Next</button>
+                    @else
+                        <button wire:click.prevent="finish" class="btn btn-success">Submit</button>
+                    @endif
+                </div>
+            </div>
+          @endforeach
 
-      <!-- Step 6 -->
-      <div class="tab-pane fade" id="step6">
-        <div class="progress-line"></div>
-        <h6>Hotel Preference</h6>
-        <button class="btn btn-outline-secondary btn-option">Standard</button>
-        <button class="btn btn-outline-secondary btn-option">Deluxe</button>
-        <button class="btn btn-outline-secondary btn-option">Super Deluxe</button>
-        <div class="nav-controls">
-          <button class="btn btn-secondary back-btn" data-back="#step5">Back</button>
-          <button class="btn btn-primary next-btn" data-next="#step7">Next</button>
-        </div>
-      </div>
+          {{-- THANK YOU SCREEN --}}
+          @if($currentStep > $totalSteps)
+            <div class="tab-pane fade show active">
+                <div class="progress-line"></div>
 
-      <!-- Step 7 -->
-      <div class="tab-pane fade" id="step7">
-        <div class="progress-line"></div>
-        <h6>How Soon will You Confirm the Booking?</h6>
-        <button class="btn btn-outline-secondary btn-option">Within 3 Days</button>
-        <button class="btn btn-outline-secondary btn-option">Within 5 Days</button>
-        <button class="btn btn-outline-secondary btn-option">Within 10 Days</button>
-        <div class="nav-controls">
-          <button class="btn btn-secondary back-btn" data-back="#step6">Back</button>
-          <button class="btn btn-primary next-btn" data-next="#step8">Next</button>
-        </div>
-      </div>
+                <div class="text-center p-3">
+                      <h5>Thanks, you're all set.</h5>
+                      <p>Thank You for Your Interest in Meghalaya!</p>
+                      <p>We've received your inquiry and will reach out soon with more details.</p>
 
-      <!-- Step 8 -->
-      <div class="tab-pane fade" id="step8">
-        <div class="progress-line"></div>
-        <h6>Contact Info</h6>
-        <input type="text" class="form-control mb-2" placeholder="Full Name" />
-        <input type="email" class="form-control mb-2" placeholder="Email" />
-        <input type="text" class="form-control mb-2" placeholder="Phone Number" />
-        <input type="text" class="form-control mb-2" placeholder="City" />
-        <div class="nav-controls">
-          <button class="btn btn-secondary back-btn" data-back="#step7">Back</button>
-          <button class="btn btn-primary next-btn" data-next="#step9">Submit</button>
-        </div>
-        <p class="small mt-2 text-muted">By clicking submit, you agree to send your info to Carnival Trips...</p>
-      </div>
+                    <button class="btn btn-primary w-100 mt-3" wire:click.prevent="goToStep(1)">
+                        Start Over  
+                    </button>
+                </div>
+            </div>
+          @endif
 
-      <!-- Step 9 -->
-      <div class="tab-pane fade" id="step9">
-        <div class="progress-line"></div>
-        <h5>Thanks, you're all set.</h5>
-        <p>Thank You for Your Interest in Meghalaya!</p>
-        <p>We've received your inquiry and will reach out soon with more details.</p>
-        <div class="nav-controls justify-content-start">
-          <button class="btn btn-secondary back-btn" data-back="#step8">Back</button>
         </div>
-        <button class="btn btn-primary w-100 mt-3">View website</button>
       </div>
     </div>
-  </div>
+
     {{-- In work, do what you enjoy. --}}
 </div>
 @section('scripts')

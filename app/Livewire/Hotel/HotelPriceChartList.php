@@ -42,10 +42,12 @@ class HotelPriceChartList extends Component
         return Hotel::with('rooms')->where('status', 1)->orderBy('name', 'ASC')->get();
     }
     public function GetAllRoom(){
-        return Room::orderBy('room_name', 'ASC')
+        return Room::orderBy('positions', 'ASC')
         ->get()
         ->unique('room_name')
-        ->values()->pluck('room_name')->toArray();
+        ->values()
+        ->pluck('room_name')
+        ->toArray();
     }
 
     public function ChangeType($value){
