@@ -227,7 +227,7 @@ class CreateQueryItinerary extends Component
             // Get Hotel
             $meal_type = $this->leadData->meal_type;
             $capacity = $this->getCapacity();
-
+            
             if($index<$this->leadData->travel_in_days){
 
                 $selectedDayHotelsId = [];
@@ -239,24 +239,54 @@ class CreateQueryItinerary extends Component
                             : $day_hotel['id'];
                     }
                 }
-                $selected_hotel = Hotel::with('priority_rooms', 'rooms')
+                // Retrieve a single hotel that matches several dynamic conditions
+                $selected_hotel = Hotel::with('priority_rooms', 'rooms') 
+                    // Eager-load related models: priority_rooms and rooms
+                    // This prevents N+1 query issues and loads room data with the hotel.
+                
                     ->join('hotel_price_charts', 'hotels.id', '=', 'hotel_price_charts.hotel_id')
+                    // Join the price chart table so hotel pricing can be filtered directly.
+                
                     ->when($this->loadDayHotelsTime == 2, function ($query) use ($selectedDayHotelsId) {
+                        // Apply this filter only if loadDayHotelsTime equals 2.
+                        // Useful when the hotel list is already pre-filtered earlier.
                         $query->whereIn('hotels.id', $selectedDayHotelsId);
                     })
+                
                     ->where('hotels.division', $division)
+                    // Match hotels in a specific division (region).
+                
                     ->where('hotels.hotel_category', $this->day_hotel_category[$index])
+                    // Filter hotels based on the required hotel category.
+                
                     ->where('hotel_price_charts.plan_title', ucwords($season))
+                    // Match the seasonal pricing plan (e.g., Peak, Off-Peak).
+                
                     ->where('hotel_price_charts.plan_item', $meal_type)
+                    // Match price chart by meal type (e.g., EP, CP, MAP, AP).
+                
                     ->where('hotel_price_charts.item_price', '>', 0)
+                    // Ensure the price exists and is not zero.
+                
                     ->whereHas('rooms', function ($query) use ($capacity) {
+                        // Only include hotels that have *at least one room* with enough capacity.
                         $query->where('capacity', '>=', $capacity);
                     })
-                     ->orderBy('hotel_price_charts.item_price', $this->budgetSortOrder)
+                
                     ->orderBy('hotels.priority', 'ASC')
-                    ->select('hotels.*')
-                    ->first();
+                    // Secondary sorting based on hotel priority (lower number = higher priority).
                     
+                    ->orderBy('hotel_price_charts.item_price', $this->budgetSortOrder)
+                    // Sort hotels by price first (ascending or descending based on budgetSortOrder)
+                    
+                    ->select('hotels.*')
+                    // Ensure only hotel fields are selected to avoid column name conflicts.
+                
+                    ->first();
+                    // Fetch only the first hotel that matches all conditions.
+                    
+                // Dump the final selected hotel to inspect the output.
+
                 // Fallback: without hotel_category
                 if (!$selected_hotel) {
                     $selected_hotel = Hotel::with('priority_rooms', 'rooms')
@@ -402,17 +432,15 @@ class CreateQueryItinerary extends Component
                 // Priority 1: exact capacity match
                 ->orderByRaw("CASE WHEN rooms.capacity = $capacity THEN 0 ELSE 1 END")
 
-                // Priority 2: among non-exact matches, choose smallest capacity >= pax
-                ->orderBy('rooms.capacity', 'ASC')
-
                 // ⭐ Priority 3: sort by room position
                 ->orderBy('rooms.positions', 'ASC')
-
+                
+                // Priority 2: among non-exact matches, choose smallest capacity >= pax
+                ->orderBy('rooms.capacity', 'ASC')
                 // Priority 4: price order
                 ->orderBy('hotel_price_charts.item_price', $this->budgetSortOrder)
 
                 ->first();
-
 
             $priority_room = $selected_hotel->priority_rooms()
                 ->where('capacity', '>=', $capacity)
@@ -654,40 +682,72 @@ class CreateQueryItinerary extends Component
                         }
                     }
 
+                    // Fetch extra hotels that match similar conditions as the main selected hotel
                     $extraHotels = Hotel::with([
+                            // Load priority rooms relationship
                             'priority_rooms',
+
+                            // Load only rooms that meet the required capacity
                             'rooms' => function ($query) use ($capacity) {
                                 $query->where('capacity', '>=', $capacity);
                             },
+
+                            // Load valid price chart for given season + meal type
                             'price_chart' => function ($query) use ($season, $meal_type) {
                                 $query->where('plan_title', ucwords($season))
                                     ->where('plan_item', $meal_type)
                                     ->where('item_price', '>', 0);
                             }
                         ])
+
+                        // Apply selected hotels list filter only when needed
                         ->when($this->loadDayHotelsTime == 2, function ($query) use ($selectedDayHotelsId) {
                             $query->whereIn('id', $selectedDayHotelsId);
                         })
+
+                        // Must match same division as the main hotel
                         ->where('division', optional($item->hotel)->division)
+
+                        // Must match same hotel category as the main hotel
                         ->where('hotel_category', optional($item->hotel)->hotel_category)
+
+                        // Ensure hotel has at least one valid room with enough capacity
                         ->whereHas('rooms', function ($query) use ($capacity) {
                             $query->where('capacity', '>=', $capacity);
                         })
+
+                        // Ensure hotel has correct price chart for season + meal type
                         ->whereHas('price_chart', function ($query) use ($season, $meal_type) {
                             $query->where('plan_title', ucwords($season))
                                 ->where('plan_item', $meal_type)
                                 ->where('item_price', '>', 0);
                         })
+
+                        // Exclude the currently selected main hotel
                         ->where('id', '!=', $item->hotel_id)
+
+                        // Sort hotels by priority (ASC → top priority first)
+                        ->orderBy('priority', 'ASC')
+
                         ->get();
 
-                    // Sort by item_price (min or max) using price_chart
                     $dayExtraHotels[$index] = $extraHotels
+
+                        // 1) Sort by price first
                         ->sortBy(function ($hotel) {
                             return $hotel->price_chart->first()->item_price ?? PHP_INT_MAX;
                         }, SORT_REGULAR, $this->package_budget === 'max')
+
+                        // 2) Then sort by priority ASC
+                        ->sortBy('priority', SORT_REGULAR, false)
+
+                        // Re-index collection
                         ->values()
-                        ->take(2) // apply limit AFTER sorting
+
+                        // Take top 2 after both sorts
+                        ->take(2)
+
+                        // Convert to array
                         ->toArray();
                 }
             }
@@ -2706,9 +2766,9 @@ class CreateQueryItinerary extends Component
         $room_capacity = Room::find($room_id)?->capacity;
         $this->selected_division = City::find($division)->name ?? null;
         $hotels = Hotel::with([
-                'rooms' => function ($query) use ($room_name, $room_capacity) {
-                    $query->where('room_name', $room_name)
-                        ->where('capacity', '>=', $room_capacity);
+                'rooms' => function ($query) use ($room_capacity) {
+                    // $query->where('room_name', $room_name)
+                    $query->where('capacity', '>=', $room_capacity);
                 },
                 'priority_rooms',
                 'price_chart' => function ($query) use ($season, $meal_type) {
@@ -2719,9 +2779,9 @@ class CreateQueryItinerary extends Component
             ])
             ->where('division', $division)
             ->where('hotel_category', $this->day_hotel_category[$index])
-            ->whereHas('rooms', function ($query) use ($room_name, $room_capacity) {
-                $query->where('room_name', $room_name)
-                    ->where('capacity', '>=', $room_capacity);
+            ->whereHas('rooms', function ($query) use ($room_capacity) {
+                // $query->where('room_name', $room_name)
+                $query->where('capacity', '>=', $room_capacity);
             })
             ->whereHas('price_chart', function ($query) use ($season, $meal_type) {
                 $query->where('plan_title', ucwords($season))
@@ -2736,7 +2796,6 @@ class CreateQueryItinerary extends Component
             }, SORT_REGULAR, $this->package_budget === 'max')
             ->values() // re-index the collection
             ->toArray();
-        // dd($getRelatedHotels);
         $existing_hotel_details = $this->existingHotelDetails($index);
 
         $current_hotel = Hotel::find($hotel_id);
@@ -2752,60 +2811,122 @@ class CreateQueryItinerary extends Component
         $this->related_hotels[0]=$existing_hotel;
         
         $sl = 1;
-        foreach($getRelatedHotels as $key=>$item){
+
+        foreach ($getRelatedHotels as $key => $item) {
+
             $existing_amount = 0;
             $new_amount = 0;
-            $room = Room::where('hotel_id', $item['id'])->where('room_name', $room_name)->first();
 
-            foreach($existing_hotel_details as $hotel_index=> $hotel_details){
-                
-                // if($hotel_index==1){
-                    $lastPart = substr(strrchr($hotel_details['field'], "_"), 1);
+            /*
+            |--------------------------------------------------------------------------
+            | STEP 1: REMOVE ROOM_NAME MATCHING
+            | We will not select room based on room_name anymore!
+            |--------------------------------------------------------------------------
+            |
+            | Instead, we will find the closest room later.
+            |
+            | So remove:
+            | $room = Room::where('hotel_id', $item['id'])
+            |             ->where('room_name', $room_name)
+            |             ->first();
+            |
+            |--------------------------------------------------------------------------
+            */
 
-                    $existing_amount+=(int)$hotel_details['price'];
-                        $query = HotelPriceChart::where('hotel_id', $item['id'])
-                            ->where('type', 2)
-                            ->where('room_id', $room->id)
-                            ->where('plan_item', $hotel_details['value'])
-                            ->where('item_price', '>', 0);
+            foreach ($existing_hotel_details as $hotel_index => $hotel_details) {
 
-                        // Conditional clause
-                        if ($hotel_details['field'] === "day_room_main_plan") {
-                            $query->where('plan_title', $season);
-                        } else {
-                            $query->where('plan_title', $lastPart); // same condition here, you can simplify this
-                        }
+                $lastPart = substr(strrchr($hotel_details['field'], "_"), 1);
 
-                        $room_single_price = $query->value('item_price');
-                        if(!$room_single_price){
-                            ItineraryDetail::where('id', $hotel_details['id'])->delete();
-                        }else{
-                            $value_quantity = $hotel_details['field']=="day_room_main_plan"?$this->leadData->number_of_rooms:$hotel_details['value_quantity'];
-                            $new_amount+=(int)$room_single_price*$value_quantity;
-                        }
-                // }
-                
+                $existing_amount += (int)$hotel_details['price'];
+
+                // Quantity per old logic
+                $value_quantity = $hotel_details['field'] == "day_room_main_plan"
+                    ? $this->leadData->number_of_rooms
+                    : $hotel_details['value_quantity'];
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | STEP 2: GET ALL PRICE OPTIONS FOR ALL ROOMS IN THIS HOTEL
+                |--------------------------------------------------------------------------
+                */
+
+                $priceOptions = HotelPriceChart::where('hotel_id', $item['id'])
+                    ->where('type', 2)
+                    ->where('plan_item', $hotel_details['value'])
+                    ->where('item_price', '>', 0)
+                    ->when($hotel_details['field'] === "day_room_main_plan", function ($q) use ($season) {
+                        $q->where('plan_title', $season);
+                    }, function ($q) use ($lastPart) {
+                        $q->where('plan_title', $lastPart);
+                    })
+                    ->get();
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | STEP 3: FIND THE CLOSEST ROOM FOR THIS HOTEL
+                |--------------------------------------------------------------------------
+                */
+
+                $closest_room = null;
+                $closest_diff = PHP_INT_MAX;
+
+                foreach ($priceOptions as $priceRow) {
+
+                    $total = $priceRow->item_price * $value_quantity;
+
+                    $difference = abs($total - $existing_amount);
+
+                    if ($difference < $closest_diff) {
+                        $closest_diff = $difference;
+                        $closest_room = $priceRow;
+                    }
+                }
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | STEP 4: APPLY THE CLOSEST ROOM PRICE TO NEW_AMOUNT
+                |--------------------------------------------------------------------------
+                */
+
+                if (!$closest_room) {
+                    ItineraryDetail::where('id', $hotel_details['id'])->delete();
+                    continue;
+                }
+
+                $new_amount += $closest_room->item_price * $value_quantity;
+
+                // Save closest match info for display
+                $item['selected_room_id'] = $closest_room->room_id;
+                $item['selected_room_name'] = Room::find($closest_room->room_id)->room_name ?? 'Unknown';
+                $item['closest_item_price'] = $closest_room->item_price;
+                $item['closest_difference'] = $closest_diff;
             }
-            $item['image'] = $item['image']?$item['image']:'build/assets/images/logo/hotel.jpg';
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | FINAL CALCULATION
+            |--------------------------------------------------------------------------
+            */
+
+            $item['image'] = $item['image'] ?: 'build/assets/images/logo/hotel.jpg';
             $item['existing_amount'] = $existing_amount;
             $item['new_amount'] = $new_amount;
-            $item['selected_room_id'] = $room->id;
-            $item['selected_room_name'] = $room_name;
             $item['selected_season'] = $season;
             $item['selected_day'] = $index;
             $item['selected_hotel_id'] = $hotel_id;
-            // dd($new_amount, $existing_amount);
+
             $difference = $new_amount - $existing_amount;
-            if($difference >= 0){
-                $item['sign'] = '+';
-            }else{
-                $item['sign'] = '-';
-            }
-            $formatted_difference = abs((int) $difference);
-            $item['difference'] = $formatted_difference;
-            $this->related_hotels[$sl]=$item;
+            $item['sign'] = $difference >= 0 ? '+' : '-';
+            $item['difference'] = abs((int)$difference);
+
+            $this->related_hotels[$sl] = $item;
             $sl++;
         }
+
         $this->isRelatedModalOpen = true;
     }
     public function closeRelatedModal(){

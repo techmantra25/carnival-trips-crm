@@ -671,7 +671,8 @@ class CostCalculatorQueryEdit extends Component
         }
     }
     public function resetItineraryDetails($itinerary_id){
-        ItineraryDetail::where('itinerary_id', $itinerary_id)->delete();
+        $data = ItineraryDetail::where('itinerary_id', $itinerary_id)->get();
+        dd($data);
     }
      public function cloneItineraryDetails($old_itinerary_id, $new_itinerary_id){
         $fetchDetails = ItineraryDetail::where('itinerary_id', $old_itinerary_id)->whereNotNull('route_service_summary_id')->orderBy('id', 'ASC')->get();
