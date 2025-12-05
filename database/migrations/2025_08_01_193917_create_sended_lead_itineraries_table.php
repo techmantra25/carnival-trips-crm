@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('sended_lead_itineraries', function (Blueprint $table) {
-            $table->id();
+           $table->bigIncrements('id');
 
             // Foreign key to leads table
             $table->unsignedBigInteger('lead_id');

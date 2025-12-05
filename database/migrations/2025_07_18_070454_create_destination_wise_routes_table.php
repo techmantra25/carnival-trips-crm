@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('destination_wise_routes', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->string('route_name')->comment('e.g., Guwahati to Shillong to Cherrapunjee');
             $table->unsignedBigInteger('destination_id')->comment('e.g., Meghalaya');
             $table->string('total_distance_km', 250)->nullable()->comment('Total route distance in kilometers');

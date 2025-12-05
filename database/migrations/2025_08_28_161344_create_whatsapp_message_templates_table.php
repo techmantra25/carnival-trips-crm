@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('whatsapp_message_templates', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->string('title'); // e.g., Template 1
             $table->enum('type', ['preset', 'custom'])->default('preset');
             $table->text('body'); // message content

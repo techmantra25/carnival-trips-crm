@@ -172,8 +172,11 @@ class PresetItineraryList extends Component
         }
     }
     public function updateJourneyDivision($index, $value){
+        $last_index = $index+1;
         $this->itinerary_journey_divisions[$index] = $value;
-        $this->night_distribution = CustomHelper::formatDayJourney($this->itinerary_journey_divisions);
+        if($last_index !== count($this->itinerary_journey)){
+            $this->night_distribution = CustomHelper::formatDayJourney($this->itinerary_journey_divisions);
+        }
     }
 
     public function submitForm()

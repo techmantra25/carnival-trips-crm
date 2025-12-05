@@ -767,7 +767,7 @@
                                         <tr class="border-b !border-primary/30">
                                             <th scope="col" class="!text-center w-1/10">#</th>
                                             <th scope="col" class="!text-center w-1/3">Destination</th>
-                                            <th scope="col" class="!text-center w-1/10">Activities</th>
+                                            {{-- <th scope="col" class="!text-center w-1/10">Activities</th> --}}
                                             {{-- <th scope="col" class="!text-center w-1/10">SightSeeings</th> --}}
                                             <th scope="col" class="!text-center w-1/10">Cabs</th>
                                         </tr>
@@ -786,8 +786,8 @@
                                             <td class="!text-center"> 
                                                 <p class="mb-1">{{ ucwords($selectedDestinationName) }}</p>
                                             </td>
-                                            <td>
-                                                {{-- For Activities --}}
+                                            {{-- For Activities --}}
+                                            {{-- <td>
                                                 @forelse ($all_activities as $act_index => $activity_item)
                                                     <div class="form-check">
                                                         <input class="form-check-input border-sky-500 new_service_checkbox" type="checkbox" 
@@ -814,7 +814,7 @@
                                                         👉Activities are not available. <a href="{{ route('admin.route.division_wise_activity_list') }}" class="text-primary">click here to add.</a>
                                                     </div>
                                                 @endforelse
-                                            </td>
+                                            </td> --}}
                                             {{-- <td>
                                                 @forelse ($all_sightseeings as $sit_index => $sight_item)
                                                     <div class="form-check">

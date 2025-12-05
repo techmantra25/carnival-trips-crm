@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('lead_whatsapp_messages', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->unsignedBigInteger('lead_id');
             $table->unsignedBigInteger('template_id')->nullable();
             $table->unsignedBigInteger('sent_by'); // admin_id

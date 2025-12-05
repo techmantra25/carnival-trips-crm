@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('leads_status', function (Blueprint $table) {
-            $table->id(); // bigint(20) UNSIGNED NOT NULL
+            $table->bigIncrements('id');
             $table->string('status'); // Status label or key
             $table->integer('position'); // Position/order
             $table->string('name'); // Display name

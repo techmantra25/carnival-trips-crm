@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('lead_url_clicks', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->unsignedBigInteger('lead_id');
             $table->timestamp('entry_time')->useCurrent();
             $table->timestamp('exit_time')->nullable();

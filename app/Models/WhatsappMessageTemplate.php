@@ -15,20 +15,14 @@ class WhatsappMessageTemplate extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
-        'template_name',
-        'title',
-        'type',
-        'body',
-        'status',
-        'image',
-        'external_link',
+        'name',
+        'language',
+        'category',
+        'temp_Id',
+        'allow_category_change',
+        'Status',
+        'components',
+        'Sno',
     ];
 
-    /**
-     * Optional: cast type for convenience
-     */
-    protected $casts = [
-        'type' => 'string',
-        'status' => 'string',
-    ];
 }

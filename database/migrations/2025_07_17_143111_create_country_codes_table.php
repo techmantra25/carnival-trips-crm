@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('country_codes', function (Blueprint $table) {
-            $table->id(); // BIGINT, AUTO_INCREMENT
+            $table->bigIncrements('id');
             $table->string('country_code', 5);
             $table->string('country_name', 50);
             $table->string('phone_code', 5);

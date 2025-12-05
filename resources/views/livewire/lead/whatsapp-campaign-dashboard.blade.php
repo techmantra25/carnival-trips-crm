@@ -121,86 +121,179 @@
         <div class="container mb-4">
             <div class="form-section">
                 <div class="toggle-container">
-                    <!-- Custom -->
-                    <input type="radio" id="custom-toggle" name="message-type" value="custom"
-                        wire:model="messageType" wire:click="selectMessageType('custom')" checked>
-                    <label for="custom-toggle">Custom Message</label>
-
-                    <!-- Preset -->
-                    <input type="radio" id="preset-toggle" name="message-type" value="preset"
-                        wire:model="messageType" wire:click="selectMessageType('preset')">
-                    <label for="preset-toggle">Preset Templates</label>
-
-                    <!-- Slider -->
-                    <span class="slider"></span>
+                    <!-- Preset Only -->
+                    <input 
+                        type="radio" 
+                        id="preset-toggle" 
+                        name="message-type" 
+                        value="preset"
+                        wire:model="messageType"  
+                        checked>
+                    <label for="preset-toggle" class="!bg-success">Preset Templates</label>
                 </div>
-                @if($messageType === 'custom')
-                    <div id="custom-panel" class="panel">
-                        <h2>Customize Your Message</h2>
-                        <div class="input-group">
-                            <label for="message-content">Message</label>
-                            <textarea id="message-content" wire:keyup="messageContent($event.target.value)" placeholder="Type your message here..." rows="4"></textarea>
-                        </div>
-                    </div>
-                @else
-                    <div id="preset-panel" class="panel">
-                        <h2>Preset Message Selection</h2>
-                        <div class="text-end mb-2">
-                            <input type="text" class="badge w-xs" wire:model="template_search" wire:keyup="QuickSearch($event.target.value)" placeholder="Quick search here..">
-                        </div>
 
-                        {{-- Template selection --}}
-                        <div class="grid grid-cols-12 gap-x-6 whatsapp-template-section">
-                            @foreach ($templates as $templateItem)
-                                <div class="sm:col-span-4 col-span-12" wire:key="template-{{ $templateItem->id }}">
-                                    <div class="box {{ $selectedTemplateId == $templateItem->id ? 'active_template' : '' }}">
-                                        <div class="box-body preset-template-item"> 
-                                            <a href="{{ $templateItem->external_link }}" target="_blank" class="absolute-badge badge gap-2 !bg-{{ $selectedTemplateId == $templateItem->id ? 'success' : 'secondary' }} text-white rounded-md">
-                                                <i class="fas fa-external-link-alt text-white cursor-pointer text-xs ms-auto"></i>
-                                            </a>
-                                            <img src="{{ $templateItem->image }}" class="card-img mb-4 !rounded-md" alt="...">
-                                            <h6 class="box-title font-semibold !text-xs">
-                                                <i class="fas fa-message text-success cursor-pointer !text-xs"></i> {{ $templateItem->template_name }}
+                    @if($messageType === 'preset')
+                        <div id="preset-panel" class="panel">
+
+                            <!-- Search -->
+                            <div class="flex justify-end mb-4">
+                                <input 
+                                    type="text"
+                                    class="badge w-xs rounded-lg border px-3 py-2 shadow-sm focus:ring-2 focus:ring-success/40"
+                                    wire:model="template_search" 
+                                    wire:keyup="QuickSearch($event.target.value)" 
+                                    placeholder="Search templates..."
+                                >
+                            </div>
+
+                            <!-- Templates Grid -->
+                            <div class="grid grid-cols-12 gap-6">
+                                @foreach ($whatsappTemplates as $item)
+                                <div class="sm:col-span-6 col-span-12" wire:key="wtpl-{{ $item['Id'] }}">
+                                    
+                                    <div class="box rounded-xl overflow-hidden shadow hover:shadow-lg transition-all duration-300
+                                        {{ $selectedTemplateId == $item['Id'] ? 'ring-2 ring-success' : 'ring-1 ring-gray-200' }}">
+                                        
+                                        <div class="box-body preset-template-item relative p-5">
+
+                                            <!-- Template Title -->
+                                            <h6 class="box-title font-semibold text-base flex items-center gap-2 mb-3 text-gray-800">
+                                                <i class="fas fa-message text-success text-sm"></i> 
+                                                {{ ucfirst($item['name']) }}
                                             </h6>
-                                            <div class="mt-2">
-                                                <button class="ti-btn ti-btn-{{ $selectedTemplateId == $templateItem->id ? 'success-full' : 'outline-success' }} ti-btn-wave me-[0.375rem] w-full uppercase"
-                                                    wire:click="selectTemplate({{ $templateItem->id }})">
-                                                    {{ $selectedTemplateId == $templateItem->id ? 'Selected' : 'Select' }}
-                                                </button>
+
+                                            <!-- Badges -->
+                                            <div class="flex flex-wrap gap-2 mb-4">
+                                                <span class="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded-md">
+                                                    Category: {{ $item['category'] }}
+                                                </span>
+                                                <span class="px-2 py-1 bg-green-50 text-green-600 text-xs rounded-md">
+                                                    Status: {{ $item['Status'] }}
+                                                </span>
+                                                <span class="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-md">
+                                                    Lang: {{ $item['language'] }}
+                                                </span>
                                             </div>
+
+                                            <!-- BODY Preview -->
+                                            @php 
+                                                $body = collect($item['components'])->firstWhere('type', 'BODY');
+                                            @endphp
+                                            @if($body)
+                                                <div class="p-4 rounded-lg bg-gray-100 border text-sm leading-6 mb-4 text-gray-700">
+                                                    {!! nl2br(e($body['text'])) !!}
+                                                </div>
+                                            @endif
+
+                                            <!-- CAROUSEL Preview -->
+                                            @php 
+                                                $carousel = collect($item['components'])->firstWhere('type', 'CAROUSEL');
+                                            @endphp
+
+                                            @if($carousel)
+                                                <div class="swiper mySwiper mb-4" wire:ignore>
+                                                    <div class="swiper-wrapper">
+
+                                                        @foreach($carousel['cards'] as $card)
+                                                            @php
+                                                                $header = collect($card['components'])->firstWhere('type','HEADER');
+                                                                $bodyTxt = collect($card['components'])->firstWhere('type','BODY');
+                                                            @endphp
+
+                                                            <div class="swiper-slide">
+                                                                <div class="w-full border rounded-lg p-2 bg-white shadow-sm">
+
+                                                                    @if(isset($header['example']['header_handle'][0]))
+                                                                        <img src="http://127.0.0.1:8000/build/assets/images/logo/hotel.jpg" 
+                                                                            class="rounded mb-2 w-full h-32 object-cover" />
+                                                                    @endif
+
+                                                                    <p class="text-sm text-gray-800">{{ $bodyTxt['text'] ?? '' }}</p>
+                                                                </div>
+                                                            </div>
+                                                        @endforeach
+
+                                                    </div>
+
+                                                    <!-- Slide Controls -->
+                                                    <div class="swiper-button-next"></div>
+                                                    <div class="swiper-button-prev"></div>
+                                                    <div class="swiper-pagination"></div>
+                                                </div>
+
+                                            @endif
+
+
+                                            <!-- Select Button -->
+                                            <button 
+                                                class="ti-btn w-full uppercase py-2 rounded-lg transition 
+                                                    {{ $selectedTemplateId == $item['Id'] 
+                                                        ? 'bg-success text-white hover:bg-success/90' 
+                                                        : 'border border-success text-success hover:bg-success hover:text-white' }}"
+                                                wire:click="selectTemplate({{ $item['Id'] }})"
+                                            >
+                                                {{ $selectedTemplateId == $item['Id'] ? 'Selected' : 'Select' }}
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
-                            @endforeach
+                                @endforeach
+                            </div>
 
                         </div>
-                    </div>
-                @endif
+                        @endif
+
+
                 
             </div>
             
             <div class="preview-section">
+                @php
+                    $selected = $previewTemplate ?? null;
+
+                    // BODY TEXT
+                    $selected_body = $selected 
+                        ? collect($selected['components'])->firstWhere('type', 'BODY') 
+                        : null;
+
+                    // HEADER IMAGE
+                    $selected_header = $selected 
+                        ? collect($selected['components'])->firstWhere('type', 'HEADER') 
+                        : null;
+
+                    $headerImage = $selected_header['example']['header_handle'][0] ?? null;
+                    // CAROUSEL
+                    $selected_carousel = $selected
+                        ? collect($selected['components'])->firstWhere('type', 'CAROUSEL')
+                        : null;
+                @endphp
+
                 <h2 class="text-end mb-2">WhatsApp Preview</h2>
-                <div class="whatsapp-message-bubble">
-                    <div class="whatsapp-card-content">
-                        @if($previewTemplate['image'])
-                        <div id="whatsapp-image-container" class="whatsapp-image-container">
-                            <img src="{{$previewTemplate['image']}}" alt="">
-                        </div>
-                        @endif
-                        <div class="whatsapp-text-content">
-                            <h3 id="whatsapp-card-title">{{$previewTemplate['title']}}</h3>
-                            <p id="whatsapp-card-message">{{$previewTemplate['body']}}</p>
-                        </div>
-                    </div>
-                    @if($previewTemplate['external_link'])
-                        <div class="whatsapp-footer-link justify-center">
-                            <a href="{{$previewTemplate['external_link']}}" target="_blank" id="whatsapp-footer-text" class="text-base cursor-pointer flex items-center justify-center gap-1">
-                                <i class="fas fa-external-link-alt text-xs"></i> Plan Your Trip
-                            </a>
+                    @if($selected)
+                        <div class="box active_template">
+                            <div class="box-body preset-template-item">
+
+                                {{-- Template Name --}}
+                                <h6 class="box-title font-semibold text-sm flex items-center gap-2 mb-2">
+                                    <i class="fas fa-message text-success text-xs"></i> 
+                                    {{ ucfirst($selected['name']) }}
+                                </h6>
+
+                                {{-- HEADER IMAGE --}}
+                                @if($headerImage)
+                                    <img src="{{ $headerImage }}" class="rounded mb-3 w-full h-32 object-cover" />
+                                @endif
+
+                                {{-- BODY --}}
+                                @if($selected_body)
+                                    <div class="p-3 rounded bg-gray-50 border text-xs leading-5 mb-4">
+                                        {!! nl2br(e($selected_body['text'])) !!}
+                                    </div>
+                                @endif
+
+                            </div>
                         </div>
                     @endif
-                </div>
                 <div class="mt-4">
                     <strong>Selected Customers:</strong>
                     @if($selectedCustomerType=='select_customers')
@@ -222,8 +315,8 @@
                         type="button" 
                         id="submit-button" 
                         wire:click="sendWhatsAppMessage" 
-                        class="submit-button {{ empty($previewTemplate['body']) || count($selectedCustomer) === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600' }}" 
-                        @if(empty($previewTemplate['body']) || count($selectedCustomer) === 0) disabled @endif
+                        class="submit-button {{ $selectedTemplateId == null || count($selectedCustomer) === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-500 hover:bg-green-600' }}" 
+                        @if($selectedTemplateId == null || count($selectedCustomer) === 0) disabled @endif
                     >
                         <i class="fas fa-paper-plane"></i> Send Now
                     </button>
@@ -233,8 +326,56 @@
             </div>
         </div>
     </div>
+    <div wire:loading class="loader" wire:target="sendWhatsAppMessage,selectTemplate,toggleLead,toggleCustomerSelection">
+        <div class="spinner">
+            <img src="{{asset('build/assets/images/media/loader.svg')}}" alt="">
+        </div>
+    </div>
 </div>
 @section('scripts')
+        <script>
+            // Swiper initializer function
+            function initSwipers() {
+                // Destroy existing Swipers to avoid duplicates
+                if (window.activeSwipers) {
+                    window.activeSwipers.forEach(swiper => swiper.destroy(true, true));
+                }
+                window.activeSwipers = [];
+
+                document.querySelectorAll(".mySwiper").forEach((el) => {
+                    let swiper = new Swiper(el, {
+                        slidesPerView: 1,
+                        spaceBetween: 12,
+                        loop: true,
+                        pagination: {
+                            el: el.querySelector(".swiper-pagination"),
+                            clickable: true,
+                        },
+                        navigation: {
+                            nextEl: el.querySelector(".swiper-button-next"),
+                            prevEl: el.querySelector(".swiper-button-prev"),
+                        },
+                    });
+
+                    window.activeSwipers.push(swiper);
+                });
+            }
+
+            // First page load
+            document.addEventListener("DOMContentLoaded", () => {
+                initSwipers();
+            });
+
+            // Re-run after Livewire updates DOM
+            document.addEventListener("livewire:navigated", () => {
+                initSwipers();
+            });
+
+            document.addEventListener("livewire:update", () => {
+                initSwipers();
+            });
+        </script>
+
         <script>
             function clearFilter() {
                 document.getElementById('lead-filter').value = '';

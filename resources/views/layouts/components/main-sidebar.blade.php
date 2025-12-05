@@ -111,9 +111,9 @@
 									<li class="slide {{ request()->is('admin/whatsapp-campaign*')? 'active' : '' }}">
 										<a href="{{route('admin.whatsapp.campaign.index')}}" class="side-menu__item">Dashboard</a>
 									</li>
-									<li class="slide {{ request()->is('admin/leads/confirmed*')? 'active' : '' }}">
+									{{-- <li class="slide {{ request()->is('admin/leads/confirmed*')? 'active' : '' }}">
 										<a href="{{route('admin.leads.confirmed.index')}}" class="side-menu__item">Whatsapp Templates</a>
-									</li>
+									</li> --}}
 								</ul>
 							</li>
 							<li class="slide has-sub {{ request()->is('admin/hotel*') 

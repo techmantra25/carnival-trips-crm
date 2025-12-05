@@ -83,15 +83,24 @@
                             <table class="whitespace-nowrap table-bordered table-bordered-primary border-primary/10 min-w-full">
                                 <thead class="bg-gray-100 text-xs">
                                     @php
-                                        $main_plan_colspan = count($season_main_plan);
-                                        foreach($season_main_plan as $main_plan){
+                                        $main_plan_colspan = 0;
+                                        foreach($season_main_plan as $main_k=>$main_plan){
                                             $plan_items = explode(', ',$main_plan['plan_item']);
-                                            $main_plan_colspan += count($plan_items);
+                                            if(count($plan_items)>1){
+                                                $main_plan_colspan += count($plan_items);
+                                            }else{
+                                                $main_plan_colspan += 1;
+                                            }
                                         }
-                                        $addon_plan_colspan = count($season_addon_plan);
+                                        
+                                        $addon_plan_colspan = 0;
                                         foreach($season_addon_plan as $addon_plan){
                                             $plan_items = explode(', ',$addon_plan['plan_item']);
-                                            $addon_plan_colspan += count($plan_items);
+                                            if(count($plan_items)>1){
+                                                $addon_plan_colspan += count($plan_items);
+                                            }else{
+                                                $addon_plan_colspan += 1;
+                                            }
                                         }
                                     @endphp
                                     <tr>
@@ -143,7 +152,7 @@
                                         @endphp
                                         @if(isset($item['room']) && is_array($item['room']))
                                             @foreach ($item['room'] as $roomIndex => $room)
-                                                <tr>
+                                                <tr wire:key="hotel-room-{{$roomIndex}}">
                                                     @if ($sl === 0)
                                                         <td rowspan="{{ $roomCount }}" class="border border-gray-300 p-2 font-bold text-blue-900 align-middle">
                                                             <p class="mb-1 uppercase">{{ $item['hotel_name'] }} 
@@ -272,6 +281,10 @@
         });
         $('#hotel_list').on('change', function (e) {
             var value = $(this).select2("val");
+            // RESET ALL PRICE INPUTS
+            $('.price_chart_value')
+                .val('')            // clear field
+                .trigger('input');  // notify Livewire
             @this.call('getHotel', value);
         });
         $('#room_list').on('change', function (e) {

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('states', function (Blueprint $table) {
-            $table->unsignedBigInteger('id')->primary(); // matches bigint(20) UNSIGNED NOT NULL
+            $table->bigIncrements('id'); // matches bigint(20) UNSIGNED NOT NULL
             $table->unsignedBigInteger('country_code_id')->nullable(); // bigint(20) UNSIGNED DEFAULT NULL
             $table->string('name', 255);
             $table->tinyInteger('status')->default(1)->comment('1: Active, 0: Inactive');

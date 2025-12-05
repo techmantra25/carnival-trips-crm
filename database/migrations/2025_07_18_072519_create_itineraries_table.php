@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('itineraries', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->enum('type', ['preset', 'post_inquiry', 'query']);
             $table->unsignedBigInteger('lead_id')->nullable()->comment("leads table id");
             $table->unsignedBigInteger('destination_id')->comment("states table id");

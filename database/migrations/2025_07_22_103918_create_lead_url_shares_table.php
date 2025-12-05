@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('lead_url_shares', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->unsignedBigInteger('lead_id');
             $table->unsignedBigInteger('shared_by')->nullable()->comment('null = cron job, else CRM admin');
             $table->string('channel', 50)->default('whatsapp')->comment('e.g. whatsapp, email, sms');

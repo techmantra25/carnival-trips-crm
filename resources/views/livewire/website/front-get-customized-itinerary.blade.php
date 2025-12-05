@@ -260,7 +260,7 @@
                             </table>
                         </div>
 
-                        {{-- Addon Table: CWNB + CWM + Extra Mattress --}}
+                        {{-- Addon Table: CNB + CWM + Extra Mattress --}}
                         <div class="table-box">
                             <table>
                                 <thead>
@@ -274,10 +274,10 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {{-- CWNB --}}
-                                    @foreach($day['cwnb'] ?? [] as $addon)
+                                    {{-- CNB --}}
+                                    @foreach($day['cnb'] ?? [] as $addon)
                                         <tr>
-                                            <td>{{ $addon['name'] ?? 'CWNB' }}</td>
+                                            <td>{{ $addon['name'] ?? 'CNB' }}</td>
                                             <td>{{ $addon['quantity'] ?? '-' }}</td>
                                             <td>{{ $addon['total_price'] ?? '-' }}</td>
                                         </tr>

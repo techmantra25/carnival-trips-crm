@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('date_wise_hotel_prices', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->unsignedBigInteger('hotel_id');
             $table->unsignedBigInteger('room_id');
             $table->date('date');

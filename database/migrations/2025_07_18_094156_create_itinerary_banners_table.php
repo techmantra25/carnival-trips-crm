@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
        Schema::create('itinerary_banners', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->string('title')->nullable();
             $table->unsignedBigInteger('destination_id')->nullable()->comment('states table id');
             $table->unsignedBigInteger('division_id')->nullable()->comment('cities table id');

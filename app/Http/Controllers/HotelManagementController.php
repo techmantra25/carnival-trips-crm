@@ -106,7 +106,7 @@ class HotelManagementController extends Controller
             'hotel_category' => ['required', 'string', 'max:255'],
             'mobile' => ['required', 'string', 'min:10', 'max:10', 'regex:/^\d{10}$/'], // Regex to ensure only numbers
             'whatsapp' => ['required', 'string', 'min:10', 'max:10', 'regex:/^\d{10}$/'], // Regex for valid number format
-            'email' => ['required', 'email', 'max:255'],
+            'email' => ['nullable', 'email', 'max:255'],
             'secndary_email' => ['nullable', 'email', 'max:255'], // Secondary email is nullable
 
             // Seasion Type
@@ -243,7 +243,7 @@ class HotelManagementController extends Controller
             'hotel_category' => ['required', 'string', 'max:255'],
             'mobile' => ['required', 'string', 'regex:/^\d{10}$/', 'size:10'],
             'whatsapp' => ['required', 'string', 'regex:/^\d{10}$/', 'size:10'],
-            'email' => ['required', 'email', 'max:255'],
+            'email' => ['nullable', 'email', 'max:255'],
             'secndary_email' => ['nullable', 'email', 'max:255'],
             'room' => ['required', 'array', 'min:1'],
             'no_of_room' => ['required', 'array', 'min:1'],
@@ -327,15 +327,29 @@ class HotelManagementController extends Controller
                 'required',
                 'string',
                 'max:255',
+                Rule::in(['CNB', 'CWM', 'Extra Mattress']),
                 Rule::unique('seasion_plans', 'title')->whereNull('deleted_at'),
             ],
-            'plan_item' => 'required|array|min:1',
+            'plan_item' => [
+                'required',
+                'array',
+                'min:1',
+                function ($attribute, $value, $fail) use ($request) {
+                    // Allow only 1 plan_item when title = Extra Mattress
+                    if ($request->title === 'Extra Mattress' && count($value) > 3) {
+                        $fail('Only one plan item is allowed for the Extra Mattress plan.');
+                    }
+                }
+            ],
             'plan_item.*' => 'required|string|max:255',
+
         ], [
             'title.required' => 'The title field is required.',
+            'title.in' => 'The title must be one of the allowed Addon Season Plans: CNB, CWM, Extra Mattress.',
             'plan_item.required' => 'At least one plan item is required.',
             'plan_item.*.required' => 'This field is required.',
         ]);
+
           // After validation, proceed to save the data
         try {
             $this->commonRepository->storeHotelSeasionPlan($validatedData);
@@ -345,18 +359,35 @@ class HotelManagementController extends Controller
         }
     }
     public function hotel_seasion_plan_update(Request $request){
-        // dd($request->all());
         $validatedData = $request->validate([
             'title' => [
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('seasion_plans', 'title')->ignore($request->id)->whereNull('deleted_at'),
+                Rule::in(['Normal Season','Peak Season','Off Season','CNB', 'CWM', 'Extra Mattress']),
+                Rule::unique('seasion_plans', 'title')
+                    ->ignore($request->id)
+                    ->whereNull('deleted_at'),
             ],
-            'plan_item' => 'required|array|min:1',
+
+            'plan_item' => [
+                'required',
+                'array',
+                'min:1',
+
+                // ✅ Allow only 1 item when title = Extra Mattress
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->title === 'Extra Mattress' && count($value) > 3) {
+                        $fail('Only one plan item is allowed for the Extra Mattress plan.');
+                    }
+                },
+            ],
+
             'plan_item.*' => 'required|string|max:255',
+
         ], [
             'title.required' => 'The title field is required.',
+            'title.in' => 'The title must be one of the allowed Season Plans: Normal Season, Peak Season, Off Season, CNB, CWM, Extra Mattress.',
             'plan_item.required' => 'At least one plan item is required.',
             'plan_item.*.required' => 'This field is required.',
         ]);
@@ -402,68 +433,87 @@ class HotelManagementController extends Controller
 
     public function UpdateRoomItemPrice(Request $request)
     {
+        // 1) Get inputs
         $id = $request->input('id');
-        $price = $request->input('price');
+        $rawPrice = $request->input('price');
         $plan_type = $request->input('plan_type');
-        // Validate price
-       
-        if (!is_numeric($price)) {
-            return response()->json(["success" => false, "message" => "Invalid input"]);
+
+        // 2) Sanitize price: remove commas/spaces/currency symbols then cast to float
+        //    Example: "1,234.50" -> "1234.50"
+        $clean = preg_replace('/[^\d\.\-]/', '', (string)$rawPrice);
+
+        if ($clean === '' || !is_numeric($clean)) {
+            return response()->json(["success" => false, "message" => "Invalid input for price"], 422);
         }
+
+        // cast and format to 2 decimal places (string) to store consistently
+        $price = number_format((float)$clean, 2, '.', '');
 
         try {
             DB::beginTransaction();
+
             if ($id) {
-                // Update existing price
+                // Update existing price row
                 $update = HotelPriceChart::find($id);
+
+                if (!$update) {
+                    DB::rollBack();
+                    return response()->json(["success" => false, "message" => "Price record not found"], 404);
+                }
+
                 $update->item_price = $price;
                 $update->plan_type = $plan_type;
 
+                // keep type in sync with related price chart type
                 $HotelPriceChartType = HotelPriceChartType::where('id', $update->price_chart_type_id)->first();
-                $update->type = $HotelPriceChartType->type;
+                if ($HotelPriceChartType) {
+                    $update->type = $HotelPriceChartType->type;
+                }
+
                 $update->save();
                 $update_price = $update->item_price;
             } else {
-                
-                // Create or update HotelPriceChartType
+                // Create or update HotelPriceChartType (unchanged)
                 $HotelPriceChartType = HotelPriceChartType::updateOrCreate(
                     [
                         'hotel_id' => $request->hotel_id,
-                        'room_id' => $request->room_id,
-                        'title' => $request->chart_type_title,
+                        'room_id'  => $request->room_id,
+                        'title'    => $request->chart_type_title,
                     ],
                     [
                         'type' => $request->chart_type,
                     ]
                 );
-                
 
                 $chartTypeId = $HotelPriceChartType->id;
-               
-                // Create or update HotelPriceChart
-                $HotelPriceChart = HotelPriceChart::updateOrCreate(
-                    [
-                        'price_chart_type_id' => $chartTypeId,
-                        'hotel_id' => $request->hotel_id,
-                        'room_id' => $request->room_id,
-                        'plan_title' => $request->plan_title,
-                        'plan_item' => $request->plan_item,
-                        'type' => $HotelPriceChartType->type,
-                        'plan_type' => $plan_type,
-                    ],
-                    [
-                        'item_price' => $price,
-                    ]
-                );
+
+                // Ensure updateOrCreate matches the full set of columns that define uniqueness
+                // This prevents creating multiple rows for the same plan/room/chart-type.
+                $matchAttributes = [
+                    'price_chart_type_id' => $chartTypeId,
+                    'hotel_id'            => $request->hotel_id,
+                    'room_id'             => $request->room_id,
+                    'plan_title'          => $request->plan_title,
+                    'plan_item'           => $request->plan_item,
+                    'plan_type'           => $plan_type,             // include plan_type so same plan/room/type won't duplicate
+                ];
+
+                $valuesToUpdate = [
+                    'type'       => $HotelPriceChartType->type,
+                    'item_price' => $price,
+                ];
+
+                // Use updateOrCreate to either update the existing matching record or create it
+                $HotelPriceChart = HotelPriceChart::updateOrCreate($matchAttributes, $valuesToUpdate);
+
                 $update_price = $HotelPriceChart->item_price;
             }
 
             DB::commit();
 
-            return response()->json(["success" => true, "price"=>$update_price, "message" => "Price updated successfully"]);
+            return response()->json(["success" => true, "price" => $update_price, "message" => "Price updated successfully"]);
         } catch (\Exception $e) {
             DB::rollBack();
-            // dd($e->getMessage());
             return response()->json([
                 "success" => false,
                 "message" => "An error occurred while updating the price.",
@@ -471,6 +521,7 @@ class HotelManagementController extends Controller
             ], 500);
         }
     }
+
 
 
 
