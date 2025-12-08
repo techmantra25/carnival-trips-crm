@@ -481,7 +481,7 @@ class CostCalculatorQueryEdit extends Component
 
             // 'source_type' => 'required|string',
             'mobile_number' => 'nullable|digits:10',
-            'arrival_date' => 'required|date',
+            'arrival_date' => 'required|date|after_or_equal:today',
             'departure_date' => 'required|date|after_or_equal:arrival_date',
             // 'company_name' => 'required|string',
             'whatsapp_number' => 'nullable|digits:10',
@@ -657,9 +657,10 @@ class CostCalculatorQueryEdit extends Component
                             ])
                         ]);
                     }
+                }else{
+                    $this->resetItineraryDetails($itinerary_id);
                 }
 
-                $this->resetItineraryDetails($itinerary_id);
                 DB::commit();
                 $encryptedId = Crypt::encrypt($itinerary_id);
                 return redirect()->route('admin.itinerary.query.build', $encryptedId);
@@ -670,10 +671,20 @@ class CostCalculatorQueryEdit extends Component
             // session()->flash('error', 'Failed to save itinerary: ' . $e->getMessage());
         }
     }
-    public function resetItineraryDetails($itinerary_id){
-        $data = ItineraryDetail::where('itinerary_id', $itinerary_id)->get();
-        dd($data);
+    public function resetItineraryDetails($itinerary_id)
+    {
+        // Get only the IDs that should NOT be deleted
+        $keepIds = ItineraryDetail::where('itinerary_id', $itinerary_id)
+            ->whereNotNull('route_service_summary_id')
+            ->where('field', 'day_route')
+            ->pluck('id');
+
+        // Delete everything else in a single query
+        ItineraryDetail::where('itinerary_id', $itinerary_id)
+            ->whereNotIn('id', $keepIds)
+            ->delete();
     }
+
      public function cloneItineraryDetails($old_itinerary_id, $new_itinerary_id){
         $fetchDetails = ItineraryDetail::where('itinerary_id', $old_itinerary_id)->whereNotNull('route_service_summary_id')->orderBy('id', 'ASC')->get();
         foreach($fetchDetails as $item){
