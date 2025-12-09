@@ -23,6 +23,7 @@ use App\Models\LeadUrlClick;
 use App\Models\Itinerary;
 use App\Models\ChangeLog;
 use Illuminate\Support\Facades\Auth;
+use App\Models\InventoryLedger;
 
 class CustomHelper
 {
@@ -559,6 +560,23 @@ class CustomHelper
         $store->after_value = $afterValue;
         $store->admin_id = $adminId;
         $store->save();
+    }
+
+    public static function addInventoryLedgerEntry(array $data)
+    {
+        // Insert ledger entry
+        $entry = InventoryLedger::create([
+            'inventory_id'   => $data['inventory_id'],
+            'hotel_id'       => $data['hotel_id'],
+            'room_id'        => $data['room_id'],
+            'lead_id'        => $data['lead_id'] ?? null,
+            'inventory_date' => $data['inventory_date'],
+            'entry_type'     => $data['entry_type'],
+            'quantity'       => $data['quantity'],
+            'description'    => $data['description'] ?? null,
+            'created_by'     => $data['created_by'] ?? null,
+        ]);
+        return $entry;
     }
 
     
