@@ -218,11 +218,12 @@ class CustomHelper
         $inventory = Inventory::where('hotel_id', $hotel_id)
             ->where('room_id', $room_id)
             ->whereDate('date', $date)
-            ->first(['total_unsold', 'block_request_type']);
+            ->first(['total_sold', 'total_unsold', 'block_request_type']);
 
         // Initialize default values if no record is found
         if (!$inventory) {
             return [
+                'total_sold' => 0,
                 'total_unsold' => 0,
                 'block_request_type' => 0,
             ];
@@ -230,6 +231,7 @@ class CustomHelper
 
         // Convert inventory object to an array
         $inventoryData = [
+            'total_sold' => $inventory->total_sold,
             'total_unsold' => $inventory->total_unsold,
             'block_request_type' => $inventory->block_request_type,
         ];
