@@ -42,7 +42,7 @@ class HotelPriceChartList extends Component
         return Hotel::with('rooms')->where('status', 1)->orderBy('name', 'ASC')->get();
     }
     public function GetAllRoom(){
-        return Room::orderBy('positions', 'ASC')
+        return Room::orderBy('id', 'ASC')
         ->get()
         ->unique('room_name')
         ->values()
