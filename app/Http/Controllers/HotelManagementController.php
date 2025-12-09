@@ -463,12 +463,13 @@ class HotelManagementController extends Controller
 
                 $update->item_price = $price;
                 $update->plan_type = $plan_type;
+                $update->type = $request->chart_type;
 
                 // keep type in sync with related price chart type
-                $HotelPriceChartType = HotelPriceChartType::where('id', $update->price_chart_type_id)->first();
-                if ($HotelPriceChartType) {
-                    $update->type = $HotelPriceChartType->type;
-                }
+                // $HotelPriceChartType = HotelPriceChartType::where('id', $update->price_chart_type_id)->first();
+                // if ($HotelPriceChartType) {
+                //     $update->type = $HotelPriceChartType->type;
+                // }
 
                 $update->save();
                 $update_price = $update->item_price;
