@@ -84,7 +84,7 @@ class HotelPriceChartList extends Component
             $room_data = Room::query()
             ->when($this->selected_room, fn($query)=>$query->whereIn('room_name', $this->selected_room))
             ->where('hotel_id', $item->id)
-            ->orderBy('room_name', 'ASC')->get()->toArray();
+            ->orderBy('positions', 'ASC')->get()->toArray();
 
             // $rooms = optional($room_data)->map(function($room){
             //     return [
@@ -138,7 +138,7 @@ class HotelPriceChartList extends Component
     }
 
     public function ResetPage(){
-        $this->reset(['selected_hotel_id', 'selected_room','isDisabled']);
+        return redirect()->route('admin.hotel.price_chart');
     }
     public function render()
     {
