@@ -118,6 +118,7 @@ class CreateQueryItinerary extends Component
     public $send_whatsapp = false;
     public $send_email = false;
     public $send_sms = false;
+    public $selectedRestHotels = [];
 
     protected $whatsapp;
     public function __construct(){
@@ -294,13 +295,25 @@ class CreateQueryItinerary extends Component
                     return $rooms->sortBy('positions')->first();
                 });
               
-
                 $minHotel = $firstRooms->sortBy('item_price')->first();
                 $maxHotel = $firstRooms->sortByDesc('item_price')->first();
 
+                // 1. Selected hotel (min or max)
                 $selected = ($this->budgetSortOrder === "ASC")
                     ? $minHotel
                     : $maxHotel;
+
+                // 2. Remove selected hotel
+                $remaining = $firstRooms->reject(function ($item) use ($selected) {
+                    return $item->hotel_id == $selected->hotel_id;
+                });
+
+                // 3. Take next 2 hotels
+                $selectedRestHotels = ($this->budgetSortOrder === "ASC")
+                    ? $remaining->sortBy('item_price')->values()->take(2)
+                    : $remaining->sortByDesc('item_price')->values()->take(2);
+
+                $this->selectedRestHotels[$index] = $selectedRestHotels;
                 if ($selected) {
                     $this->generateHotelData($index, $selected->hotel_id, $selected->room_id, $season);
                 }  else {
@@ -661,8 +674,35 @@ class CreateQueryItinerary extends Component
                 }
             }
             $this->activeTab[$index] = 0;
+            // Set local reference
             $this->dayExtraHotels[$index] = $dayExtraHotels[$index];
-            $merged = array_merge($results, $dayExtraHotels[$index]);
+
+            // Prepare an empty array to store matched hotels
+            $finalMatchedHotels = [];
+
+            foreach ($this->selectedRestHotels[$index] as $rest_hotel_item) {
+
+                $restHotelId = $rest_hotel_item['hotel_id'];
+
+                // Match hotels by hotel_id == id
+                $matched = collect($this->dayExtraHotels[$index])
+                    ->where('id', $restHotelId)
+                    ->first(); // take only one hotel
+
+                if ($matched) {
+                    $finalMatchedHotels[] = $matched; // push to final list
+                }
+            }
+
+            // Reset index of final matched hotels
+            $finalMatchedHotels = array_values($finalMatchedHotels);
+
+            // Replace original dayExtraHotels with matched list
+            $this->dayExtraHotels[$index] = $finalMatchedHotels;
+
+            // Now merge results + matched hotels
+            $merged = array_merge($results, $this->dayExtraHotels[$index]);
+
             return $merged;
             // Merge and assign the updated values
         }
@@ -3013,7 +3053,7 @@ class CreateQueryItinerary extends Component
                 'rooms.id as room_id',
                 'hotel_price_charts.item_price'
             )
-            ->orderBy('hotel_price_charts.item_price', $priorityOrder) // ASC = MIN, DESC = MAX
+            ->orderBy('rooms.positions', 'ASC') // ASC = MIN, DESC = MAX
             ->first();
 
         if (!$room) {

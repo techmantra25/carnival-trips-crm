@@ -138,7 +138,7 @@ class HotelPriceChartList extends Component
     }
 
     public function ResetPage(){
-        $this->reset(['selected_hotel_id', 'selected_room','isDisabled']);
+        return redirect()->route('admin.hotel.price_chart');
     }
     public function render()
     {
