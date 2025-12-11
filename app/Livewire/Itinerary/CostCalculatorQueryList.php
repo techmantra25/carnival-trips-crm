@@ -677,6 +677,37 @@ class CostCalculatorQueryList extends Component
     public function QuickSearch($value){
         $this->search = $value;
     }
+    public function convertQueryToLead($id)
+    {
+        try {
+            // Retrieve lead
+            $lead = Lead::findOrFail($id);
+
+            // Update lead fields
+            $lead->unique_id = CustomHelper::GenerateUniqueId('leads', 'LTD');
+            $lead->generate_from = "lead";
+            $lead->created_at = now();
+            $lead->updated_at = now();
+            $lead->assigned_to_id = Auth::guard('admin')->user()->id;
+
+            $lead->save();
+
+            // Success redirect
+            return redirect()
+                ->route('admin.leads.index')
+                ->with('success', 'Query has been successfully converted to a Lead.');
+
+        } catch (\Exception $e) {
+
+            // Log the error
+            \Log::error('Query-to-Lead error: ' . $e->getMessage());
+
+            // Redirect with error message
+            session()->flash('success', 'Query successfully converted to Lead.');
+        }
+    }
+
+
     public function render()
     {   
         $this->divisions= City::where('state_id', $this->destination)->orderBy('name', 'ASC')->get();

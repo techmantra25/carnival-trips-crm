@@ -93,7 +93,6 @@
                         </a>
                     </div> --}}
                     <div class="flex justify-between pb-2">
-                        
                         <div class="flex left-column">
                             <div class="bg-orange-200 rounded-lg shadow-md w-fit p-2 text-black-600 text-[13px] italic">
                                 <div class="px-2 flex justify-between">
@@ -1256,7 +1255,7 @@
                                                                                 <div class="md:col-span-9 col-span-12 mb-4 itinerary-build">
                                                                                 </div> 
                                                                             @endif
-                                                                                <div class="md:col-span-3 col-span-12 mb-4 itinerary-build">
+                                                                                {{-- <div class="md:col-span-3 col-span-12 mb-4 itinerary-build">
                                                                                     <div class="p-1 border border-gray-300 rounded-md shadow-sm">
                                                                                         <table class="table w-full" style="border-collapse: separate; border-spacing: 0">
                                                                                             <thead class="bg-primary/5">
@@ -1275,7 +1274,7 @@
                                                                                                                 <span class="badge gap-2 bg-warning/10 text-warning uppercase w-full mb-1">Existing Per Day Cabs</span>
                                                                                                                 <select wire:key="existing-per-day-cab-{{ $division_index }}-100" 
                                                                                                                 wire:change="confirm_for_all_day_cab('per_day_cab',{{$division_index}}, $event.target.value, $event.target.selectedOptions[0].getAttribute('data-price'), $event.target.selectedOptions[0].getAttribute('data-id'))"
-                                                                                                                {{-- wire:change="getPerDayCab('per_day_cab',{{$division_index}}, $event.target.value, $event.target.selectedOptions[0].getAttribute('data-price'), $event.target.selectedOptions[0].getAttribute('data-id'))" --}}
+                                                                                                                
                                                                                                                 class="text-xs rounded-sm py-0 mb-2">
                                                                                                                     <option value="">Choose an Existing Per Day Cab</option>
                                                                                                                     @forelse ($division_per_day_cab['per_day_existing_cabs'] as $per_day_existing_cabs)
@@ -1358,19 +1357,8 @@
                                                                                                 @endforelse
                                                                                             </tbody>
                                                                                         </table>
-
-                                                                                        {{-- <div class="mt-4" wire:key="dayselectedCab-{{ $division_index }}">
-                                                                                            <span class="badge gap-2 bg-danger/10 text-danger uppercase text-small m-2">
-                                                                                                <i class="fas fa-route"></i> Route  
-                                                                                                <span class="custom-header-separator">|</span>  
-                                                                                                <i class="fas fa-binoculars"></i> Sightseeing  
-                                                                                                <span class="custom-header-separator">|</span>  
-                                                                                                <i class="fas fa-running"></i> Activity  
-                                                                                                <span class="custom-header-separator">|</span> in {{$division_item['division_name']}}
-                                                                                            </span>
-                                                                                        </div> --}}
                                                                                     </div>
-                                                                                </div>
+                                                                                </div> --}}
                                                                         </div>
                                                                     </div>
                                                                 {{-- <div class="mt-4"  wire:key="dayselectedCab-{{ $division_index }}">
@@ -1566,29 +1554,61 @@
                 </div>
                 <!-- Right Card - Total & Send -->
                 <div class="flex flex-col justify-between bg-white shadow-lg rounded-2xl p-6 max-height-250">
-                    <div class="text-center mb-4">
-                        <p class="uppercase text-gray-500 text-sm">Total Estimated Amount</p>
-                        <p class="text-2xl font-bold text-gray-800">
-                            {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $total_amount }}
+
+                    {{-- If arrival date is valid (today or future) --}}
+                    @if($valid_panel)
+
+                        {{-- If lead is NOT confirmed --}}
+                        @if($leadData->status != "Confirmed")
+
+                            <div class="text-center mb-4">
+                                <p class="uppercase text-gray-500 text-sm">Total Estimated Amount</p>
+                                <p class="text-2xl font-bold text-gray-800">
+                                    {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $total_amount }}
+                                </p>
+                            </div>
+
+                            {{-- Show success/error messages --}}
+                            @if (session('success'))
+                                <div class="alert alert-success mb-2">
+                                    {{ session('success') }}
+                                </div>
+                            @endif
+
+                            @if (session('error'))
+                                <div class="alert alert-danger mb-2">
+                                    {!! session('error') !!}
+                                </div>
+                            @endif
+
+                            {{-- If any sending options are enabled --}}
+                            @if($send_whatsapp || $send_email || $send_sms)
+                                <button wire:click="sendMessages"
+                                    class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition-all">
+                                    Send Messages
+                                </button>
+                            @else
+                                <p class="text-gray-500 text-sm text-center mt-2">
+                                    No communication method selected.
+                                </p>
+                            @endif
+
+                        @else
+                            {{-- Lead is already confirmed --}}
+                            <p class="text-center text-green-600 font-semibold">
+                                This lead has already been confirmed. No further action required.
+                            </p>
+                        @endif
+
+                    @else
+                        {{-- Arrival date is in the past --}}
+                        <p class="text-center text-red-500 font-semibold">
+                            This lead is no longer active because the arrival date has passed.
                         </p>
-                    </div>
-                    @if($send_whatsapp || $send_email || $send_sms)
-                        @if (session('success'))
-                            <div class="alert alert-success mb-1">
-                                {{ session('success') }}
-                            </div>
-                        @endif
-                        @if (session('error'))
-                            <div class="alert alert-danger mb-1">
-                                {!! session('error') !!}
-                            </div>
-                        @endif
-                        <button wire:click="sendMessages"
-                            class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition-all">
-                            Send
-                        </button>
                     @endif
+
                 </div>
+
                 
             </div>
 

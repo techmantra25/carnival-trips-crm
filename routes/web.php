@@ -228,6 +228,7 @@ use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagem
    
 
     Route::prefix('cron')->group(function(){
+        // Run this endpoint every 1 minute (set in server cron or scheduler)
         Route::get('update-lead-status', [CronController::class, 'update_lead_status']);
     });
 

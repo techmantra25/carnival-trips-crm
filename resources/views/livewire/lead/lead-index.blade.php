@@ -277,12 +277,12 @@
                                                         $title .= "Hotel Category: " . optional($sent_itinerary_item->category)->name;
                                                     @endphp
 
-                                                    <span 
+                                                    <a href="{{route('website.lead.customized.itinerary', $sent_itinerary_item->itinerary_code)}}" target="_blank"
                                                         class="badge bg-outline-secondary {{$sent_itinerary_item->is_confirmed==0?"badge-custom-outline-secondary":"badge-custom-outline-secondary-selected"}} cursor-pointer" 
                                                         title="{{ $title }}"
                                                     >
                                                         {{ $sent_itinerary_item->itinerary_code }}
-                                                    </span>
+                                                    </a>
                                                 @endforeach
                                             </div>
 

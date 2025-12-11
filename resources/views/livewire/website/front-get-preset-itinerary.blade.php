@@ -205,7 +205,7 @@
                                         </div>
                                     </div>
 
-                                    <h2 class="text-center">Shillong &amp; Cherrapunjee</h2>
+                                    <h2 class="text-center">Your Dream Itinerary</h2>
                                     <h2 class="text-center">Day by Day Brief</h2>
                                     
                                     <div class="content-wrap-box">
@@ -851,7 +851,7 @@
         </div>
     </section>
 
-    <div class="two-sections-background">
+    {{-- <div class="two-sections-background">
         <div class="background">
             <img src="{{asset('front_assets/images/section-2-bg-last.png')}}" alt="">
         </div>
@@ -1003,9 +1003,9 @@
                 </din>
             </div>
         </section>
-    </div>
+    </div> --}}
 
-    <div class="two-sections-background-2">
+    {{-- <div class="two-sections-background-2">
         <div class="background">
             <img src="{{asset('front_assets/images/section-2-bg-middle.png')}}" alt="">
         </div>
@@ -1101,9 +1101,9 @@
                 </div>
             </div>
         </section>
-    </div>
+    </div> --}}
 
-    <section class="itinerary-reviews-section">
+    {{-- <section class="itinerary-reviews-section">
         <div class="background">
             <img src="{{asset('front_assets/images/map-bg.png')}}" alt="">
         </div>
@@ -1289,9 +1289,9 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> --}}
 
-    <section class="itinerary-why-choose-section">
+    {{-- <section class="itinerary-why-choose-section">
         <div class="background">
             <div class="bg bg-2">
                 <img src="{{asset('front_assets/images/section-3-bg-2.png')}}" alt="Background">
@@ -1347,9 +1347,9 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> --}}
 
-    <section class="itinerary-statistics-section">
+    {{-- <section class="itinerary-statistics-section">
         <div class="background">
             <img src="{{asset('front_assets/images/listing-section-3-bg.png')}}" alt="">
         </div>
@@ -1375,7 +1375,7 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> --}}
 </div>
 @section('scripts')
     <script>

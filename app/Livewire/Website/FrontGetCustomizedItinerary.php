@@ -21,11 +21,12 @@ class FrontGetCustomizedItinerary extends Component
         ->firstOrFail();
 
         $this->lead_url_share = LeadUrlShare::where('sended_lead_itinerary_id', $this->sent_lead_itinerary->id)->firstOrFail();
-
-        // dd($this->sent_lead_itinerary->lead);
         $this->itinerary = [
             'name' => $this->sent_lead_itinerary->lead->customer_name ?? 'N/A',
-            'mobile' => $this->sent_lead_itinerary->lead->customer_mobile ?? 'N/A',
+            'mobile' => isset($this->sent_lead_itinerary->lead) 
+            ? $this->sent_lead_itinerary->lead->country_code . $this->sent_lead_itinerary->lead->customer_mobile
+            : 'N/A',
+
             'email' => $this->sent_lead_itinerary->lead->customer_email ?? 'N/A',
             'travel_dates' => Carbon::parse($this->sent_lead_itinerary->lead->arrival_date)->format('d M Y') . 
                             ' to ' . 
@@ -40,12 +41,17 @@ class FrontGetCustomizedItinerary extends Component
             'number_of_rooms' => $this->sent_lead_itinerary->lead->number_of_rooms ?? 0,
             'extra_mattress' => $this->sent_lead_itinerary->lead->extra_mattress ?? 'N/A',
             'meal_type' => $this->sent_lead_itinerary->lead->meal_type ?? 'N/A',
+            'destination' => $this->sent_lead_itinerary->destination->name ?? 'N/A',
         ];
         
         $stay_by_journey = explode(',',$this->sent_lead_itinerary->stay_by_journey);
         foreach($stay_by_journey as $key=>$item){
             $index = $key+1;
             $division = City::findOrFail($item);
+            $hotel_detail = SendedLeadItineraryDetail::where('sended_lead_itinerary_id', $this->sent_lead_itinerary->id)
+            ->where('field', 'day_hotel')
+            ->where('header', 'day_' . $index)
+            ->first();
             $this->day_itinerary[$index] = [
                 'day'=>$index,
                 'division'=>$division->name,
@@ -55,11 +61,7 @@ class FrontGetCustomizedItinerary extends Component
                             ->where('header', 'day_' . $index)
                             ->get(['value as name', 'value_quantity as quantity', 'price as total_price'])
                             ->toArray(),
-                'hotel' => SendedLeadItineraryDetail::where('sended_lead_itinerary_id', $this->sent_lead_itinerary->id)
-                            ->where('field', 'day_hotel')
-                            ->where('header', 'day_' . $index)
-                            ->select('value as name')
-                            ->first()?->toArray() ?? ['name' => null],
+                'hotel' =>  $hotel_detail?->hotel?->toArray() ?? null,
 
                 'hotel_room' => SendedLeadItineraryDetail::where('sended_lead_itinerary_id', $this->sent_lead_itinerary->id)
                             ->where('field', 'day_room')
@@ -174,6 +176,6 @@ class FrontGetCustomizedItinerary extends Component
     }
     public function render()
     {
-        return view('livewire.website.front-get-customized-itinerary')->layout('layouts.frontend.master', ['title' => $this->title]);
+        return view('livewire.website.front-get-customized-itinerary')->layout('layouts.frontend.master2', ['title' => $this->title]);
     }
 }

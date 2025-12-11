@@ -88,6 +88,7 @@ class WhatsappCampaignDashboard extends Component
             }
         })
         ->where('customer_whatsapp', '!=', null) // Ensure whatsapp number is not null
+        ->where('generate_from', 'lead')
         ->orderBy('id', 'DESC')
         ->get();
         $allLeads = $leads;

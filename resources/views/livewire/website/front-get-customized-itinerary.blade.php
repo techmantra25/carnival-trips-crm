@@ -1,351 +1,981 @@
-<style>
-.container.itinerary-theme {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    max-width: 900px;
-    margin: auto;
-    padding: 20px;
-    background: #fefefe;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-}
+<div class="container">
+    <style>
+    .table{
+        width:100%;
+        background:#fff;
+    }
+    table{
+        width:100%;
+    }
+    .table tr td {
+        font-size:15px;
+        color:#000;
+    }
+    .table thead i {
+        color:#1e58a3;
+    }
+    .route-style {
+        position:relative;
+    }
+    .route-style:after {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1px;
+        height: 100%;
+        background: #0162e8;
+    }
+    .route-style li {
+        position: relative;
+        padding: 3px 12px;
+        color:#838383;
+    }
+    .route-style li:after {
+        content: "";
+        width: 7px;
+        height: 7px;
+        position: absolute;
+        border-radius: 50%;
+        background: #0162e8;
+        left: -3px;
+        top: 8px;
+        z-index: 2;
+        border: 2px solid #fff;
+    }
 
-.itinerary-header {
-    display: flex;
-    justify-content: space-between;
-    background: #2bb2a5;
-    color: white;
-    padding: 20px;
-    border-radius: 8px 8px 0 0;
-}
+    .total-ex-list {
+        list-style:none;
+    }
+    .total-ex-list li {
+        color:rgb(0, 0, 0);
+        font-size: 11px;
+        margin-bottom: 7px;
+    }
+    .total-ex-list li i {
+        color: #f2a144;
+        margin-right:10px;
+    }
 
-.itinerary-header h1 {
-    margin-top: 0;
-    font-size: 28px;
-}
+    .hotel-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(297px, 1fr));
+        gap:8px;
+    }
+     .hotel-list li {
+        border:1px solid #ccc;
+        border-top-left-radius:6px;
+        border-top-right-radius:6px;
+     }
+    .hotel-list li figure {
+        overflow:hidden;
+        border-top-left-radius:6px;
+        border-top-right-radius:6px;
+        height: 200px;
+    }
+    .hotel-list li figcaption {
+        padding: 12px;
+    }
 
-.header-text p {
-    margin: 4px 0;
-}
+    .hotel-list li figcaption h3 {
+        font-size: 12px;
+        text-transform: uppercase;
+        color: #1e58a3;
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+    .hotel-list li figcaption h2 {
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+    .hotel-list li figcaption p {
+        font-size: 12px;
+    }
 
-.header-graphic img {
-    height: 100px;
-}
+    .activity-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap:8px;
+    }
 
-.day-box {
-    margin-top: 30px;
-    border: 1px solid #2bb2a5;
-    border-radius: 8px;
-    overflow: hidden;
-}
+    .activity-list li {
+        border-radius:6px;
+        overflow:hidden;
+        position:relative;
+        z-index: 1;
+        height: 187px;
+    }
 
-.day-label {
-    background: #d4f1ef;
-    padding: 10px 20px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    border-bottom: 1px solid #2bb2a5;
-}
+     .activity-list li:after {
+        content:"";
+        position:absolute;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        background: linear-gradient(1deg,rgba(0, 0, 0, 1) 14%, rgba(0, 0, 0, 0) 100%);
+        z-index: -1;
+     }
+     .activity-list li figcaption {
+        padding: 22px;
+        color: #fff;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+     }
 
-.check-icon {
-    color: green;
-    font-size: 20px;
-    margin-right: 10px;
-}
+     .activity-list li figcaption h2 {
+        color:#fff;
+        font-size:13px;
+     }
 
-.day-title {
-    font-size: 18px;
-    color: #003d4d;
-}
+    .keep-together {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
 
-.info-blocks {
-    padding: 15px 20px;
-    background-color: #f3fafa;
-    font-size: 14px;
-    border-bottom: 1px solid #ddd;
-}
+    .page-break-after {
+    page-break-after: always;
+    break-after: page;
+    }
 
-.route-title {
-    padding: 10px 20px;
-    font-weight: bold;
-    font-size: 16px;
-    background: #eef9f8;
-    color: #004e5a;
-}
 
-.activity-table {
-    padding: 15px 20px;
-}
+    @media print {
 
-.activity-table table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    overflow: hidden;
-}
-
-.activity-table th, .activity-table td {
-    padding: 10px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
-
-.activity-table th {
-    background-color: #f0f8f7;
-    font-weight: bold;
-    color: #333;
-}
-
-.sightseeing-title {
-    font-weight: bold;
-    margin-top: 20px;
-    margin-bottom: 10px;
-    color: #004e5a;
-}
-.itinerary-theme .route-section {
-    margin-bottom: 2rem;
-}
-
-.itinerary-theme .route-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #333;
-}
-
-.itinerary-theme .tables-row {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.itinerary-theme .table-box {
-    flex: 1;
-    min-width: 200px;
-    background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-.itinerary-theme table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.itinerary-theme th {
-    background: #f5f5f5;
-    padding: 10px;
-    text-align: left;
-    border-bottom: 1px solid #ccc;
-    font-weight: 600;
-}
-
-.itinerary-theme td {
-    padding: 10px;
-    border-bottom: 1px solid #eee;
-}
-
-.activity-table table td{
-    padding: 5px;
-    font-size: 12px;
-}
-</style>
-<div class="container itinerary-theme">
-    <div class="itinerary-header">
-        <div class="header-text">
-            <h1>Customized Trip Itinerary</h1>
-            <p><strong>Start Date:</strong> {{ $itinerary['arrival_date'] }}</p>
-            <p><strong>End Date:</strong> {{ $itinerary['departure_date'] }}</p>
-            <p><strong>Duration:</strong> {{ $itinerary['travel_duration'] }}</p>
-            <p><strong>Meal Plan:</strong> {{ $itinerary['meal_type'] }}</p>
-            <p><strong>Travellers:</strong> {{ $itinerary['number_of_travellor'] }} ({{ $itinerary['number_of_adults'] }} Adults, {{ $itinerary['number_of_children'] }} Children)</p>
-        </div>
-        <div class="header-graphic">
-            <img src="https://cdn-icons-png.flaticon.com/512/201/201623.png" alt="Trip Graphic">
-        </div>
-    </div>
-
-    @foreach($day_itinerary as $day)
-        <div class="day-box">
-            <div class="day-label">
-                <span class="check-icon">✔</span>
-                <span class="day-title">Day {{ $day['day'] }} - {{ $day['division'] }}</span>
-            </div>
-
-            <div class="info-blocks">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <p class="mb-1"><strong>Hotel:</strong> {{ $day['hotel']['name'] ?? 'N/A' }}</p>
-                        <p class="mb-1"><strong>Room Type:</strong> {{ $day['hotel_room']['name'] ?? 'N/A' }}</p>
-                    </div>
-                    <div>
-                        <p class="mb-1"><strong>Meal Plan:</strong> {{ $day['pax_with_adults']['name'] ?? 'N/A' }}</p>
-                        <p class="mb-1"><strong>Rooms:</strong> {{ $itinerary['number_of_rooms']?? 'N/A' }}</p>
-                    </div>
-                </div>
-            </div>
-
-            @foreach($day['route'] as $route)
-                <div class="activity-table">
-                    @foreach($day['route'] as $route)
-                    <div class="route-section">
-                        <div class="route-title"><strong>{{ ucwords($route['name']) }}</strong></div>
-
-                        <div class="tables-row">
-                            <!-- Activity Table -->
-                            <div class="table-box">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Activity</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($route['activitys'] ?? [] as $activity)
-                                        <tr>
-                                            <td>{{ $activity['name'] }}</td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <!-- Sightseeing Table -->
-                            <div class="table-box">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Sightseeing</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($route['sightseeings'] ?? [] as $sight)
-                                        <tr>
-                                            <td>{{ $sight['name'] }}</td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-                    <div class="tables-row">
-                        {{-- Cab Table --}}
-                        <div class="table-box">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th colspan="3">Cab</th>
-                                    </tr>
-                                    <tr>
-                                        <th>Cab Name</th>
-                                        <th>Qty</th>
-                                        <th>Price</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($day['cab'] ?? [] as $cab)
-                                        <tr>
-                                            <td>{{ $cab['name'] }}</td>
-                                            <td>{{ $cab['quantity'] }}</td>
-                                            <td>{{ $cab['total_price'] }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-
-                        {{-- Addon Table: CNB + CWM + Extra Mattress --}}
-                        <div class="table-box">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th colspan="3">Addon Items</th>
-                                    </tr>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Qty</th>
-                                        <th>Price</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {{-- CNB --}}
-                                    @foreach($day['cnb'] ?? [] as $addon)
-                                        <tr>
-                                            <td>{{ $addon['name'] ?? 'CNB' }}</td>
-                                            <td>{{ $addon['quantity'] ?? '-' }}</td>
-                                            <td>{{ $addon['total_price'] ?? '-' }}</td>
-                                        </tr>
-                                    @endforeach
-
-                                    {{-- CWM --}}
-                                    @foreach($day['cwm'] ?? [] as $addon)
-                                        <tr>
-                                            <td>{{ $addon['name'] }}</td>
-                                            <td>{{ $addon['quantity'] }}</td>
-                                            <td>{{ $addon['total_price'] }}</td>
-                                        </tr>
-                                    @endforeach
-
-                                    {{-- Extra Mattress --}}
-                                    @foreach($day['extra_mattress'] ?? [] as $addon)
-                                        <tr>
-                                            <td>{{ $addon['name'] }}</td>
-                                            <td>{{ $addon['quantity'] }}</td>
-                                            <td>{{ $addon['total_price'] }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-
-        </div>
-         {{-- CAB + Addons Table Row --}}
+        body {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        .bg-color {
+            background-color:#d2e8ff !important;
+        }
+    }
     
-    @endforeach
+</style>
+    <div class="card">
+        <table class="table" id="print-section">
+            <tr>
+                <td>
+                    <table style="background: rgba(254, 215, 170, 0.2);  border: 1px solid #fed7aa;">
+                        <tr>
+                            <td>
+                                <table>
+                                    <tr>
+                                        <td style="font-size:16px; color:#000; text-transform:uppercase; padding-left:15px !important; padding-right:15px !important; padding-bottom:0px !important;">
+                                            Customized Trip Itinerary
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        {{-- {{dd($itinerary)}} --}}
+                                        <td style="padding:15px !important;">
+                                            <p style="font-size:13px; color:#000; margin-bottom:9px;"><strong>Client:</strong>{{$itinerary['name']}} </p>
+                                            <p style="font-size:13px; color:#000; margin-bottom:9px;"><strong>Client Email:</strong> {{$itinerary['email']}} </p>
+                                            <p style="font-size:13px; color:#000; margin-bottom:9px;"><strong>Client Mobile:</strong> +{{$itinerary['mobile']}} </p>
+                                            <p style="font-size:13px; color:#000; margin-bottom:9px;"><strong>Travel Date:</strong> {{$itinerary['travel_dates']}} </p>
+                                            
+                                        </td>
+                                        <td style="padding:15px !important;">
+                                            <p style="font-size:13px; color:#000; margin-bottom:9px;"><strong>PAX:</strong> {{$itinerary['number_of_travellor']}} </p>
+                                            <p style="font-size:13px; color:#000; margin-bottom:9px;"><strong>Adults:</strong> {{$itinerary['number_of_adults']}} </p>
+                                            <p style="font-size:13px; color:#000; margin-bottom:9px;"><strong>Child:</strong> {{$itinerary['number_of_children']}} </p>
+                                            <p style="font-size:13px; color:#000; margin-bottom:9px;"><strong>Extra Mattress:</strong> {{$itinerary['extra_mattress']}} </p>
+                                        </td>
+                                        <td style="padding:15px !important;">
+                                            <p style="font-size:13px; color:#000; margin-bottom:9px;"><strong>{{$itinerary['destination']}} Trip:</strong> {{$itinerary['travel_duration']}} </p>
+                                            <p style="font-size:13px; color:#000; margin-bottom:9px;"><strong>Total Room:</strong> {{$itinerary['number_of_rooms']}} </p>
+                                            <p style="font-size:13px; color:#000; margin-bottom:9px;"><strong>Meal Type:</strong> {{$itinerary['meal_type']}} </p>
+                                            
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td style="vertical-align: top; text-align: center;">
+                                <a class="navbar-brand py-0" href="#" style="display: inline-block;">
+                                    <img src="{{asset('front_assets/images/logo.png')}}" 
+                                        alt="logo"
+                                        style="max-width: 120px; width: 100%; height: auto; display: block; margin: 0 auto;">
+                                </a>
+
+                                <table style="background:#1e58a3; color:#fff; text-align:center; width:100%; margin-top:10px;">
+                                    <tr>
+                                        <td style="text-align:center; padding:10px;">
+                                            <h4 style="color:#fff; text-transform:uppercase; font-size: 13px; margin:0;">
+                                                Total Amount
+                                            </h4>
+                                            <strong style="color:#fff; font-size:18px;">₹15080</strong>
+
+                                            <p style="color:#fff; font-size: 12px; margin:5px 0 0 0;">
+                                                Itinerary Code : <strong style="color:#fff;">{{$sent_lead_itinerary->itinerary_code}}</strong>
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+
+
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="2">
+                    @foreach($day_itinerary as $day)
+                    {{-- {{dd($day)}} --}}
+                        <table style="border:1px solid rgba(1, 98, 232, 0.5) !important">
+                            <thead class="bg-color" style="background-color:#d2e8ff;">
+                                <tr>
+                                    <td><h4 style="font-size:22px; color:#031b4e; text-align:center;"> <i class="fa-solid fa-circle-check" style="font-size:20px; color:#1e58a3;"></i>  DAY {{ $day['day'] }} ({{ $day['division'] }})<h4></td>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr>
+                                    <td >
+                                        <table>
+                                            <tr>
+                                                <td>
+                                                    <span style="background:rgba(238, 51, 94, 0.2); color:rgb(238, 51, 94); border:1px solid rgb(238, 51, 94); display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:7px; line-height: 1;">
+                                                        <i class="fas fa-hotel"></i> Hotel | in {{ $day['division'] }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                           
+                                            <tr>
+                                                <td style="width:70%; vertical-align:top;">
+                                                    <table style="border:1px solid #ccc;">
+                                                        <tr>
+                                                            <td>
+                                                                <img src="{{ $day['hotel']['image'] 
+                                                                    ? asset($day['hotel']['image']) 
+                                                                    : asset('build/assets/images/logo/demo.webp') }}"
+                                                                    style="width:225px; height:120px; object-fit:cover;">
+                                                            </td>
+
+                                                            <td style="vertical-align:top;">
+                                                                <h5 style="font-size:15px; text-transform: uppercase; color: #031b4e;">{{$day['hotel']['name']}}<h5>
+                                                                <p style="font-size:12px; color:#000; margin-bottom:15px;">{{$day['hotel']['address']}}</p>
+                                                            <p>
+                                                                <span style="background:rgba(238, 51, 94, 0.2); color:rgb(238, 51, 94); border:1px solid rgb(238, 51, 94); display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px; line-height: 1;">
+                                                                    ROOMS
+                                                                </span>
+                                                            </p>
+
+                                                            <span style=" color:#4e4e4e; border:1px solid #ddd; display: inline-block; font-size: 12px; text-transform: uppercase; border-radius: 5px; padding:4px; line-height: 1;">{{$day['hotel_room']['name']}}</span>
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td colspan="2">
+                                                                <table style="border: 1px solid rgba(1, 98, 232, 0.5) !important; width:100%;">
+                                                                    <tr>
+                                                                        <td style="padding:0 !important;">
+                                                                            <table style="table-layout:fixed;">
+                                                                                <thead style="font-size:14px; font-weight:600; background: rgba(1, 98, 232, 0.1); color:#031b4e; width:180px; border-bottom: 1px solid rgba(1, 98, 232, 0.5) !important;">
+                                                                                    <tr>
+                                                                                        <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">Plan</th>
+                                                                                        <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">Meal Plan</th>
+                                                                                        <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">CNB</th>
+                                                                                        <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">CWM</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    <tr>
+                                                                                        <td style="vertical-align:top;">
+                                                                                            <p><span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1;">epa</span></p>
+                                                                                        </td>
+                                                                                        <td style="vertical-align:top;">
+                                                                                            <p><span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1;">breakfast <i style="color:#ee335e;">(5)</i></span></p>
+                                                                                            <p><span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1;">Lunch <i style="color:#ee335e;">(3)</i></span></p>
+                                                                                            <p><span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1;">Dinner <i style="color:#ee335e;">(4)</i></span></p>
+                                                                                        </td>
+                                                                                        <td style="vertical-align:top;">
+                                                                                            <p><span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1;">below 3 years <i style="color:#ee335e;">(3)</i></span></p>
+                                                                                            <p><span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1;">below 1 years <i style="color:#ee335e;">(2)</i></span></p>
+                                                                                        </td>
+                                                                                        <td style="vertical-align:top;">
+                                                                                            <p><span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1;">6-8 years <i style="color:#ee335e;">(3)</i></span></p>
+                                                                                            <p><span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1;">1-4 years <i style="color:#ee335e;">(1)</i></span></p>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+
+                                                <td style="vertical-align:top;">
+                                                    <div style=" background: rgba(254, 215, 170, 0.2);  border: 1px solid #fed7aa; padding: 20px; max-width: 419px;">
+                                                        <ul class="total-ex-list">
+                                                            <li><i class="fa-solid fa-circle-arrow-right"></i> Day Room Main Plan (1 * 1600) = ₹1600</li>
+                                                            <li> <i class="fa-solid fa-circle-arrow-right"></i> Day Room Addon Plan Meal Plan (4 * 0) = ₹0</li>
+                                                            <li><i class="fa-solid fa-circle-arrow-right"></i> Day Room Addon Plan Cwb (1 * 650) = ₹650</li>
+                                                            <li><i class="fa-solid fa-circle-arrow-right"></i> Per Day Cab (2 * 8000) = ₹16000</li>
+                                                            <li><i class="fa-solid fa-circle-arrow-right"></i> Day Sightseeing (7 * 78.57) = ₹550</li>
+                                                        </ul>
+                                                        <hr style="border: 1px solid #fed7aa; background-color:#fed7aa; margin-top: 16px; margin-bottom: 10px;">
+                                                        <h3 style="font-size: 13px;">Total Amount: ₹18,930</h3>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                
+                                </tr>
+
+                                <tr>
+                                    <td style="vertical-align:top;">
+                                        <table>
+                                            <tr>
+                                                <td>
+                                                    <span style="background:rgba(238, 51, 94, 0.2); color:rgb(238, 51, 94); border:1px solid rgb(238, 51, 94); display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:7px; line-height: 1;">
+                                                        <i class="fas fa-taxi"></i> Cabs | in Port Blair
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                             {{dd($day)}}
+                                            <tr>
+                                                <td style="vertical-align:top;">
+                                                    <table style="border: 1px solid rgba(1, 98, 232, 0.5) !important;">
+                                                        <thead style="font-size:14px; font-weight:600; background: rgba(1, 98, 232, 0.1); color:#031b4e; width:180px; border-bottom: 1px solid rgba(1, 98, 232, 0.5) !important; text-align:left;">
+                                                            <tr>
+                                                                <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">CAB</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <table style=" margin-bottom:6px; width:100%;">
+                                                                        <tr>
+                                                                            <td style="text-align:center;">
+                                                                                <ul style="display:flex; align-items:center; flex-wrap:wrap;">
+                                                                                    <li style="text-align:center; width:180px; border:1px solid #ccc; margin-bottom:6px; margin-right:6px; padding: 18px 0;">
+                                                                                        <img width="80" src="https://christmastree.quickdemo.in/assets/img/cab.png" style="margin:auto;">
+                                                                                        <p>
+                                                                                            <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1; background-color: rgba(34, 192, 60, 0.1);
+                                                                                            color: #22c03c;">Tempo (17S) <i style="color:#ee335e;">(1)</i></span>
+                                                                                        </p>
+                                                                                    </li>
+                                                                                    <li style="text-align:center; width:180px; border:1px solid #ccc; margin-bottom:6px; margin-right:6px; padding: 18px 0;">
+                                                                                        <img width="80" src="https://christmastree.quickdemo.in/assets/img/cab.png" style="margin:auto;">
+                                                                                        <p>
+                                                                                            <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1; background-color: rgba(34, 192, 60, 0.1);
+                                                                                            color: #22c03c;">Tempo (17S) <i style="color:#ee335e;">(1)</i></span>
+                                                                                        </p>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+
+                                <tr >
+                                    <td style="vertical-align:top;" >
+                                        <table>
+                                            <tr>
+                                                <td>
+                                                    <span style="background:rgba(238, 51, 94, 0.2); color:rgb(238, 51, 94); border:1px solid rgb(238, 51, 94); display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:7px; line-height: 1;">
+                                                        <i class="fas fa-route"></i> Route | <i class="fas fa-binoculars"></i> Sight | <i class="fas fa-running"></i> Activity |  seen in Port Blair
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="vertical-align:top;">
+                                                    <table style="border: 1px solid rgba(1, 98, 232, 0.5) !important;">
+                                                        <thead style="font-size:14px; font-weight:600; background: rgba(1, 98, 232, 0.1); color:#031b4e; width:180px; border-bottom: 1px solid rgba(1, 98, 232, 0.5) !important; text-align:left;">
+                                                            <tr>
+                                                                <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px; width:65px; border-right: 1px solid rgba(1, 98, 232, 0.5) !important;">SL.No</th>
+                                                                <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px; border-right: 1px solid rgba(1, 98, 232, 0.5) !important;">Route</th>
+                                                                <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px; border-right: 1px solid rgba(1, 98, 232, 0.5) !important;">Sightseen</th>
+                                                                <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">Activity</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr style="border-bottom:1px solid #ccc !important;">
+                                                                <td rowspan="2" style="vertical-align:top; border-right: 1px solid #ccc !important;">
+                                                                    <span style="border: 1px solid rgba(34, 192, 60, 0.8) !important; background-color:rgba(34, 192, 60, 0.1); color:#22c03c; text-align:center; border-radius: 4px; padding: 2px 3px; font-size: 11px;">
+                                                                        1
+                                                                    </span>
+                                                                </td>
+
+                                                                <td style="vertical-align:top; border-right: 1px solid #ccc !important;">
+                                                                    <h6 style="font-size:14px; text-transform: uppercase; color: #031b4e; margin-bottom:5px;">Port Blair City Tour</h6>
+                                                                </td>
+
+                                                                <td style="vertical-align:top; border-right: 1px solid #ccc !important;">
+                                                                    <p>
+                                                                        <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; border-radius: 5px; padding:4px 6px; line-height: 1;">
+                                                                            Cellular Jail (Historic Freedom Fighter Memorial) <i style="color:#ee335e;">(5)</i>
+                                                                        </span>
+                                                                    </p>
+                                                                    <p>
+                                                                        <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; border-radius: 5px; padding:4px 6px; line-height: 1;">
+                                                                            Marina Park & Flag Point (Leisure Walk) <i style="color:#ee335e;">(4)</i>
+                                                                        </span>
+                                                                    </p>
+                                                                </td>
+
+                                                                <td style="vertical-align:top;">
+                                                                    <p>
+                                                                        <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; border-radius: 5px; padding:4px 6px; line-height: 1;">
+                                                                            Light & Sound Show at Cellular Jail (Evening) <i style="color:#ee335e;">(5)</i>
+                                                                        </span>
+                                                                    </p>
+                                                                </td>
+                                                                
+                                                            </tr>
+
+                                                            <tr style="border-bottom:1px solid #ccc;">
+                                                                <td colspan="4">
+                                                                    <table style="">
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <td >
+                                                                                    <ul style="display:flex; align-items:center; flex-wrap:wrap;">
+                                                                                        <li style="text-align:center; width:180px; border:1px solid #ccc; margin-bottom:6px; margin-right:6px; padding: 18px 0;">
+                                                                                            <img width="80" src="https://christmastree.quickdemo.in/assets/img/cab.png" style="margin:auto;">
+                                                                                            <p>
+                                                                                                <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1; background-color: rgba(34, 192, 60, 0.1);
+                                                                                                color: #22c03c;">Tempo (17S) <i style="color:#ee335e;">(1)</i></span>
+                                                                                            </p>
+                                                                                        </li>
+                                                                                        <li style="text-align:center; width:180px; border:1px solid #ccc; margin-bottom:6px; margin-right:6px; padding: 18px 0;">
+                                                                                            <img width="80" src="https://christmastree.quickdemo.in/assets/img/cab.png" style="margin:auto;">
+                                                                                            <p>
+                                                                                                <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1; background-color: rgba(34, 192, 60, 0.1);
+                                                                                                color: #22c03c;">Tempo (17S) <i style="color:#ee335e;">(1)</i></span>
+                                                                                            </p>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td rowspan="2" style="vertical-align:top; border-right: 1px solid #ccc !important;">
+                                                                    <span style="border: 1px solid rgba(34, 192, 60, 0.8) !important; background-color:rgba(34, 192, 60, 0.1); color:#22c03c; text-align:center; border-radius: 4px; padding: 2px 3px; font-size: 11px;">
+                                                                        2
+                                                                    </span>
+                                                                </td>
+
+                                                                <td style="vertical-align:top; border-right: 1px solid #ccc !important;">
+                                                                    <h6 style="font-size:14px; text-transform: uppercase; color: #031b4e; margin-bottom:5px;">Port Blair City Tour</h6>
+                                                                </td>
+
+                                                                <td style="vertical-align:top; border-right: 1px solid #ccc !important;">
+                                                                    <p>
+                                                                        <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; border-radius: 5px; padding:4px 6px; line-height: 1;">
+                                                                            Cellular Jail (Historic Freedom Fighter Memorial) <i style="color:#ee335e;">(5)</i>
+                                                                        </span>
+                                                                    </p>
+                                                                    <p>
+                                                                        <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; border-radius: 5px; padding:4px 6px; line-height: 1;">
+                                                                            Marina Park & Flag Point (Leisure Walk) <i style="color:#ee335e;">(4)</i>
+                                                                        </span>
+                                                                    </p>
+                                                                </td>
+
+                                                                <td style="vertical-align:top;">
+                                                                    <p>
+                                                                        <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; border-radius: 5px; padding:4px 6px; line-height: 1;">
+                                                                            Light & Sound Show at Cellular Jail (Evening) <i style="color:#ee335e;">(5)</i>
+                                                                        </span>
+                                                                    </p>
+                                                                </td>
+                                                                
+                                                            </tr>
+
+
+
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    @endforeach
+                    <table style="border:1px solid rgba(1, 98, 232, 0.5) !important" >
+                        <thead class="bg-color" style="background-color:#d2e8ff;">
+                            <tr>
+                                <td><h4 style="font-size:22px; color:#031b4e; text-align:center;"> <i class="fa-solid fa-circle-check" style="font-size:20px; color:#1e58a3;"></i>  DAY 2 (Port Blair)<h4></td>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr>
+                                <td >
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                <span style="background:rgba(238, 51, 94, 0.2); color:rgb(238, 51, 94); border:1px solid rgb(238, 51, 94); display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:7px; line-height: 1;">
+                                                    <i class="fas fa-hotel"></i> Hotel | 1 night | in Port Blair
+                                                </span>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td style="width:70%; vertical-align:top;">
+                                                <table style="border:1px solid #ccc;">
+                                                    <tr>
+                                                        <td>
+                                                            <img src="http://christmastree.quickdemo.in/public/storage/hotel/lemon-tree-hotel-1643-20250327073919.webp" style="width:225px; height:120px;">
+                                                        </td>
+                                                        <td style="vertical-align:top;">
+                                                            <h5 style="font-size:15px; text-transform: uppercase; color: #031b4e;">TSG Emerald View Hotel & Spa<h5>
+                                                            <p style="font-size:12px; color:#000; margin-bottom:15px;">Lamba Line, opp. to Airport Gate, Junglighat, Sri Vijaya Puram, 
+                                                            Andaman and Nicobar Islands 744103</p>
+                                                        <p>
+                                                            <span style="background:rgba(238, 51, 94, 0.2); color:rgb(238, 51, 94); border:1px solid rgb(238, 51, 94); display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px; line-height: 1;">
+                                                                ROOMS
+                                                            </span>
+                                                        </p>
+
+                                                        <span style=" color:#4e4e4e; border:1px solid #ddd; display: inline-block; font-size: 12px; text-transform: uppercase; border-radius: 5px; padding:4px; line-height: 1;">Luxury - Non-AC</span>
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <td colspan="2">
+                                                            <table style="border: 1px solid rgba(1, 98, 232, 0.5) !important; width:100%;">
+                                                                <tr>
+                                                                    <td style="padding:0 !important;">
+                                                                        <table style="table-layout:fixed;">
+                                                                            <thead style="font-size:14px; font-weight:600; background: rgba(1, 98, 232, 0.1); color:#031b4e; width:180px; border-bottom: 1px solid rgba(1, 98, 232, 0.5) !important;">
+                                                                                <tr>
+                                                                                    <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">Plan</th>
+                                                                                    <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">Meal Plan</th>
+                                                                                    <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">CNB</th>
+                                                                                    <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">CWM</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                <tr>
+                                                                                    <td style="vertical-align:top;">
+                                                                                        <p><span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1;">epa</span></p>
+                                                                                    </td>
+                                                                                    <td style="vertical-align:top;">
+                                                                                        <p><span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1;">breakfast <i style="color:#ee335e;">(5)</i></span></p>
+                                                                                        <p><span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1;">Lunch <i style="color:#ee335e;">(3)</i></span></p>
+                                                                                        <p><span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1;">Dinner <i style="color:#ee335e;">(4)</i></span></p>
+                                                                                    </td>
+                                                                                    <td style="vertical-align:top;">
+                                                                                        <p><span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1;">below 3 years <i style="color:#ee335e;">(3)</i></span></p>
+                                                                                        <p><span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1;">below 1 years <i style="color:#ee335e;">(2)</i></span></p>
+                                                                                    </td>
+                                                                                    <td style="vertical-align:top;">
+                                                                                        <p><span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1;">6-8 years <i style="color:#ee335e;">(3)</i></span></p>
+                                                                                        <p><span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1;">1-4 years <i style="color:#ee335e;">(1)</i></span></p>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+
+                                            <td style="vertical-align:top;">
+                                                <div style=" background: rgba(254, 215, 170, 0.2);  border: 1px solid #fed7aa; padding: 20px; max-width: 419px;">
+                                                    <ul class="total-ex-list">
+                                                        <li><i class="fa-solid fa-circle-arrow-right"></i> Day Room Main Plan (1 * 1600) = ₹1600</li>
+                                                        <li> <i class="fa-solid fa-circle-arrow-right"></i> Day Room Addon Plan Meal Plan (4 * 0) = ₹0</li>
+                                                        <li><i class="fa-solid fa-circle-arrow-right"></i> Day Room Addon Plan Cwb (1 * 650) = ₹650</li>
+                                                        <li><i class="fa-solid fa-circle-arrow-right"></i> Per Day Cab (2 * 8000) = ₹16000</li>
+                                                        <li><i class="fa-solid fa-circle-arrow-right"></i> Day Sightseeing (7 * 78.57) = ₹550</li>
+                                                    </ul>
+                                                    <hr style="border: 1px solid #fed7aa; background-color:#fed7aa; margin-top: 16px; margin-bottom: 10px;">
+                                                    <h3 style="font-size: 13px;">Total Amount: ₹18,930</h3>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            
+                            </tr>
+
+                            <tr>
+                                <td style="vertical-align:top;">
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                <span style="background:rgba(238, 51, 94, 0.2); color:rgb(238, 51, 94); border:1px solid rgb(238, 51, 94); display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:7px; line-height: 1;">
+                                                    <i class="fas fa-taxi"></i> Cabs | in Port Blair
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="vertical-align:top;">
+                                                <table style="border: 1px solid rgba(1, 98, 232, 0.5) !important;">
+                                                    <thead style="font-size:14px; font-weight:600; background: rgba(1, 98, 232, 0.1); color:#031b4e; width:180px; border-bottom: 1px solid rgba(1, 98, 232, 0.5) !important; text-align:left;">
+                                                        <tr>
+                                                            <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">CAB</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <table style=" margin-bottom:6px; width:100%;">
+                                                                    <tr>
+                                                                        <td style="text-align:center;">
+                                                                            <ul style="display:flex; align-items:center; flex-wrap:wrap;">
+                                                                                <li style="text-align:center; width:180px; border:1px solid #ccc; margin-bottom:6px; margin-right:6px; padding: 18px 0;">
+                                                                                    <img width="80" src="https://christmastree.quickdemo.in/assets/img/cab.png" style="margin:auto;">
+                                                                                    <p>
+                                                                                        <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1; background-color: rgba(34, 192, 60, 0.1);
+                                                                                        color: #22c03c;">Tempo (17S) <i style="color:#ee335e;">(1)</i></span>
+                                                                                    </p>
+                                                                                </li>
+                                                                                <li style="text-align:center; width:180px; border:1px solid #ccc; margin-bottom:6px; margin-right:6px; padding: 18px 0;">
+                                                                                    <img width="80" src="https://christmastree.quickdemo.in/assets/img/cab.png" style="margin:auto;">
+                                                                                    <p>
+                                                                                        <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1; background-color: rgba(34, 192, 60, 0.1);
+                                                                                        color: #22c03c;">Tempo (17S) <i style="color:#ee335e;">(1)</i></span>
+                                                                                    </p>
+                                                                                </li>
+                                                                            </ul>
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="vertical-align:top;">
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                <span style="background:rgba(238, 51, 94, 0.2); color:rgb(238, 51, 94); border:1px solid rgb(238, 51, 94); display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:7px; line-height: 1;">
+                                                    <i class="fas fa-route"></i> Route | <i class="fas fa-binoculars"></i> Sight | <i class="fas fa-running"></i> Activity |  seen in Port Blair
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="vertical-align:top;">
+                                                <table style="border: 1px solid rgba(1, 98, 232, 0.5) !important;">
+                                                    <thead style="font-size:14px; font-weight:600; background: rgba(1, 98, 232, 0.1); color:#031b4e; width:180px; border-bottom: 1px solid rgba(1, 98, 232, 0.5) !important; text-align:left;">
+                                                        <tr>
+                                                            <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px; width:65px; border-right: 1px solid rgba(1, 98, 232, 0.5) !important;">SL.No</th>
+                                                            <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px; border-right: 1px solid rgba(1, 98, 232, 0.5) !important;">Route</th>
+                                                            <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px; border-right: 1px solid rgba(1, 98, 232, 0.5) !important;">Sightseen</th>
+                                                            <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">Activity</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr style="border-bottom:1px solid #ccc !important;">
+                                                            <td rowspan="2" style="vertical-align:top; border-right: 1px solid #ccc !important;">
+                                                                <span style="border: 1px solid rgba(34, 192, 60, 0.8) !important; background-color:rgba(34, 192, 60, 0.1); color:#22c03c; text-align:center; border-radius: 4px; padding: 2px 3px; font-size: 11px;">
+                                                                    1
+                                                                </span>
+                                                            </td>
+
+                                                            <td style="vertical-align:top; border-right: 1px solid #ccc !important;">
+                                                                <h6 style="font-size:14px; text-transform: uppercase; color: #031b4e; margin-bottom:5px;">Port Blair City Tour</h6>
+                                                            </td>
+
+                                                            <td style="vertical-align:top; border-right: 1px solid #ccc !important;">
+                                                                <p>
+                                                                    <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; border-radius: 5px; padding:4px 6px; line-height: 1;">
+                                                                        Cellular Jail (Historic Freedom Fighter Memorial) <i style="color:#ee335e;">(5)</i>
+                                                                    </span>
+                                                                </p>
+                                                                <p>
+                                                                    <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; border-radius: 5px; padding:4px 6px; line-height: 1;">
+                                                                        Marina Park & Flag Point (Leisure Walk) <i style="color:#ee335e;">(4)</i>
+                                                                    </span>
+                                                                </p>
+                                                            </td>
+
+                                                            <td style="vertical-align:top;">
+                                                                <p>
+                                                                    <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; border-radius: 5px; padding:4px 6px; line-height: 1;">
+                                                                        Light & Sound Show at Cellular Jail (Evening) <i style="color:#ee335e;">(5)</i>
+                                                                    </span>
+                                                                </p>
+                                                            </td>
+                                                            
+                                                        </tr>
+
+                                                        <tr style="border-bottom:1px solid #ccc;">
+                                                            <td colspan="4">
+                                                                <table style="">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td >
+                                                                                <ul style="display:flex; align-items:center; flex-wrap:wrap;">
+                                                                                    <li style="text-align:center; width:180px; border:1px solid #ccc; margin-bottom:6px; margin-right:6px; padding: 18px 0;">
+                                                                                        <img width="80" src="https://christmastree.quickdemo.in/assets/img/cab.png" style="margin:auto;">
+                                                                                        <p>
+                                                                                            <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1; background-color: rgba(34, 192, 60, 0.1);
+                                                                                            color: #22c03c;">Tempo (17S) <i style="color:#ee335e;">(1)</i></span>
+                                                                                        </p>
+                                                                                    </li>
+                                                                                    <li style="text-align:center; width:180px; border:1px solid #ccc; margin-bottom:6px; margin-right:6px; padding: 18px 0;">
+                                                                                        <img width="80" src="https://christmastree.quickdemo.in/assets/img/cab.png" style="margin:auto;">
+                                                                                        <p>
+                                                                                            <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1; background-color: rgba(34, 192, 60, 0.1);
+                                                                                            color: #22c03c;">Tempo (17S) <i style="color:#ee335e;">(1)</i></span>
+                                                                                        </p>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </td>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td rowspan="2" style="vertical-align:top; border-right: 1px solid #ccc !important;">
+                                                                <span style="border: 1px solid rgba(34, 192, 60, 0.8) !important; background-color:rgba(34, 192, 60, 0.1); color:#22c03c; text-align:center; border-radius: 4px; padding: 2px 3px; font-size: 11px;">
+                                                                    2
+                                                                </span>
+                                                            </td>
+
+                                                            <td style="vertical-align:top; border-right: 1px solid #ccc !important;">
+                                                                <h6 style="font-size:14px; text-transform: uppercase; color: #031b4e; margin-bottom:5px;">Port Blair City Tour</h6>
+                                                            </td>
+
+                                                            <td style="vertical-align:top; border-right: 1px solid #ccc !important;">
+                                                                <p>
+                                                                    <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; border-radius: 5px; padding:4px 6px; line-height: 1;">
+                                                                        Cellular Jail (Historic Freedom Fighter Memorial) <i style="color:#ee335e;">(5)</i>
+                                                                    </span>
+                                                                </p>
+                                                                <p>
+                                                                    <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; border-radius: 5px; padding:4px 6px; line-height: 1;">
+                                                                        Marina Park & Flag Point (Leisure Walk) <i style="color:#ee335e;">(4)</i>
+                                                                    </span>
+                                                                </p>
+                                                            </td>
+
+                                                            <td style="vertical-align:top;">
+                                                                <p>
+                                                                    <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; border-radius: 5px; padding:4px 6px; line-height: 1;">
+                                                                        Light & Sound Show at Cellular Jail (Evening) <i style="color:#ee335e;">(5)</i>
+                                                                    </span>
+                                                                </p>
+                                                            </td>
+                                                            
+                                                        </tr>
+
+
+
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <table style="border:1px solid rgba(1, 98, 232, 0.5) !important">
+                        <thead style="background-color:#d2e8ff;">
+                            <tr>
+                                <th>
+                                    <h4 style="font-size:22px; color:#031b4e; text-align:center;"> <i class="fa-solid fa-circle-check" style="font-size:20px; color:#1e58a3;"></i> Hotel Summery </h4>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                <ul class="hotel-list">
+                                        <li>
+                                            <figure>
+                                                <img src="http://christmastree.quickdemo.in/public/storage/hotel/lemon-tree-hotel-1643-20250327073919.webp">
+                                            </figure>
+                                            <figcaption>
+                                                <h3>Day 1</h3>
+                                                <h2>TSG Emerald View Hotel &amp; Spa</h2>
+                                                <p>Lamba Line, opp. to Airport Gate, Junglighat, Sri Vijaya Puram, Andaman and Nicobar Islands 744103</p>
+                                            </figcaption>
+                                        </li>
+
+                                        <li>
+                                            <figure>
+                                                <img src="http://christmastree.quickdemo.in/public/storage/hotel/lemon-tree-hotel-1643-20250327073919.webp">
+                                            </figure>
+                                            <figcaption>
+                                                <h3>Day 2</h3>
+                                                <h2>TSG Emerald View Hotel &amp; Spa</h2>
+                                                <p>Lamba Line, opp. to Airport Gate, Junglighat, Sri Vijaya Puram, Andaman and Nicobar Islands 744103</p>
+                                            </figcaption>
+                                        </li>
+
+                                        <li>
+                                            <figure>
+                                                <img src="http://christmastree.quickdemo.in/public/storage/hotel/lemon-tree-hotel-1643-20250327073919.webp">
+                                            </figure>
+                                            <figcaption>
+                                                <h3>Day 3</h3>
+                                                <h2>TSG Emerald View Hotel &amp; Spa</h2>
+                                                <p>Lamba Line, opp. to Airport Gate, Junglighat, Sri Vijaya Puram, Andaman and Nicobar Islands 744103</p>
+                                            </figcaption>
+                                        </li>
+                                </ul>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td>
+                    <table style="border:1px solid rgba(1, 98, 232, 0.5) !important">
+                        <thead style="background-color:#d2e8ff;">
+                            <tr>
+                                <th>
+                                    <h4 style="font-size:22px; color:#031b4e; text-align:center;"> <i class="fa-solid fa-circle-check" style="font-size:20px; color:#1e58a3;"></i> Activities Summery </h4>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                <ul class="activity-list">
+                                        <li style="background:url(http://christmastree.quickdemo.in/public/storage/hotel/lemon-tree-hotel-1643-20250327073919.webp); background-repeat:no-repeat; background-size:cover; background-position:center center;">
+                                            <figcaption>
+                                                <h2>Light & Sound Show at Cellular Jail (Evening) </h2>
+                                            </figcaption>
+                                        </li>
+                                        <li style="background:url(http://christmastree.quickdemo.in/public/storage/hotel/lemon-tree-hotel-1643-20250327073919.webp); background-repeat:no-repeat; background-size:cover; background-position:center center;">
+                                            <figcaption>
+                                                <h2>Light & Sound Show at Cellular Jail (Evening) </h2>
+                                            </figcaption>
+                                        </li>
+                                        <li style="background:url(http://christmastree.quickdemo.in/public/storage/hotel/lemon-tree-hotel-1643-20250327073919.webp); background-repeat:no-repeat; background-size:cover; background-position:center center;">
+                                            <figcaption>
+                                                <h2>Light & Sound Show at Cellular Jail (Evening) </h2>
+                                            </figcaption>
+                                        </li>
+                                        <li style="background:url(http://christmastree.quickdemo.in/public/storage/hotel/lemon-tree-hotel-1643-20250327073919.webp); background-repeat:no-repeat; background-size:cover; background-position:center center;">
+                                            <figcaption>
+                                                <h2>Light & Sound Show at Cellular Jail (Evening) </h2>
+                                            </figcaption>
+                                        </li>
+                                        <li style="background:url(http://christmastree.quickdemo.in/public/storage/hotel/lemon-tree-hotel-1643-20250327073919.webp); background-repeat:no-repeat; background-size:cover; background-position:center center;">
+                                            <figcaption>
+                                                <h2>Light & Sound Show at Cellular Jail (Evening) </h2>
+                                            </figcaption>
+                                        </li>
+                                </ul>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <table style="border:1px solid rgba(1, 98, 232, 0.5) !important">
+                        <thead style="background-color:#d2e8ff;">
+                            <tr>
+                                <th>
+                                    <h4 style="font-size:22px; color:#031b4e; text-align:center;"> <i class="fa-solid fa-circle-check" style="font-size:20px; color:#1e58a3;"></i> Exclusions </h4>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                <p>
+                                        <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; border-radius: 5px; padding:4px 6px; line-height: 1; margin-bottom:5px;">
+                                            1. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                        </span>
+                                    </p>
+                                <p>
+                                        <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; border-radius: 5px; padding:4px 6px; line-height: 1; margin-bottom:5px;">
+                                            2. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                        </span>
+                                    </p>
+                                <p>
+                                        <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; border-radius: 5px; padding:4px 6px; line-height: 1; margin-bottom:5px;">
+                                            3. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                        </span>
+                                    </p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+
+            <tr class="keep-together">
+                <td>
+                    <table style="border:1px solid rgba(1, 98, 232, 0.5) !important">
+                        <thead style="background-color:#d2e8ff;">
+                            <tr>
+                                <th>
+                                    <h4 style="font-size:22px; color:#031b4e; text-align:center;"> <i class="fa-solid fa-circle-check" style="font-size:20px; color:#1e58a3;"></i> Inclusions </h4>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                <p>
+                                        <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; border-radius: 5px; padding:4px 6px; line-height: 1; margin-bottom:5px;">
+                                            1. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                        </span>
+                                    </p>
+                                <p>
+                                        <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; border-radius: 5px; padding:4px 6px; line-height: 1; margin-bottom:5px;">
+                                            2. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                        </span>
+                                    </p>
+                                <p>
+                                        <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; border-radius: 5px; padding:4px 6px; line-height: 1; margin-bottom:5px;">
+                                            3. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                        </span>
+                                    </p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+
+        </table>
+    </div>
 </div>
-@section('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // 1. Track every page click
-            document.addEventListener('click', function () {
-                 @this.call('incrementClick');
-            });
-
-            // 2. Track when user exits the page/tab
-            window.addEventListener('beforeunload', function () {
-                 @this.call('setExitTime');
-            });
-
-           // 1. Start session when visible
-            if (document.visibilityState === 'visible') {
-                @this.call('startNewClickLog');
-            }
-
-            // 2. Handle tab visibility change
-            document.addEventListener('visibilitychange', function () {
-                if (document.visibilityState === 'visible') {
-                    @this.call('startNewClickLog');
-                } else {
-                    @this.call('closeClickLog');
-                }
-            });
-
-            // 3. Update exit_time every second only if tab is active
-            setInterval(function () {
-                if (document.visibilityState === 'visible') {
-                    @this.call('updateExitTime');
-                }
-            }, 1000);
-
-        });
-    </script>
-@endsection

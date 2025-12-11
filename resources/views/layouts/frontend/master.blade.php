@@ -87,7 +87,7 @@
             </div>
             <div class="row copyright-content">
                 <div class="col-12">
-                    <p>Copyright &copy; 2025 Carrnivaltrips. All Rights Reserved</p>
+                    <p>Copyright &copy; {{date('Y')}} Carrnivaltrips. All Rights Reserved</p>
                 </div>
             </div>
         </div>

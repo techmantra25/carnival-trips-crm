@@ -118,6 +118,7 @@ class CreateQueryItinerary extends Component
     public $send_whatsapp = false;
     public $send_email = false;
     public $send_sms = false;
+    public $valid_panel = true;
     public $selectedRestHotels = [];
 
     protected $whatsapp;
@@ -169,7 +170,8 @@ class CreateQueryItinerary extends Component
         $this->getTriphighlight();
         $this->loadSelectedInclusions();
         $this->loadSelectedExclusions();
-        
+        $this->valid_panel = Carbon::parse($this->leadData->arrival_date)->isFuture() 
+                     || Carbon::parse($this->leadData->arrival_date)->isToday();
     }
 
     protected function filterHotelData(){
@@ -3350,6 +3352,8 @@ class CreateQueryItinerary extends Component
                     'timestamp' => now()->toDateTimeString(),
                 ]),
             ]);
+
+            
 
         DB::commit();
 
