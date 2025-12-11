@@ -19,7 +19,7 @@
             <!-- Dynamic Body -->
             <tr>
               <td style="padding:24px; color:#374151; font-size:15px; line-height:24px;">
-                {!! $html !!}
+                @yield('content')
               </td>
             </tr>
 
@@ -37,4 +37,4 @@
     </table>
 
   </body>
-</html>
+</html>1
