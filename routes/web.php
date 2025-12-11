@@ -230,6 +230,9 @@ use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagem
     Route::prefix('cron')->group(function(){
         // Run this endpoint every 1 minute (set in server cron or scheduler)
         Route::get('update-lead-status', [CronController::class, 'update_lead_status']);
+        // Runs once per day (scheduled in server CRON or Laravel scheduler)
+        // This will auto-release hotel room stock based on release_trigger settings
+        Route::get('update-auto-release-room-stock', [CronController::class, 'update_auto_release_room_stock']);
     });
 
     Route::get('/trip-preference-form/{code}', TripPreferenceForm::class)->name('website.trip.preference.form');

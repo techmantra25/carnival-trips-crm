@@ -189,9 +189,9 @@
                                         <td>
                                                 <p class="badge bg-primary text-white">{{$lead_item->unique_id }}</p>
                                                 <p class="mt-1"> {{ $lead_item->customer_name }}
-                                                <span class="badge gap-2 bg-success/10 text-success">
+                                                {{-- <span class="badge gap-2 bg-success/10 text-success">
                                                     <span class="w-1.5 h-1.5 inline-block bg-success rounded-full"></span>Online
-                                                </span>
+                                                </span> --}}
                                                 </p>
                                             
                                             @php

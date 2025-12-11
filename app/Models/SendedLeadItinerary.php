@@ -33,4 +33,7 @@ class SendedLeadItinerary extends Model
     {
         return $this->belongsTo(Admin::class, 'confirmed_by');
     }
+    public function details(){
+        return $this->hasMany(SendedLeadItineraryDetail::class, 'sended_lead_itinerary_id', 'id');
+    }
 }

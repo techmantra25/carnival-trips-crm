@@ -22,6 +22,7 @@ use App\Models\ItineraryTemplate;
 use App\Models\LeadUrlClick;
 use App\Models\Itinerary;
 use App\Models\ChangeLog;
+use App\Models\SendedLeadItinerary;
 use Illuminate\Support\Facades\Auth;
 use App\Models\InventoryLedger;
 
@@ -581,5 +582,190 @@ class CustomHelper
         return $entry;
     }
 
-    
+    public static function updateRoomInventoryStock($sended_lead_itinerary_id, $status)
+    {
+        DB::beginTransaction();
+
+        try {
+            $itinerary = SendedLeadItinerary::find($sended_lead_itinerary_id);
+            if (!$itinerary || !$itinerary->lead) {
+                DB::commit();
+                return;
+            }
+
+            $rooms = (int)($itinerary->lead->number_of_rooms ?? 0);
+            $startDate = Carbon::parse($itinerary->lead->arrival_date);
+            $endDate   = Carbon::parse($itinerary->lead->departure_date);
+
+            if ($status == "Confirmed") {
+
+                /** ---------------------------
+                 *  CONFIRM → DEDUCT STOCK
+                 *  entry_type = booking_sold
+                 * ---------------------------- */
+                for ($k = 0; $k < $itinerary->total_nights; $k++) {
+
+                    $currentDate = $startDate->copy()->addDays($k);
+                    if ($currentDate->gt($endDate)) {
+                        $currentDate = $endDate->copy();
+                    }
+
+                    $day = $k + 1;
+                    $Daydate = $currentDate->format('Y-m-d');
+
+                    $roomId = $itinerary->details()
+                        ->whereNotNull('hotel_id')
+                        ->whereNotNull('room_id')
+                        ->where('field', 'day_room')
+                        ->where('header', "day_$day")
+                        ->value('room_id');
+
+                    if (!$roomId) continue;
+
+                    $inventory = Inventory::where('room_id', $roomId)
+                        ->where('date', $Daydate)
+                        ->lockForUpdate()
+                        ->first();
+
+                    if (!$inventory) continue;
+
+                    $beforeUnsold = $inventory->total_unsold;
+                    $beforeSold   = $inventory->total_sold;
+
+                    // Prevent negative unsold
+                    if ($inventory->total_unsold < $rooms) {
+                        // Oversell protection: Do NOT sell; stop deduction
+                        $roomsToSell = $inventory->total_unsold; // whatever available
+                    } else {
+                        $roomsToSell = $rooms;
+                    }
+
+                    // Deduct logic
+                    $inventory->total_unsold = $inventory->total_unsold - $roomsToSell;
+                    $inventory->total_sold   = $inventory->total_sold + $roomsToSell;
+                    $inventory->save();
+
+                    $afterUnsold = $inventory->total_unsold;
+
+                    InventoryLedger::updateOrCreate(
+                    [
+                        'inventory_id'   => $inventory->id,
+                        'lead_id'        => $itinerary->lead->id,
+                        'inventory_date' => $inventory->date,
+                        'entry_type'     => 'booking_sold',
+                        'hotel_id'       => $inventory->hotel_id,
+                        'room_id'        => $inventory->room_id,
+                    ],
+                    [
+                        'quantity'       => -$roomsToSell,
+                        'description'    => "Rooms sold on confirmation. Unsold Before: $beforeUnsold, After: $afterUnsold",
+                        'created_by'     => Auth::guard('admin')->id(),
+                    ]
+                );
+
+                }
+
+            } else {
+
+                /** -----------------------------------------------
+                 *  STATUS ≠ Confirmed → RESTORE STOCK
+                 *  entry_type = system_adjust
+                 * ----------------------------------------------- */
+
+                for ($k = 0; $k < $itinerary->total_nights; $k++) {
+
+                    $currentDate = $startDate->copy()->addDays($k);
+                    if ($currentDate->gt($endDate)) {
+                        $currentDate = $endDate->copy();
+                    }
+
+                    $day = $k + 1;
+                    $Daydate = $currentDate->format('Y-m-d');
+
+                    $roomId = $itinerary->details()
+                        ->whereNotNull('hotel_id')
+                        ->whereNotNull('room_id')
+                        ->where('field', 'day_room')
+                        ->where('header', "day_$day")
+                        ->value('room_id');
+
+                    if (!$roomId) continue;
+
+                    $inventory = Inventory::where('room_id', $roomId)
+                        ->where('date', $Daydate)
+                        ->lockForUpdate()
+                        ->first();
+
+                    if (!$inventory) continue;
+
+                    $beforeUnsold = $inventory->total_unsold;
+                    $beforeSold   = $inventory->total_sold;
+
+                    // Calculate sold restore
+                    $newSold = $inventory->total_sold - $rooms;
+
+                    if ($newSold < 0) {
+                        // Prevent negative sold
+                        $inventory->total_sold = 0;
+                        // Do not increase unsold if sold goes below zero
+                    } else {
+                        $inventory->total_sold   = $newSold;
+                        $inventory->total_unsold = $inventory->total_unsold + $rooms;
+                    }
+
+                    $inventory->save();
+                    $afterUnsold = $inventory->total_unsold;
+
+                    $qtyChanged = $afterUnsold - $beforeUnsold;
+
+                    InventoryLedger::updateOrCreate(
+                    [
+                        'inventory_id'   => $inventory->id,
+                        'lead_id'        => $itinerary->lead->id,
+                        'inventory_date' => $inventory->date,
+                        'entry_type'     => 'system_adjust',
+                        'hotel_id'       => $inventory->hotel_id,
+                        'room_id'        => $inventory->room_id,
+                    ],
+                    [
+                        'quantity'       => $qtyChanged,
+                        'description'    => "Stock restored. Unsold Before: $beforeUnsold, After: $afterUnsold",
+                        'created_by'     => Auth::guard('admin')->id(),
+                    ]
+                );
+
+                }
+            }
+
+            DB::commit();
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
+
+   public static function checkRoomStockByDate($date, $room_id, $required_stock)
+    {
+        $total_unsold = Inventory::where('room_id', $room_id)
+            ->where('date', date('Y-m-d', strtotime($date)))
+            ->value('total_unsold');
+
+        // If no record exists, treat as 0
+        $total_unsold = $total_unsold ?? 0;
+
+        // If no stock, return 0
+        if ($total_unsold <= 0) {
+            return 0;
+        }
+
+        // Return remaining stock
+        return $total_unsold;
+    }
+
+
+
+
+
+
 }

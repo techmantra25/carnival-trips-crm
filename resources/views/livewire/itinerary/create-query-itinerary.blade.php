@@ -973,13 +973,26 @@
                                                                                                         
                                                                                                             <div class="custom-hotel-details !ml-0">
                                                                                                                 <div class="custom-hotel-details-top">
-                                                                                                                    <p class="text-black-600 text-base italic">{{$division_hotel_item['hotel_name']}}</p>
-                                                                                                                    <p class="badge gap-2 bg-danger/10 text-danger uppercase text-small my-2">Rooms</p>
-                                                                                                                    {{-- @if(isset($division_hotel_item['hotel_category_name']))
-                                                                                                                        <p class="text-black-500 text-small text-danger">
-                                                                                                                            {{ $division_hotel_item['hotel_category_name'] }}
+                                                                                                                    <p class="text-black-600 text-base italic">{{$division_hotel_item['hotel_name']}} </p>
+                                                                                                                    <p class="badge gap-2 bg-primary/10 text-primary uppercase text-small my-2">Rooms</p>
+                                                                                                                    @php
+                                                                                                                        $stock = App\Helpers\CustomHelper::checkRoomStockByDate(
+                                                                                                                            $division_item['division_date'],
+                                                                                                                            $division_hotel_item['selected_room'],
+                                                                                                                            max((int)$leadData->number_of_rooms, 1)
+                                                                                                                        );
+                                                                                                                    @endphp
+
+                                                                                                                    @if($stock == 0)
+                                                                                                                        <p class="badge gap-2 bg-danger/10 text-danger uppercase text-small my-2">
+                                                                                                                            Out of Stock
                                                                                                                         </p>
-                                                                                                                    @endif --}}
+                                                                                                                    @else
+                                                                                                                        <p class="badge gap-2 bg-success/10 text-success uppercase text-small my-2">
+                                                                                                                            {{ $stock }} Rooms Remaining
+                                                                                                                        </p>
+                                                                                                                    @endif
+
                                                                                                                     
                                                                                                                     <div class="small-btm">
                                                                                                                         <select class="w-full" 

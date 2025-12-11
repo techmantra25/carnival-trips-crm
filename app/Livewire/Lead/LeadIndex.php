@@ -929,6 +929,8 @@ class LeadIndex extends Component
             return;
         }
 
+        DB::beginTransaction(); // ← Transaction start
+
         try {
             $lead = Lead::find($this->active_lead->id);
             if ($lead) {
@@ -944,25 +946,29 @@ class LeadIndex extends Component
                     'timestamp' => now()->toDateTimeString(),
                 ];
 
+                // Reset previous confirmed itinerary (if any)
+                $previousConfirmed = SendedLeadItinerary::where('lead_id', $lead->id)
+                    ->where('is_confirmed', 1)
+                    ->first();
+
+                // If previously confirmed itinerary exists and new status is NOT Confirmed,
+                // then add back (restore) the deducted room inventory stock
+                if ($previousConfirmed && $this->selected_status !== 'Confirmed') {
+                    $previousConfirmed->is_confirmed = 0;
+                    $previousConfirmed->confirmed_by = null;
+                    $previousConfirmed->confirmed_at = null;
+                    $previousConfirmed->save();
+                    CustomHelper::updateRoomInventoryStock($previousConfirmed->id, $this->selected_status);
+                }
+
                 if ($this->selected_status == 'Confirmed') {
-                    // Reset previous confirmed itinerary (if any)
-                    $previousConfirmed = SendedLeadItinerary::where('lead_id', $lead->id)
-                        ->where('is_confirmed', 1)
-                        ->first();
-
-                    if ($previousConfirmed && $previousConfirmed->id != $this->selected_itinerary) {
-                        $previousConfirmed->is_confirmed = 0;
-                        $previousConfirmed->confirmed_by = null;
-                        $previousConfirmed->confirmed_at = null;
-                        $previousConfirmed->save();
-                    }
-
                     // Confirm the newly selected itinerary
                     $SendedLeadItinerary = SendedLeadItinerary::findOrFail($this->selected_itinerary);
                     $SendedLeadItinerary->is_confirmed = 1;
                     $SendedLeadItinerary->confirmed_by = $this->authUser->id;
                     $SendedLeadItinerary->confirmed_at = now()->toDateTimeString();
                     $SendedLeadItinerary->save();
+                    $this->selected_itinerary = null;
 
                     // Log both itineraries
                     $logMessage += [
@@ -982,6 +988,7 @@ class LeadIndex extends Component
                             'hotel_category' => optional($SendedLeadItinerary->category)->name,
                         ],
                     ];
+                    CustomHelper::updateRoomInventoryStock($SendedLeadItinerary->id, "Confirmed");
                 }
 
                 // Final log write
@@ -991,15 +998,17 @@ class LeadIndex extends Component
                     'message' => json_encode($logMessage),
                 ]);
 
+                DB::commit(); // ← Transaction commit
+
                 session()->flash('success', 'Lead status updated successfully!');
-                $this->showLeadStatusModal = false;
-                $this->selected_status = null;
-                $this->selected_itinerary = null;
+                $this->reset(['selected_itinerary', 'showLeadStatusModal', 'selected_status']);
             } else {
                 $this->leadAssignError = 'Selected lead not found.';
+                DB::rollBack(); // rollback on failure
             }
-           
+
         } catch (\Exception $e) {
+            DB::rollBack(); // ← Transaction rollback
             $this->leadAssignError = $e->getMessage();
         }
     }

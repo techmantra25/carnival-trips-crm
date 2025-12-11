@@ -35,9 +35,6 @@ class AdminAuthController extends Controller
             // Redirect back if login fails
             return back()->withErrors(['email' => 'The provided credentials are incorrect.']);
         } catch (\Exception $e) {
-            // Log the error for debugging
-            // Log::error('Login error: ' . $e->getMessage());
-            // dd($e->getMessage());
             // Handle the error and notify the user
             return back()->withErrors(['email' => 'An error occurred while trying to login. Please try again later.']);
         }

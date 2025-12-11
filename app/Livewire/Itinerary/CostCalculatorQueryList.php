@@ -181,6 +181,9 @@ class CostCalculatorQueryList extends Component
                   ->orWhere('number_of_travellor', 'like', "%{$this->search}%");
             });
         })
+        ->whereHas('lead', function ($q){
+            $q->where('created_by', Auth::guard('admin')->user()->id);
+        })
         ->orderBy('id', 'DESC')
         ->get();
     }
@@ -688,6 +691,7 @@ class CostCalculatorQueryList extends Component
             $lead->generate_from = "lead";
             $lead->created_at = now();
             $lead->updated_at = now();
+            $lead->team_lead_id = Auth::guard('admin')->user()->id;
             $lead->assigned_to_id = Auth::guard('admin')->user()->id;
 
             $lead->save();
