@@ -47,5 +47,13 @@ class SendedLeadItineraryDetail extends Model
     public function route_service(){
         return $this->belongsTo(RouteServiceSummary::class, 'route_service_summary_id', 'id');
     }
+    public function activity()
+    {
+        return $this->belongsTo(
+            DivisionWiseActivity::class,
+            'value',
+            'name'
+        );
+    }
 
 }

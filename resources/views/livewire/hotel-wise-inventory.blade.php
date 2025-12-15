@@ -318,7 +318,7 @@
                                     @endphp
                                     <li class="inventory_count">
                                         <input type="text" value="{{$inventoryData['total_unsold']}}" placeholder="0" class="count-{{$inventoryData['total_unsold'] == 0?"0":$inventoryData['block_request_type']}}"  @if($inventoryData['total_unsold'] == 0)  wire:click="BlockSingleRequestItem('{{$date_item}}', {{$inventoryData['total_unsold']}},'{{$room->room_name}}',{{$room->id}})" @endif readonly>
-                                        <span class="info active">{{$inventoryData['total_sold']}} Sold</span><span class="info">D {{$selected_trigger_point}}</span>
+                                        <span class="{{ $inventoryData['total_sold'] > 0 ? 'info active' : 'info' }}">{{$inventoryData['total_sold']}} Sold</span><span class="info">D {{$selected_trigger_point}}</span>
                                     </li>
                                     @endforeach
                                 </ul>

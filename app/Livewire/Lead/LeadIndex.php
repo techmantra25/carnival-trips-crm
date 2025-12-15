@@ -950,15 +950,19 @@ class LeadIndex extends Component
                 $previousConfirmed = SendedLeadItinerary::where('lead_id', $lead->id)
                     ->where('is_confirmed', 1)
                     ->first();
-
+                
+                
                 // If previously confirmed itinerary exists and new status is NOT Confirmed,
                 // then add back (restore) the deducted room inventory stock
                 if ($previousConfirmed && $this->selected_status !== 'Confirmed') {
+                    CustomHelper::updateRoomInventoryStock($previousConfirmed->id, $this->selected_status);
+                }
+                
+                if($previousConfirmed){
                     $previousConfirmed->is_confirmed = 0;
                     $previousConfirmed->confirmed_by = null;
                     $previousConfirmed->confirmed_at = null;
                     $previousConfirmed->save();
-                    CustomHelper::updateRoomInventoryStock($previousConfirmed->id, $this->selected_status);
                 }
 
                 if ($this->selected_status == 'Confirmed') {

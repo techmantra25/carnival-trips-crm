@@ -81,7 +81,14 @@
                             <span>No of Result: {{count($preset_itineraries)}}</span>
                         </div>
                         <div>
-                            <input type="text" class="badge bg-outline-primary w-xs" wire:model="search" wire:keyup="QuickSearch($event.target.value)" placeholder="Quick Search..">
+                            <input
+                                type="text"
+                                class="badge bg-outline-primary w-xs"
+                                wire:model="search"
+                                wire:keyup="QuickSearch($event.target.value)"
+                                placeholder="Quick Search.."
+                                title="1NKAZI+2NSHL+2NCHR+1NDAW+1NFLY or 7D/6N"
+                            />
                             {{-- <a href="javascript:void(0)" class="badge bg-outline-danger cursor-pointer" wire:click="ResetData">
                                 Reset
                             </a> --}}

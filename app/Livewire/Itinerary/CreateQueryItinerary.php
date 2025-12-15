@@ -2704,7 +2704,6 @@ class CreateQueryItinerary extends Component
                 }
             }
         }
-
     }
     public function existingHotelDetails($index){
         return ItineraryDetail::where('itinerary_id', $this->itinerary_id)->whereNotNull('hotel_id')->where('header', 'day_' . $index)->whereIn('field', ['day_room_main_plan', 'day_room_addon_plan_cwm'])->get()->toArray();

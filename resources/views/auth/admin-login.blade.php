@@ -20,6 +20,13 @@
                     <p class="h5 font-semibold mb-2 text-center !text-defaulttextcolor dark:!text-defaulttextcolor/85">Sign In</p>
                     <p class="mb-4 text-[#8c9097] opacity-[0.7] font-normal text-center">Welcome back!</p>
                     
+                     <!-- Success Message -->
+                        @if(session('success'))
+                            <div class="alert alert-success mb-4">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+
                     <!-- Laravel Login Form -->
                     <form method="POST" action="{{ route('admin.login') }}">
                         @csrf
@@ -33,9 +40,9 @@
 
                             <!-- Password Field -->
                             <div class="xl:col-span-12 col-span-12">
-                                {{-- <label for="password" class="form-label text-default block">Password
-                                    <a href="{{ route('password.request') }}" class="float-right text-danger">Forget password?</a>
-                                </label> --}}
+                                <label for="password" class="form-label text-default block">Password
+                                    <a href="{{ route('admin.forgot.password') }}" class="float-right text-danger">Forget password?</a>
+                                </label> 
                                 <div class="input-group">
                                     <x-text-input id="password" class="form-control form-control-lg !rounded-tl-md !rounded-bl-md" type="password" name="password" />
                                     <button class="ti-btn ti-btn-light !rounded-tl-none !rounded-bl-none !mb-0 !border !border-s-0 !border-defaultborder/10" type="button" onclick="createpassword('password',this)" id="button-addon2">

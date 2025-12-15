@@ -37,6 +37,16 @@ use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagem
         Route::get('login', [AdminAuthController::class, 'showLoginForm'])->name('login');
         // Handle admin login
         Route::post('login', [AdminAuthController::class, 'login']);
+
+        // forgot password
+        Route::get('/forgot-password', [AdminAuthController::class, 'showforgotPage'])
+        ->name('forgot.password');
+        Route::post('forgot-password/send-otp', [AdminAuthController::class, 'sendOtp'])
+            ->name('send.otp');
+        Route::post('forgot-password/verify-otp', [AdminAuthController::class, 'verifyOtp'])
+            ->name('verify.otp');
+        Route::post('forgot-password/reset-password', [AdminAuthController::class, 'resetPassword'])
+            ->name('reset.password');
     });
 
     // Route::get('dashboard', [DashboardsController::class, 'index'])->name('admin.dashboard');
@@ -73,6 +83,8 @@ use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagem
             Route::get('/', [EmployeeManagement::class, 'index'])->name('admin.employee.index');
             Route::get('/designations', [EmployeeManagement::class, 'designationIndex'])->name('admin.designation.index');
             Route::get('/hierarchy', [EmployeeManagement::class, 'employeeHierarchy'])->name('admin.employee-hierarchy');
+            Route::get('/profile', [EmployeeManagement::class, 'employee_profile'])->name('admin.employee.profile');
+
         });
         // Route::get('/profile', [EmployeeManagement::class, 'employee_profile'])->name('admin.employee.profile');
     

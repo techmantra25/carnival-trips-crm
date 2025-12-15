@@ -585,8 +585,8 @@ class CustomHelper
     public static function updateRoomInventoryStock($sended_lead_itinerary_id, $status)
     {
         DB::beginTransaction();
-
         try {
+            $previewItinerary = SendedLeadItinerary::
             $itinerary = SendedLeadItinerary::find($sended_lead_itinerary_id);
             if (!$itinerary || !$itinerary->lead) {
                 DB::commit();
