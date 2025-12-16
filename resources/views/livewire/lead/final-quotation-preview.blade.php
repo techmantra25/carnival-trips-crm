@@ -1,4 +1,5 @@
-<div class="container">
+
+<div>
     <style>
     .table{
         width:100%;
@@ -140,18 +141,6 @@
     page-break-after: always;
     break-after: page;
     }
-
-
-    @media print {
-
-        body {
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-        }
-        .bg-color {
-            background-color:#d2e8ff !important;
-        }
-    }
     
 </style>
     <div class="card">
@@ -168,7 +157,6 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        {{-- {{dd($itinerary)}} --}}
                                         <td style="padding:15px !important;">
                                             <p style="font-size:13px; color:#000; margin-bottom:9px;"><strong>Client:</strong>{{$itinerary['name']}} </p>
                                             <p style="font-size:13px; color:#000; margin-bottom:9px;"><strong>Client Email:</strong> {{$itinerary['email']}} </p>
@@ -448,58 +436,6 @@
                                     </td>
                                 </tr>
                                 @endif
-                                {{-- <tr>
-                                    <td style="vertical-align:top;">
-                                        <table>
-                                            <tr>
-                                                <td>
-                                                    <span style="background:rgba(238, 51, 94, 0.2); color:rgb(238, 51, 94); border:1px solid rgb(238, 51, 94); display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:7px; line-height: 1;">
-                                                        <i class="fas fa-taxi"></i> Cabs | in Port Blair
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td style="vertical-align:top;">
-                                                    <table style="border: 1px solid rgba(1, 98, 232, 0.5) !important;">
-                                                        <thead style="font-size:14px; font-weight:600; background: rgba(1, 98, 232, 0.1); color:#031b4e; width:180px; border-bottom: 1px solid rgba(1, 98, 232, 0.5) !important; text-align:left;">
-                                                            <tr>
-                                                                <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">CAB</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td>
-                                                                    <table style=" margin-bottom:6px; width:100%;">
-                                                                        <tr>
-                                                                            <td style="text-align:center;">
-                                                                                <ul style="display:flex; align-items:center; flex-wrap:wrap;">
-                                                                                    <li style="text-align:center; width:180px; border:1px solid #ccc; margin-bottom:6px; margin-right:6px; padding: 18px 0;">
-                                                                                        <img width="80" src="https://christmastree.quickdemo.in/assets/img/cab.png" style="margin:auto;">
-                                                                                        <p>
-                                                                                            <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1; background-color: rgba(34, 192, 60, 0.1);
-                                                                                            color: #22c03c;">Tempo (17S) <i style="color:#ee335e;">(1)</i></span>
-                                                                                        </p>
-                                                                                    </li>
-                                                                                    <li style="text-align:center; width:180px; border:1px solid #ccc; margin-bottom:6px; margin-right:6px; padding: 18px 0;">
-                                                                                        <img width="80" src="https://christmastree.quickdemo.in/assets/img/cab.png" style="margin:auto;">
-                                                                                        <p>
-                                                                                            <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1; background-color: rgba(34, 192, 60, 0.1);
-                                                                                            color: #22c03c;">Tempo (17S) <i style="color:#ee335e;">(1)</i></span>
-                                                                                        </p>
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </td>
-                                                                        </tr>
-                                                                    </table>
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr> --}}
 
                                 <tr >
                                     <td style="vertical-align:top;" >
@@ -849,45 +785,142 @@
                     </table>
                 </td>
             </tr>
-
-
         </table>
     </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-2 mt-2">
+        <!-- Left Card - Message Options -->
+        <div class="col-span-1 md:col-span-2 h-full">
+            <div class="bg-white shadow-lg rounded-2xl p-6 space-y-5 min-h-[350px]">
+                <!-- Header -->
+                <h2 class="uppercase text-gray-600 text-sm font-semibold">Send Quotation Via</h2>
+
+                <!-- Message Options -->
+                <div class="flex flex-wrap gap-6">
+                    <label class="flex items-center gap-2">
+                        <input type="checkbox" wire:model="send_whatsapp" wire:change="messageChannelChanged"
+                            class="form-checkbox h-5 w-5 text-blue-600 focus:ring-blue-500">
+                        <span class="text-gray-800 font-medium cursor-pointer">WhatsApp</span>
+                    </label>
+                    <label class="flex items-center gap-2">
+                        <input type="checkbox" wire:model="send_email" wire:change="messageChannelChanged"
+                            class="form-checkbox h-5 w-5 text-blue-600 focus:ring-blue-500">
+                        <span class="text-gray-800 font-medium cursor-pointer">Email</span>
+                    </label>
+
+                </div>
+
+                <!-- Status Badge -->
+                <span class="badge gap-2 bg-danger/10 text-danger">
+                    <span class="w-1.5 h-1.5 inline-block bg-danger rounded-full"></span>
+                    Quotation Sent (PDF Attached)
+                </span>
+
+                <!-- History Table -->
+                <div class="overflow-x-auto !mt-0">
+                    <table
+                        class="table-auto min-w-full text-sm text-center border border-gray-200 rounded table-sent-packages">
+                        <thead class="bg-gray-100 uppercase text-xs text-gray-600">
+                            <tr>
+                                <th class="px-3 py-2 border">Sent On</th>
+                                <th class="px-3 py-2 border">Itinerary</th>
+                                <th class="px-3 py-2 border">Channel</th>
+                                <th class="px-3 py-2 border">Total Amount</th>
+                                <th class="px-3 py-2 border">Code</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @forelse($sent_itineraries as $quotation)
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-3 py-2 border">
+                                        {{ $quotation->created_at->format('d M Y, h:i A') }}
+                                    </td>
+
+                                    <td class="px-3 py-2 border font-medium">
+                                        {{ optional($quotation->sentItinerary)->itinerary_syntax ?? '-' }}
+                                    </td>
+
+                                    <td class="px-3 py-2 border capitalize">
+                                        {{ $quotation->channel }}
+                                    </td>
+
+                                    <td class="px-3 py-2 border font-semibold">
+                                        {{ env('DEFAULT_CURRENCY_SYMBOL') }}
+                                        {{ number_format(optional($quotation->sentItinerary)->total_cost ?? 0) }}
+                                    </td>
+
+                                    <td class="px-3 py-2 border">
+                                         {{ optional($quotation->sentItinerary)->itinerary_code ?? '-' }}
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="px-4 py-6 text-gray-500 text-center">
+                                        No quotation has been shared yet.
+                                    </td>
+                                </tr>
+                            @endforelse
+                            </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- Right Card - Total & Send -->
+        <div class="flex flex-col justify-between bg-white shadow-xl rounded-2xl p-5 sm:p-6 
+                    max-w-full sm:max-w-md w-full mx-auto text-center">
+
+            <!-- Header -->
+            <div class="mb-2">
+                <h4 class="text-xs font-semibold tracking-widest uppercase text-gray-500">
+                    Total Amount
+                </h4>
+
+                <div class="text-2xl sm:text-3xl font-bold text-gray-900 mt-1">
+                    {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ number_format($total_amount) }}
+                </div>
+            </div>
+
+            <!-- Itinerary Info (No Extra Gap) -->
+            <div class="mb-4">
+                <p class="text-sm text-gray-600">
+                    Itinerary Code:
+                    <span class="font-semibold text-gray-900">
+                        {{ $sent_lead_itinerary->itinerary_code }}
+                    </span>
+                </p>
+            </div>
+            {{-- Show success/error messages --}}
+            @if (session('success'))
+                <div class="alert alert-success mb-2">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="alert alert-danger mb-2">
+                    {!! session('error') !!}
+                </div>
+            @endif
+            <!-- Action -->
+            @if($send_whatsapp || $send_email)
+                <button wire:click="sendMessages"
+                    class="w-full bg-primary text-white py-3 rounded-xl font-medium
+                        hover:bg-primary-dark focus:outline-none focus:ring-2
+                        focus:ring-primary/50 transition-all duration-200">
+                    Send Messages
+                </button>
+            @else
+                <p class="text-gray-500 text-sm mt-2">
+                    No communication method selected.
+                </p>
+            @endif
+        </div>
+
+    </div>
+     <div wire:loading class="loader" wire:target="messageChannelChanged,sendMessages">
+        <div class="spinner">
+        <img src="{{asset('build/assets/images/media/loader.svg')}}" alt="">
+        </div>
+    </div>
 </div>
-@section('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // 1. Track every page click
-            document.addEventListener('click', function () {
-                 @this.call('incrementClick');
-            });
-
-            // 2. Track when user exits the page/tab
-            window.addEventListener('beforeunload', function () {
-                 @this.call('setExitTime');
-            });
-
-           // 1. Start session when visible
-            if (document.visibilityState === 'visible') {
-                @this.call('startNewClickLog');
-            }
-
-            // 2. Handle tab visibility change
-            document.addEventListener('visibilitychange', function () {
-                if (document.visibilityState === 'visible') {
-                    @this.call('startNewClickLog');
-                } else {
-                    @this.call('closeClickLog');
-                }
-            });
-
-            // 3. Update exit_time every second only if tab is active
-            setInterval(function () {
-                if (document.visibilityState === 'visible') {
-                    @this.call('updateExitTime');
-                }
-            }, 1000);
-
-        });
-    </script>
-@endsection

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('inventory_ledger', function (Blueprint $table) {
-             $table->bigIncrements('id');
+            $table->bigIncrements('id');
 
             // Link to inventories table
             $table->unsignedBigInteger('inventory_id')->comment('Reference to inventories table');

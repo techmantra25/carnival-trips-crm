@@ -1,159 +1,156 @@
-<div class="container">
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Final Quotation</title>
+
     <style>
-    .table{
-        width:100%;
-        background:#fff;
-    }
-    table{
-        width:100%;
-    }
-    .table tr td {
-        font-size:15px;
-        color:#000;
-    }
-    .table thead i {
-        color:#1e58a3;
-    }
-    .route-style {
-        position:relative;
-    }
-    .route-style:after {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 1px;
-        height: 100%;
-        background: #0162e8;
-    }
-    .route-style li {
-        position: relative;
-        padding: 3px 12px;
-        color:#838383;
-    }
-    .route-style li:after {
-        content: "";
-        width: 7px;
-        height: 7px;
-        position: absolute;
-        border-radius: 50%;
-        background: #0162e8;
-        left: -3px;
-        top: 8px;
-        z-index: 2;
-        border: 2px solid #fff;
-    }
+        .table{
+                width:100%;
+                background:#fff;
+            }
+            table{
+                width:100%;
+            }
+            .table tr td {
+                font-size:15px;
+                color:#000;
+            }
+            .table thead i {
+                color:#1e58a3;
+            }
+            .route-style {
+                position:relative;
+            }
+            .route-style:after {
+                content: "";
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 1px;
+                height: 100%;
+                background: #0162e8;
+            }
+            .route-style li {
+                position: relative;
+                padding: 3px 12px;
+                color:#838383;
+            }
+            .route-style li:after {
+                content: "";
+                width: 7px;
+                height: 7px;
+                position: absolute;
+                border-radius: 50%;
+                background: #0162e8;
+                left: -3px;
+                top: 8px;
+                z-index: 2;
+                border: 2px solid #fff;
+            }
 
-    .total-ex-list {
-        list-style:none;
-    }
-    .total-ex-list li {
-        color:rgb(0, 0, 0);
-        font-size: 11px;
-        margin-bottom: 7px;
-    }
-    .total-ex-list li i {
-        color: #f2a144;
-        margin-right:10px;
-    }
+            .total-ex-list {
+                list-style:none;
+            }
+            .total-ex-list li {
+                color:rgb(0, 0, 0);
+                font-size: 11px;
+                margin-bottom: 7px;
+            }
+            .total-ex-list li i {
+                color: #f2a144;
+                margin-right:10px;
+            }
 
-    .hotel-list {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(297px, 1fr));
-        gap:8px;
-    }
-     .hotel-list li {
-        border:1px solid #ccc;
-        border-top-left-radius:6px;
-        border-top-right-radius:6px;
-     }
-    .hotel-list li figure {
-        overflow:hidden;
-        border-top-left-radius:6px;
-        border-top-right-radius:6px;
-        height: 200px;
-    }
-    .hotel-list li figcaption {
-        padding: 12px;
-    }
+            .hotel-list {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(297px, 1fr));
+                gap:8px;
+            }
+            .hotel-list li {
+                border:1px solid #ccc;
+                border-top-left-radius:6px;
+                border-top-right-radius:6px;
+            }
+            .hotel-list li figure {
+                overflow:hidden;
+                border-top-left-radius:6px;
+                border-top-right-radius:6px;
+                height: 200px;
+            }
+            .hotel-list li figcaption {
+                padding: 12px;
+            }
 
-    .hotel-list li figcaption h3 {
-        font-size: 12px;
-        text-transform: uppercase;
-        color: #1e58a3;
-        font-weight: 500;
-        margin-bottom: 8px;
-    }
-    .hotel-list li figcaption h2 {
-        font-size: 13px;
-        font-weight: 500;
-        margin-bottom: 8px;
-    }
-    .hotel-list li figcaption p {
-        font-size: 12px;
-    }
+            .hotel-list li figcaption h3 {
+                font-size: 12px;
+                text-transform: uppercase;
+                color: #1e58a3;
+                font-weight: 500;
+                margin-bottom: 8px;
+            }
+            .hotel-list li figcaption h2 {
+                font-size: 13px;
+                font-weight: 500;
+                margin-bottom: 8px;
+            }
+            .hotel-list li figcaption p {
+                font-size: 12px;
+            }
 
-    .activity-list {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap:8px;
-    }
+            .activity-list {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap:8px;
+            }
 
-    .activity-list li {
-        border-radius:6px;
-        overflow:hidden;
-        position:relative;
-        z-index: 1;
-        height: 187px;
-    }
+            .activity-list li {
+                border-radius:6px;
+                overflow:hidden;
+                position:relative;
+                z-index: 1;
+                height: 187px;
+            }
 
-     .activity-list li:after {
-        content:"";
-        position:absolute;
-        top:0;
-        left:0;
-        width:100%;
-        height:100%;
-        background: linear-gradient(1deg,rgba(0, 0, 0, 1) 14%, rgba(0, 0, 0, 0) 100%);
-        z-index: -1;
-     }
-     .activity-list li figcaption {
-        padding: 22px;
-        color: #fff;
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-     }
+            .activity-list li:after {
+                content:"";
+                position:absolute;
+                top:0;
+                left:0;
+                width:100%;
+                height:100%;
+                background: linear-gradient(1deg,rgba(0, 0, 0, 1) 14%, rgba(0, 0, 0, 0) 100%);
+                z-index: -1;
+            }
+            .activity-list li figcaption {
+                padding: 22px;
+                color: #fff;
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+            }
 
-     .activity-list li figcaption h2 {
-        color:#fff;
-        font-size:13px;
-     }
+            .activity-list li figcaption h2 {
+                color:#fff;
+                font-size:13px;
+            }
 
-    .keep-together {
-        page-break-inside: avoid;
-        break-inside: avoid;
-    }
+            .keep-together {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
 
-    .page-break-after {
-    page-break-after: always;
-    break-after: page;
-    }
+            .page-break-after {
+            page-break-after: always;
+            break-after: page;
+            }
+    </style>
+       
+</head>
+<body>
 
-
-    @media print {
-
-        body {
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-        }
-        .bg-color {
-            background-color:#d2e8ff !important;
-        }
-    }
-    
-</style>
+<div>
     <div class="card">
         <table class="table" id="print-section">
             <tr>
@@ -168,7 +165,6 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        {{-- {{dd($itinerary)}} --}}
                                         <td style="padding:15px !important;">
                                             <p style="font-size:13px; color:#000; margin-bottom:9px;"><strong>Client:</strong>{{$itinerary['name']}} </p>
                                             <p style="font-size:13px; color:#000; margin-bottom:9px;"><strong>Client Email:</strong> {{$itinerary['email']}} </p>
@@ -448,58 +444,6 @@
                                     </td>
                                 </tr>
                                 @endif
-                                {{-- <tr>
-                                    <td style="vertical-align:top;">
-                                        <table>
-                                            <tr>
-                                                <td>
-                                                    <span style="background:rgba(238, 51, 94, 0.2); color:rgb(238, 51, 94); border:1px solid rgb(238, 51, 94); display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:7px; line-height: 1;">
-                                                        <i class="fas fa-taxi"></i> Cabs | in Port Blair
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td style="vertical-align:top;">
-                                                    <table style="border: 1px solid rgba(1, 98, 232, 0.5) !important;">
-                                                        <thead style="font-size:14px; font-weight:600; background: rgba(1, 98, 232, 0.1); color:#031b4e; width:180px; border-bottom: 1px solid rgba(1, 98, 232, 0.5) !important; text-align:left;">
-                                                            <tr>
-                                                                <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">CAB</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td>
-                                                                    <table style=" margin-bottom:6px; width:100%;">
-                                                                        <tr>
-                                                                            <td style="text-align:center;">
-                                                                                <ul style="display:flex; align-items:center; flex-wrap:wrap;">
-                                                                                    <li style="text-align:center; width:180px; border:1px solid #ccc; margin-bottom:6px; margin-right:6px; padding: 18px 0;">
-                                                                                        <img width="80" src="https://christmastree.quickdemo.in/assets/img/cab.png" style="margin:auto;">
-                                                                                        <p>
-                                                                                            <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1; background-color: rgba(34, 192, 60, 0.1);
-                                                                                            color: #22c03c;">Tempo (17S) <i style="color:#ee335e;">(1)</i></span>
-                                                                                        </p>
-                                                                                    </li>
-                                                                                    <li style="text-align:center; width:180px; border:1px solid #ccc; margin-bottom:6px; margin-right:6px; padding: 18px 0;">
-                                                                                        <img width="80" src="https://christmastree.quickdemo.in/assets/img/cab.png" style="margin:auto;">
-                                                                                        <p>
-                                                                                            <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1; background-color: rgba(34, 192, 60, 0.1);
-                                                                                            color: #22c03c;">Tempo (17S) <i style="color:#ee335e;">(1)</i></span>
-                                                                                        </p>
-                                                                                    </li>
-                                                                                </ul>
-                                                                            </td>
-                                                                        </tr>
-                                                                    </table>
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr> --}}
 
                                 <tr >
                                     <td style="vertical-align:top;" >
@@ -849,45 +793,9 @@
                     </table>
                 </td>
             </tr>
-
-
         </table>
     </div>
 </div>
-@section('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // 1. Track every page click
-            document.addEventListener('click', function () {
-                 @this.call('incrementClick');
-            });
 
-            // 2. Track when user exits the page/tab
-            window.addEventListener('beforeunload', function () {
-                 @this.call('setExitTime');
-            });
-
-           // 1. Start session when visible
-            if (document.visibilityState === 'visible') {
-                @this.call('startNewClickLog');
-            }
-
-            // 2. Handle tab visibility change
-            document.addEventListener('visibilitychange', function () {
-                if (document.visibilityState === 'visible') {
-                    @this.call('startNewClickLog');
-                } else {
-                    @this.call('closeClickLog');
-                }
-            });
-
-            // 3. Update exit_time every second only if tab is active
-            setInterval(function () {
-                if (document.visibilityState === 'visible') {
-                    @this.call('updateExitTime');
-                }
-            }, 1000);
-
-        });
-    </script>
-@endsection
+</body>
+</html>

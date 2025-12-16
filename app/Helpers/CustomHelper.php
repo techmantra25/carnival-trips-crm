@@ -586,8 +586,9 @@ class CustomHelper
     {
         DB::beginTransaction();
         try {
-            $previewItinerary = SendedLeadItinerary::
+            // dd($sended_lead_itinerary_id);
             $itinerary = SendedLeadItinerary::find($sended_lead_itinerary_id);
+         
             if (!$itinerary || !$itinerary->lead) {
                 DB::commit();
                 return;

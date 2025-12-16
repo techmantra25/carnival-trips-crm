@@ -27,6 +27,10 @@ class LeadManagementController extends Controller
     {
         return view('admin.leads.confirmed');
     }
+    public function final_quotation($code)
+    {
+        return view('admin.leads.final-quotation', compact('code'));
+    }
     public function lead_log_history($lead_id){
         $common = CustomHelper::setHeadersAndTitle('Lead Management', 'Log History');
 

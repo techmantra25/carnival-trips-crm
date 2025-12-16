@@ -9,7 +9,7 @@
     @section('title','Lead Management') <!-- This sets the page title dynamically -->
     @section('content')
         <!-- Start:: row-10 -->
-        <livewire:lead.confirmed-lead-index/>
+        <livewire:lead.final-quotation-preview :code="$code"/>
         <!-- End:: row-10 -->
     @endsection
 

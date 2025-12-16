@@ -225,23 +225,25 @@
                                         </td>
                                         <td>
                                             <div class="!text-center mb-2">
-                                                @foreach($lead_item->sent_itinerary()->orderBy('id', 'ASC')->get() as $sent_itinerary_item)
+                                                @foreach($lead_item->sent_itinerary()->where('is_confirmed', 1)->orderBy('id', 'ASC')->get() as $sent_itinerary_item)
                                                     @php
-                                                        $title = "Itinerary: {$sent_itinerary_item->itinerary_syntax}\n";
+                                                        $title  = "Itinerary: {$sent_itinerary_item->itinerary_syntax}\n";
                                                         $title .= "Send Via: {$sent_itinerary_item->send_via}\n";
                                                         $title .= "Total Cost: ₹" . number_format($sent_itinerary_item->total_cost) . "\n";
                                                         $title .= "Destination: " . optional($sent_itinerary_item->destination)->name . "\n";
                                                         $title .= "Hotel Category: " . optional($sent_itinerary_item->category)->name;
                                                     @endphp
 
-                                                    <a href="{{route('website.lead.customized.itinerary', $sent_itinerary_item->itinerary_code)}}" target="_blank"
-                                                         
-                                                        class="badge bg-outline-secondary {{$sent_itinerary_item->is_confirmed==0?"badge-custom-outline-secondary":"badge-custom-outline-secondary-selected"}} cursor-pointer" 
-                                                        title="{{ $title }}"
+                                                    <a href="{{ route('admin.leads.final-quotation', $sent_itinerary_item->itinerary_code) }}"
+                                                    target="_blank"
+                                                    class="badge bg-outline-secondary badge-custom-outline-secondary cursor-pointer"
+                                                    title="{{ $title }}"
                                                     >
+                                                        <i class="fa fa-file-pdf text-danger me-1"></i>
                                                         {{ $sent_itinerary_item->itinerary_code }}
                                                     </a>
                                                 @endforeach
+
                                             </div>
 
                                             <div class="!text-center">
@@ -289,7 +291,7 @@
                                                     {{-- <a href="{{route('admin.cost_calculator.query_edit',$encryptedId)}}" class="ti-btn ti-btn-orange  mt-[0.375rem]" title="Edit Lead"><i class="fa-regular fa-pen-to-square"></i></a> --}}
 
                                                     {{-- Itinerary --}}
-                                                    @if($lead_item->itinerary->night_journey &&                 $lead_item->itinerary->stay_by_journey)
+                                                    @if($lead_item->itinerary->night_journey && $lead_item->itinerary->stay_by_journey)
                                                         <a href="{{route('admin.itinerary.query.build', $encryptedId)}}" class="ti-btn ti-btn-teal mt-[0.375rem]" title="Itinerary"><i class="fa-solid fa-arrows-up-down-left-right"></i></a> <br>
                                                     @endif
                                                      <br>
