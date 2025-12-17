@@ -67,7 +67,7 @@
                             <div class="left-content">
                                 <h2>For Great Experience</h2>
                                 <h3><span>Travel</span> {{$great_experience_title?$great_experience_title->value:"...."}}</h3>
-                                <p class="desc">{{$great_experience_title?$great_experience_text->value:"...."}}</p>
+                                <p class="desc">{{$great_experience_text?$great_experience_text->value:"...."}}</p>
                                 <ul>
                                     @foreach($great_experience_sub_details as $great_experience_sub_detail)
                                         <li>
