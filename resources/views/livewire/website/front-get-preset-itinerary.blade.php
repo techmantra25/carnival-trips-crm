@@ -1,8 +1,22 @@
 <div>
     <section class="itinerary-banner-section">
         <div class="background">
-            <img src="{{asset('front_assets/images/banner-bg.jpg')}}" alt="">
+            @php
+                $bannerSection = $template
+                    ? $template->detail
+                        ->where('header', 'banner_section')
+                        ->where('field', 'main_banner')
+                        ->first()
+                    : null;
+            @endphp
+
+            @if ($bannerSection && $bannerSection->value)
+                <img src="{{ asset($bannerSection->value) }}" alt="">
+            @else
+                <img src="{{ asset('front_assets/images/banner-bg.jpg') }}" alt="">
+            @endif
         </div>
+
         <div class="content">
             <div class="container">
                 <div class="row">
@@ -19,13 +33,13 @@
                                 {{$divisions_journey['city_name'].'('.$divisions_journey['count'].'D)'}} @if (!$loop->last), @endif
                             @endforeach
                         </div>
-                        <div class="cta-row">
+                        {{-- <div class="cta-row">
                             <a href="#" class="cta">
                                 <img src="{{asset('front_assets/icons/telephone-white.png')}}" alt="">
                                 Call Us Now
                             </a>
                             <a href="#" class="cta-2">Send Enquiry</a>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
             </div>

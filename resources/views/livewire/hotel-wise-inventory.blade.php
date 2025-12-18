@@ -69,8 +69,10 @@
 </div>
 @if(count($dateRange)>0)
     <div class="date-pick-row !mb-3">
+       
         <button class="badge rounded-full bg-light text-dark mb-1 ammenity_icon fs-15 {{ $activeButtonid == 'second' && $activeViewSummary == 0 ? 'active' : 'hidden' }}" wire:click="OpenViewSummary()"><i class="ri-eye-line pr-0.5"></i>View Summary</button>
         <button class="ti-btn-primary-full !py-1 pt-0 ti-btn-wave inventory_btn me-[0.375rem] {{ $activeButtonid == 'second' ? 'active' : 'hidden' }}" wire:click="TabChange('second')"><i class="fa-solid fa-plus"></i>Upload Your Inventory</button>
+         <button class="ti-btn-danger-full !py-1 pt-0 ti-btn-wave inventory_btn me-[0.375rem]" wire:click="pageRefresh()">Refresh</button>
     </div>
 @endif
 <div class="date-pick-row !mb-3">
@@ -222,27 +224,28 @@
                     </div>
                 </div>
             </div>
-            <div class="cta-block">
+            <div class="cta-block" wire:key="release-trigger-{{ $selectedHotel }}">
                 <div class="col2">
                     <label class="cta-label">Release Trigger</label>
                     <div class="cta-row">
-                        <button type="button" class="yellow">Policy</button>
-                        <button type="button" class="yellow">D-
+                        <button type="button" class="yellow">
+                            D-
                             <x-input-field 
                                 type="text" 
                                 name="release_trigger_point"
                                 wire:model.debounce.500ms="release_trigger_point" 
-                                wire:keyup="ReleaseTriggerUpdate({{$selectedHotel}}, $event.target.value)" 
+                                wire:keyup="ReleaseTriggerUpdate({{ $selectedHotel }}, $event.target.value)" 
                                 placeholder="0"
                                 class="release_trigger_point" 
-                                value="{{$selected_trigger_point}}" 
+                                value="{{ $selected_trigger_point }}" 
                                 wire:loading.class="opacity-100"
                                 onkeyup="validateNumber(this)"
-                                />
+                            />
                         </button>
                     </div>
                 </div>
             </div>
+
         </div>
         <div class="my-3">
             @if (session('success'))
@@ -860,7 +863,7 @@
         </div>
     @endif
 @endif
-<div wire:loading class="loader" wire:target="FilterDate,accordionItem,GetDivisions,loadCategories,loadHotels,OpenViewSummary,TabChange,CloseBlockSingleModal,BlockSingleRequestItem,toggleExtraDays,updateMonth,toggleRoomWiseQuantity,SecondAccordionItem,GetRoomItemMaxPrice,UpdateInventory">
+<div wire:loading class="loader" wire:target="FilterDate,accordionItem,GetDivisions,loadCategories,loadHotels,OpenViewSummary,TabChange,CloseBlockSingleModal,BlockSingleRequestItem,toggleExtraDays,updateMonth,toggleRoomWiseQuantity,SecondAccordionItem,GetRoomItemMaxPrice,UpdateInventory, pageRefresh">
     <div class="spinner">
     <img src="{{asset('build/assets/images/media/loader.svg')}}" alt="">
     </div>

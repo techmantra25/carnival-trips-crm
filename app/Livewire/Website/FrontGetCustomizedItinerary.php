@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use App\Models\City;
 use App\Models\LeadUrlShare;
 use App\Models\LeadUrlClick;
+use Illuminate\Support\Facades\Auth;
 
 class FrontGetCustomizedItinerary extends Component
 {
@@ -18,8 +19,10 @@ class FrontGetCustomizedItinerary extends Component
     public $day_itinerary = [];
     public $day_wise_amount_data = [];
     public $total_amount = 0;
+    public bool $authUser = false;
     public function mount($code){
-       $this->sent_lead_itinerary = SendedLeadItinerary::where('itinerary_code', $code)
+        $this->authUser = Auth::guard('admin')->check();
+        $this->sent_lead_itinerary = SendedLeadItinerary::where('itinerary_code', $code)
         ->firstOrFail();
         $this->leadData = $this->sent_lead_itinerary->lead;
         $this->lead_url_share = LeadUrlShare::where('sended_lead_itinerary_id', $this->sent_lead_itinerary->id)->firstOrFail();
@@ -156,7 +159,7 @@ class FrontGetCustomizedItinerary extends Component
                                     'total_price' => $item->price,
                                     'piece_price' => $item->rate,
                                     'ticket_price'=> $item->ticket_price,
-                                    'image'       => optional($item->activity->firstImage)->file_path
+                                    'image'       => optional(optional($item->activity)->firstImage)->file_path
                                         ? asset($item->activity->firstImage->file_path)
                                         : asset('assets/img/default.jpg'),
                                 ];

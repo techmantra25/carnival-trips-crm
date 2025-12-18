@@ -163,7 +163,7 @@ class FinalQuotationPreview extends Component
                                     'total_price' => $item->price,
                                     'piece_price' => $item->rate,
                                     'ticket_price'=> $item->ticket_price,
-                                    'image'       => optional($item->activity->firstImage)->file_path
+                                    'image'       => optional(optional($item->activity)->firstImage)->file_path
                                         ? asset($item->activity->firstImage->file_path)
                                         : asset('assets/img/default.jpg'),
                                 ];

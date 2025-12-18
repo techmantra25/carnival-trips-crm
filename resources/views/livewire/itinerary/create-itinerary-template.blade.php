@@ -1,4 +1,10 @@
 <div>
+    <style>
+       .itinerary-build .main-image-preview {
+            width: 300px !important;
+            height: 170px !important;
+       }
+    </style>
     <div class="grid grid-cols-12 gap-6">
         <div class="xl:col-span-12 col-span-12">
             <div class="box custom-box">
@@ -45,19 +51,44 @@
                                                         <div class="md:col-span-10 col-span-12 mb-4 itinerary-build">
                                                             <div class="image-preview-container">
                                                                 @foreach ($mainBanner as $index => $main_banner)
-                                                                    <label class="image-preview-label px-1">
-                                                                        <input type="radio" name="main_banner" wire:model="main_banner" value="{{ $main_banner->image }}" class="hidden peer" wire:change="UpdateByKeyUp('banner_section','main_banner',$event.target.value)">
-                                                                        <div class="image-preview peer-checked:border-blue-500 relative">
-                                                                            <img src="{{ asset($main_banner->image) }}" alt="Image Preview" class="image-thumbnail">
+                                                                    <label
+                                                                        class="main-image-preview image-preview peer-checked:border-blue-500 relative !overflow-visible"
+                                                                        wire:key="main-banner-{{ $main_banner->id }}"
+                                                                    >
+                                                                        <input
+                                                                            type="radio"
+                                                                            name="main_banner"
+                                                                            wire:model="main_banner"
+                                                                            value="{{ $main_banner->image }}"
+                                                                            class="hidden peer"
+                                                                            wire:change="UpdateByKeyUp('banner_section','main_banner',$event.target.value)"
+                                                                        >
+
+                                                                        <div class="image-preview main-image-preview peer-checked:border-blue-500 relative">
+                                                                            <img
+                                                                                src="{{ asset($main_banner->image) }}"
+                                                                                alt="Image Preview"
+                                                                                class="image-thumbnail"
+                                                                            >
+
                                                                             <!-- Selected Text -->
                                                                             <div class="absolute bottom-0 left-0 right-0 bg-white text-center text-sm font-semibold py-1 hidden peer-checked:block">
                                                                                 Selected
                                                                             </div>
                                                                         </div>
+
+                                                                        <button
+                                                                            type="button"
+                                                                            class="delete-icon"
+                                                                            onclick="confirmMainBannerDelete({{ $main_banner->id }})"
+                                                                        >
+                                                                            ✖
+                                                                        </button>
                                                                     </label>
                                                                 @endforeach
                                                             </div>
                                                         </div>
+
                                                         <div class="md:col-span-2 col-span-12 mb-4">
                                                             <div class="border-l-0 sightseeing_images">
                                                                 <label class="file-upload-container">
@@ -105,7 +136,7 @@
                                                                 class="form-control form-control-sm w-full sm:w-1/2" 
                                                                 placeholder="Title"
                                                                 wire:model="great_experience_sub_detail.{{ $ex_index }}.title"
-                                                                wire:keyup="UpdateByKeyUpValue('great_experience','great_experience_sub_detail_{{ $ex_index }}', $event.target.value)">
+                                                                wire:keyup="UpdateByKeyUpValue('great_experience','great_experience_sub_detail_{{ $ex_index }}', $event.target.value)" value="{{$sub_detail['title']}}">
                                                             </textarea>
 
                                                             {{-- Description --}}
@@ -113,7 +144,7 @@
                                                                 class="form-control form-control-sm w-full sm:w-1/2" 
                                                                 placeholder="Description"
                                                                 wire:model="great_experience_sub_detail.{{ $ex_index }}.description"
-                                                                wire:keyup="UpdateByKeyUpDesc('great_experience','great_experience_sub_detail_{{ $ex_index }}', $event.target.value)">
+                                                                wire:keyup="UpdateByKeyUpDesc('great_experience','great_experience_sub_detail_{{ $ex_index }}', $event.target.value)" value="{{$sub_detail['description']}}">
                                                             </textarea>
 
                                                             <button type="button" wire:click="removeGreatExperienceSubDetail({{ $ex_index }})" 
@@ -199,11 +230,11 @@
                                                         <label class="sm:col-span-2 col-span-12 col-form-label">Trip
                                                             Highlights</label>
                                                         <div class="sm:col-span-10 col-span-12">
-                                                            @foreach ($trip_highlights as $index => $highlight)
+                                                            @foreach ($trip_highlights as $index => $high_light)
                                                             <div class="flex items-center gap-2 mb-2">
                                                                 <input type="text" class="form-control form-control-sm"
                                                                     wire:model="trip_highlights.{{ $index }}"
-                                                                    wire:keyup="UpdateByKeyUp('about_destination','trip_highlights_{{ $index }}',$event.target.value)">
+                                                                    wire:keyup="UpdateByKeyUp('about_destination','trip_highlights_{{ $index }}',$event.target.value)" value="{{$high_light}}">
 
                                                                 {{-- @if ($index > 0)  --}}
                                                                 <button type="button"
@@ -321,20 +352,24 @@
                                                 <label class="sm:col-span-2 col-span-12 col-form-label">Inclusions</label>
                                                 <div class="sm:col-span-10 col-span-12">
                                                     @foreach ($inclusions as $index => $highlight)
-                                                        <div class="flex items-center gap-2 mb-2">
-                                                            <img src="{{asset('build/assets/images/media/checkmark.png')}}" alt="" width="24" height="24">
-                                                            <input type="text" class="form-control form-control-sm" 
-                                                                wire:model="inclusions.{{ $index }}" 
-                                                                wire:keyup="UpdateByKeyUp('inclusion_exclusions','inclusions_{{ $index }}',$event.target.value)">
-                                                
-                                                            {{-- @if ($index > 0)  --}}
-                                                                <button type="button" wire:click="removeAboutInclusion({{ $index }})" 
-                                                                    class="badge bg-outline-danger cursor-pointer !font-normal !text-sm uppercase">
-                                                                    Remove
-                                                                </button>
-                                                            {{-- @endif --}}
+                                                        <div class="flex items-center gap-2 mb-2"
+                                                            wire:key="inclusion-{{ $index }}">
+
+                                                            <img src="{{ asset('build/assets/images/media/checkmark.png') }}" width="24">
+
+                                                            <input type="text"
+                                                                class="form-control form-control-sm"
+                                                                wire:model="inclusions.{{ $index }}"
+                                                                wire:keyup="UpdateByKeyUp('inclusion_exclusions','inclusions_{{ $index }}',$event.target.value)" value="{{$highlight}}">
+
+                                                            <button type="button"
+                                                                wire:click="removeAboutInclusion({{ $index }})"
+                                                                class="badge bg-outline-danger cursor-pointer !font-normal !text-sm uppercase">
+                                                                Remove
+                                                            </button>
                                                         </div>
                                                     @endforeach
+
                                                 
                                                     <div class="text-end">
                                                         <button type="button" wire:click="addAboutInclusion" 
@@ -388,3 +423,28 @@
         </div>
     </div>
 </div>
+@section('scripts')
+ <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+   <script>
+        function confirmMainBannerDelete(id) {
+            Swal.fire({
+                title: "Delete Banner?",
+                text: "This action will permanently delete the selected banner. This cannot be undone. Do you want to continue?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#dc2626", // Red
+                cancelButtonColor: "#6b7280",  // Gray
+                confirmButtonText: "Yes, delete",
+                cancelButtonText: "Cancel",
+                backdrop: true,
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    @this.call('mainBannerDelete', id);
+                }
+            });
+        }
+    </script>
+
+
+@endsection

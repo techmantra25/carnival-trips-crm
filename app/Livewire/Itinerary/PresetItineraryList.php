@@ -12,9 +12,13 @@ use App\Helpers\CustomHelper;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Crypt;
 use Carbon\Carbon;
+use Livewire\WithPagination;
 
 class PresetItineraryList extends Component
 {
+    use WithPagination;
+
+    protected $paginationTheme = 'bootstrap'; // or 'tailwind'
     public $desitinations =[];
     public $divisions =[];
     public $categories =[];
@@ -80,32 +84,9 @@ class PresetItineraryList extends Component
         
         $this->desitinations = State::where('status', 1)->orderBy('name', 'ASC')->get();
         $this->categories = Category::where('status', 1)->orderBy('name', 'ASC')->get();
-        $this->preset_itineraries = $this->getItinerary();
+        // $this->preset_itineraries = $this->getItinerary();
     }
 
-    public function getItinerary()
-    {
-        return Itinerary::query()
-            ->when($this->selectedDestination, function ($query) {
-                $query->where('destination_id', $this->selectedDestination); // Use '=' for exact match
-            })
-            ->when($this->selectedCategory, function ($query) {
-                $query->where('hotel_category', $this->selectedCategory); // Use '=' for exact match
-            })
-            ->when($this->selectedType, function ($query) {
-                $query->where('type', $this->selectedType); // Use '=' for exact match
-            })
-            ->when($this->search, function ($query) {
-                $query->where(function ($q) {
-                    $q->where('itinerary_syntax', 'like', "%{$this->search}%")
-                      ->orWhere('itinerary_journey', 'like', "%{$this->search}%")
-                      ->orWhere('type', 'like', "%{$this->search}%");
-                });
-            })
-            // ->orderBy('id', 'DESC')
-            ->orderBy('total_days', 'DESC')
-            ->get();
-    }
 
     public function NewPresetItinerary($value){
         $this->day = "";
@@ -118,18 +99,18 @@ class PresetItineraryList extends Component
         $this->divisions= City::where('state_id', $value)->orderBy('name', 'ASC')->get();
         $this->active_night_distribution = 1;
         $this->validateDaysAndNights($this->day);
-        $this->preset_itineraries = $this->getItinerary();
+        // $this->preset_itineraries = $this->getItinerary();
     }
     public function GetCategory($value){
         $this->selectedCategory = $value;
         $this->active_night_distribution = 1;
         $this->validateDaysAndNights($this->day);
-        $this->preset_itineraries = $this->getItinerary();
+        // $this->preset_itineraries = $this->getItinerary();
     }
 
     public function QuickSearch($value){
         $this->search = $value;
-        $this->preset_itineraries = $this->getItinerary();
+        // $this->preset_itineraries = $this->getItinerary();
     }
     public function ResetData(){
         $this->search = '';
@@ -255,7 +236,7 @@ class PresetItineraryList extends Component
             }
             $this->reset(['itinerary_journey', 'itinerary_journey_divisions','valid_from_day', 'valid_from_month','valid_to_day','valid_to_month']);
             $this->active_assign_new_modal = 0;
-            $this->preset_itineraries = $this->getItinerary();
+            // $this->preset_itineraries = $this->getItinerary();
             
             session()->flash('success', 'Itinerary saved successfully!');
          
@@ -266,8 +247,42 @@ class PresetItineraryList extends Component
         }
     }
     
+    public function updated($property)
+    {
+        if (in_array($property, [
+            'selectedDestination',
+            'selectedCategory',
+            'selectedType',
+            'search'
+        ])) {
+            $this->resetPage();
+        }
+    }
+
     public function render()
     {
-        return view('livewire.itinerary.preset-itinerary-list');
+        $presetitineraries = Itinerary::query()
+            ->when($this->selectedDestination, function ($query) {
+                $query->where('destination_id', $this->selectedDestination); // Use '=' for exact match
+            })
+            ->when($this->selectedCategory, function ($query) {
+                $query->where('hotel_category', $this->selectedCategory); // Use '=' for exact match
+            })
+            ->when($this->selectedType, function ($query) {
+                $query->where('type', $this->selectedType); // Use '=' for exact match
+            })
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('itinerary_syntax', 'like', "%{$this->search}%")
+                      ->orWhere('itinerary_journey', 'like', "%{$this->search}%")
+                      ->orWhere('type', 'like', "%{$this->search}%");
+                });
+            })
+            // ->orderBy('id', 'DESC')
+            ->orderBy('total_days', 'DESC')
+            ->paginate(10); //
+        return view('livewire.itinerary.preset-itinerary-list', [
+            'presetitineraries' => $presetitineraries,
+        ]);
     }
 }

@@ -811,6 +811,7 @@ class HotelWiseInventory extends Component
         }
     }
     public function ReleaseTriggerUpdate($hotel_id, $value){
+        // dd($hotel_id, $value);
         $hotel = Hotel::findOrFail($hotel_id);
         $oldValue = $hotel->release_trigger;
         $hotel->update([
@@ -879,7 +880,10 @@ class HotelWiseInventory extends Component
             return ['status' => false, 'message' => 'Failed to send email.'];
         }
     }
+    
+    public function pageRefresh(){
 
+    }
     public function render()
     {
         return view('livewire.hotel-wise-inventory');

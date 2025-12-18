@@ -124,58 +124,64 @@ class CreateItineraryTemplate extends Component
 
     public function removeAboutDescHighlight($index)
     {
+        $value = $this->trip_highlights[$index];
         unset($this->trip_highlights[$index]); // Remove highlight
         $this->trip_highlights = array_values($this->trip_highlights); // Re-index array
-        $this->deleteHighlightFromDB($index);
+        $this->deleteHighlightFromDB($value);
     }
     public function removeGreatExperienceSubDetail($index)
-    {
+    {   
+        $value = $this->great_experience_sub_detail[$index];
         unset($this->great_experience_sub_detail[$index]);
         $this->great_experience_sub_detail = array_values($this->great_experience_sub_detail);
-        $this->deleteGreatExperienceSubDetailFromDB($index);
+        $this->deleteGreatExperienceSubDetailFromDB($value);
     }
     public function removeAboutInclusion($index)
     {
+        $value = $this->inclusions[$index];
         unset($this->inclusions[$index]); // Remove highlight
         $this->inclusions = array_values($this->inclusions); // Re-index array
-        $this->deleteInclusionFromDB($index);
+        $this->deleteInclusionFromDB($value);
     }
     public function removeAboutExclusion($index)
-    {
+    {   
+        $value = $this->exclusions[$index];
         unset($this->exclusions[$index]); // Remove highlight
         $this->exclusions = array_values($this->exclusions); // Re-index array
-        $this->deleteExclusionFromDB($index);
+        $this->deleteExclusionFromDB($value);
     }
-    public function deleteHighlightFromDB($index)
+    public function deleteHighlightFromDB($value)
     {
-        $fieldName = 'trip_highlights_' . $index;
         ItineraryTemplateDetail::where('itinerary_template_id', $this->template_id)
             ->where('header', 'about_destination')
-            ->where('field', $fieldName)
+            ->where('field', 'like', 'trip_highlights_%')
+            ->where('value', $value)
             ->delete();
     }
-    public function deleteGreatExperienceSubDetailFromDB($index)
+    public function deleteGreatExperienceSubDetailFromDB($value)
     {
-        $fieldName = 'great_experience_sub_detail_' . $index;
+        // $fieldName = 'great_experience_sub_detail_' . $index;
         ItineraryTemplateDetail::where('itinerary_template_id', $this->template_id)
             ->where('header', 'great_experience')
-            ->where('field', $fieldName)
+            ->where('field', 'like', 'great_experience_sub_detail_%')
+            ->where('value', $value['title'])
+            ->where('description', $value['description'])
             ->delete();
     }
-    public function deleteInclusionFromDB($index)
+    public function deleteInclusionFromDB($value)
     {
-        $fieldName = 'inclusions_' . $index;
         ItineraryTemplateDetail::where('itinerary_template_id', $this->template_id)
             ->where('header', 'inclusion_exclusions')
-            ->where('field', $fieldName)
+            ->where('field', 'like', 'inclusions_%')
+            ->where('value',  $value)
             ->delete();
     }
-    public function deleteExclusionFromDB($index)
+    public function deleteExclusionFromDB($value)
     {
-        $fieldName = 'exclusions_' . $index;
         ItineraryTemplateDetail::where('itinerary_template_id', $this->template_id)
             ->where('header', 'inclusion_exclusions')
-            ->where('field', $fieldName)
+            ->where('field', 'like', 'exclusions_%')
+             ->where('value',  $value)
             ->delete();
     }
 
@@ -185,7 +191,7 @@ class CreateItineraryTemplate extends Component
         DB::beginTransaction();
         try {
             $this->validate([
-                'uploadMainBanner' => 'image|max:2048', // 2MB Max
+                'uploadMainBanner' => 'image|max:20048', // 20MB Max
             ]);
             $store = new ItineraryBanner;
             $store->division_id = $this->selectedDivision;
@@ -396,6 +402,20 @@ class CreateItineraryTemplate extends Component
             ]
         );
     }
+   public function mainBannerDelete($id)
+    {
+        $banner = ItineraryBanner::findOrFail($id);
+
+        // Delete related template details
+        ItineraryTemplateDetail::where('value', $banner->image)->delete();
+
+        // Delete banner
+        $banner->delete();
+
+        session()->flash('success', 'Banner deleted successfully.');
+    }
+
+
     public function render()
     {
         $this->mainBanner = ItineraryBanner::where('destination_id', $this->template->destination_id)->get();

@@ -245,7 +245,7 @@
                                             </tr>
                                            
                                             <tr>
-                                                <td style="width:70%; vertical-align:top;">
+                                                <td style="width:{{$authUser?'70':'100'}}%; vertical-align:top;">
                                                     <table style="border:1px solid #ccc;">
                                                         <tr>
                                                             <td>
@@ -258,191 +258,315 @@
 
                                                             <td style="vertical-align:top;">
                                                                 <h5 style="font-size:15px; text-transform: uppercase; color: #031b4e;">{{$day['hotel']['name']}}<h5>
-                                                                <p style="font-size:12px; color:#000; margin-bottom:15px;">{{$day['hotel']['address']}}</p>
-                                                            <p>
-                                                                <span style="background:rgba(238, 51, 94, 0.2); color:rgb(238, 51, 94); border:1px solid rgb(238, 51, 94); display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px; line-height: 1;">
-                                                                    ROOMS
+                                                                    <p style="font-size:12px; color:#000; margin-bottom:15px;">{{$day['hotel']['address']}}</p>
+                                                                <p>
+                                                                    <span style="background:rgba(238, 51, 94, 0.2); color:rgb(238, 51, 94); border:1px solid rgb(238, 51, 94); display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px; line-height: 1;">
+                                                                        ROOMS
+                                                                    </span>
+                                                                </p>
+
+                                                                <span style=" color:#4e4e4e; border:1px solid #ddd; display: inline-block; font-size: 12px; text-transform: uppercase; border-radius: 5px; padding:4px; line-height: 1;">{{$day['hotel_room']['name']}} : 
+                                                                    <i style="color:#ee335e;">
+                                                                    <strong>({{$itinerary['number_of_rooms']}})</strong>
+                                                                    </i>
                                                                 </span>
-                                                            </p>
-
-                                                            <span style=" color:#4e4e4e; border:1px solid #ddd; display: inline-block; font-size: 12px; text-transform: uppercase; border-radius: 5px; padding:4px; line-height: 1;">{{$day['hotel_room']['name']}} : 
-                                                                <i style="color:#ee335e;">
-                                                                  <strong>({{$itinerary['number_of_rooms']}})</strong>
-                                                                </i>
-                                                            </span>
                                                             </td>
-                                                        </tr>
+                                                             @if(!$authUser)
+                                                                <td width="50%">
+                                                                    <table>
+                                                                        <tr>
+                                                                            @php
+                                                                                $hasMealPlan = !empty($day['pax_with_adults']);
+                                                                                $hasCNB = !empty($day['cnb']);
+                                                                                $hasCWM = !empty($day['cwm']);
+                                                                                $hasExtraMattress = !empty($day['extra_mattress']);
+                                                                            @endphp
 
-                                                        <tr>
-                                                            @php
-                                                                $hasMealPlan = !empty($day['pax_with_adults']);
-                                                                $hasCNB = !empty($day['cnb']);
-                                                                $hasCWM = !empty($day['cwm']);
-                                                                $hasExtraMattress = !empty($day['extra_mattress']);
-                                                            @endphp
-
-                                                            <td colspan="2">
-                                                                <table style="border: 1px solid rgba(1, 98, 232, 0.5) !important; width:100%;">
-                                                                    <tr>
-                                                                        <td style="padding:0 !important;">
-                                                                            <table style="table-layout:fixed;">
-                                                                                <thead style="font-size:14px; font-weight:600; background: rgba(1, 98, 232, 0.1);
-                                                                                    color:#031b4e; border-bottom: 1px solid rgba(1, 98, 232, 0.5) !important;">
+                                                                            <td colspan="2">
+                                                                                <table style="border: 1px solid rgba(1, 98, 232, 0.5) !important; width:100%;">
                                                                                     <tr>
-                                                                                        @if($hasMealPlan)
-                                                                                            <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding:10px;">
-                                                                                                Meal Plan
-                                                                                            </th>
-                                                                                        @endif
+                                                                                        <td style="padding:0 !important;">
+                                                                                            <table style="table-layout:fixed;">
+                                                                                                <thead style="font-size:14px; font-weight:600; background: rgba(1, 98, 232, 0.1);
+                                                                                                    color:#031b4e; border-bottom: 1px solid rgba(1, 98, 232, 0.5) !important;">
+                                                                                                    <tr>
+                                                                                                        @if($hasMealPlan)
+                                                                                                            <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding:10px;">
+                                                                                                                Meal Plan
+                                                                                                            </th>
+                                                                                                        @endif
 
-                                                                                        @if($hasCNB)
-                                                                                            <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding:10px;">
-                                                                                                CNB
-                                                                                            </th>
-                                                                                        @endif
+                                                                                                        @if($hasCNB)
+                                                                                                            <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding:10px;">
+                                                                                                                CNB
+                                                                                                            </th>
+                                                                                                        @endif
 
-                                                                                        @if($hasCWM)
-                                                                                            <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding:10px;">
-                                                                                                CWM
-                                                                                            </th>
-                                                                                        @endif
+                                                                                                        @if($hasCWM)
+                                                                                                            <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding:10px;">
+                                                                                                                CWM
+                                                                                                            </th>
+                                                                                                        @endif
 
-                                                                                        @if($hasExtraMattress)
-                                                                                            <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding:10px;">
-                                                                                                Extra Mattress
-                                                                                            </th>
-                                                                                        @endif
+                                                                                                        @if($hasExtraMattress)
+                                                                                                            <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding:10px;">
+                                                                                                                Extra Mattress
+                                                                                                            </th>
+                                                                                                        @endif
+                                                                                                    </tr>
+                                                                                                </thead>
+
+                                                                                                <tbody>
+                                                                                                    <tr style="text-align:center">
+                                                                                                        @if($hasMealPlan)
+                                                                                                            <td style="vertical-align:top;">
+                                                                                                                <p>
+                                                                                                                    <span style="color:#031b4e; border:1px solid #ddd; display:inline-block;
+                                                                                                                        font-size:11px; text-transform:uppercase; border-radius:5px;
+                                                                                                                        padding:4px 6px; line-height:1;">
+                                                                                                                        {{ $day['pax_with_adults']['name'] }}
+                                                                                                                    </span>
+                                                                                                                </p>
+                                                                                                            </td>
+                                                                                                        @endif
+
+                                                                                                        @if($hasCNB)
+                                                                                                            <td style="vertical-align:top;">
+                                                                                                                @foreach($day['cnb'] as $cnb)
+                                                                                                                    <p>
+                                                                                                                        <span style="color:#031b4e; border:1px solid #ddd; display:inline-block;
+                                                                                                                            font-size:11px; text-transform:uppercase; border-radius:5px;
+                                                                                                                            padding:4px 6px; line-height:1;">
+                                                                                                                            {{ $cnb['name'] }}
+                                                                                                                            <i style="color:#ee335e;">
+                                                                                                                                ({{ $cnb['quantity'] }})
+                                                                                                                            </i>
+                                                                                                                        </span>
+                                                                                                                    </p>
+                                                                                                                @endforeach
+                                                                                                            </td>
+                                                                                                        @endif
+
+                                                                                                        @if($hasCWM)
+                                                                                                            <td style="vertical-align:top;">
+                                                                                                                @foreach($day['cwm'] as $cwm)
+                                                                                                                    <p>
+                                                                                                                        <span style="color:#031b4e; border:1px solid #ddd; display:inline-block;
+                                                                                                                            font-size:11px; text-transform:uppercase; border-radius:5px;
+                                                                                                                            padding:4px 6px; line-height:1;">
+                                                                                                                            {{ $cwm['name'] }}
+                                                                                                                            <i style="color:#ee335e;">
+                                                                                                                                ({{ $cwm['quantity'] }})
+                                                                                                                            </i>
+                                                                                                                        </span>
+                                                                                                                    </p>
+                                                                                                                @endforeach
+                                                                                                            </td>
+                                                                                                        @endif
+
+                                                                                                        @if($hasExtraMattress)
+                                                                                                            <td style="vertical-align:top;">
+                                                                                                                @foreach($day['extra_mattress'] as $extra)
+                                                                                                                    <p>
+                                                                                                                        <span style="color:#031b4e; border:1px solid #ddd; display:inline-block;
+                                                                                                                            font-size:11px; text-transform:uppercase; border-radius:5px;
+                                                                                                                            padding:4px 6px; line-height:1;">
+                                                                                                                            {{ $extra['name'] }}
+                                                                                                                            <i style="color:#ee335e;">
+                                                                                                                                ({{ $extra['quantity'] }})
+                                                                                                                            </i>
+                                                                                                                        </span>
+                                                                                                                    </p>
+                                                                                                                @endforeach
+                                                                                                            </td>
+                                                                                                        @endif
+                                                                                                    </tr>
+                                                                                                </tbody>
+
+                                                                                            </table>
+                                                                                        </td>
                                                                                     </tr>
-                                                                                </thead>
-
-                                                                                <tbody>
-                                                                                    <tr style="text-align:center">
-                                                                                        @if($hasMealPlan)
-                                                                                            <td style="vertical-align:top;">
-                                                                                                <p>
-                                                                                                    <span style="color:#031b4e; border:1px solid #ddd; display:inline-block;
-                                                                                                        font-size:11px; text-transform:uppercase; border-radius:5px;
-                                                                                                        padding:4px 6px; line-height:1;">
-                                                                                                        {{ $day['pax_with_adults']['name'] }}
-                                                                                                    </span>
-                                                                                                </p>
-                                                                                            </td>
-                                                                                        @endif
-
-                                                                                        @if($hasCNB)
-                                                                                            <td style="vertical-align:top;">
-                                                                                                @foreach($day['cnb'] as $cnb)
-                                                                                                    <p>
-                                                                                                        <span style="color:#031b4e; border:1px solid #ddd; display:inline-block;
-                                                                                                            font-size:11px; text-transform:uppercase; border-radius:5px;
-                                                                                                            padding:4px 6px; line-height:1;">
-                                                                                                            {{ $cnb['name'] }}
-                                                                                                            <i style="color:#ee335e;">
-                                                                                                                ({{ $cnb['quantity'] }})
-                                                                                                            </i>
-                                                                                                        </span>
-                                                                                                    </p>
-                                                                                                @endforeach
-                                                                                            </td>
-                                                                                        @endif
-
-                                                                                        @if($hasCWM)
-                                                                                            <td style="vertical-align:top;">
-                                                                                                @foreach($day['cwm'] as $cwm)
-                                                                                                    <p>
-                                                                                                        <span style="color:#031b4e; border:1px solid #ddd; display:inline-block;
-                                                                                                            font-size:11px; text-transform:uppercase; border-radius:5px;
-                                                                                                            padding:4px 6px; line-height:1;">
-                                                                                                            {{ $cwm['name'] }}
-                                                                                                            <i style="color:#ee335e;">
-                                                                                                                ({{ $cwm['quantity'] }})
-                                                                                                            </i>
-                                                                                                        </span>
-                                                                                                    </p>
-                                                                                                @endforeach
-                                                                                            </td>
-                                                                                        @endif
-
-                                                                                        @if($hasExtraMattress)
-                                                                                            <td style="vertical-align:top;">
-                                                                                                @foreach($day['extra_mattress'] as $extra)
-                                                                                                    <p>
-                                                                                                        <span style="color:#031b4e; border:1px solid #ddd; display:inline-block;
-                                                                                                            font-size:11px; text-transform:uppercase; border-radius:5px;
-                                                                                                            padding:4px 6px; line-height:1;">
-                                                                                                            {{ $extra['name'] }}
-                                                                                                            <i style="color:#ee335e;">
-                                                                                                                ({{ $extra['quantity'] }})
-                                                                                                            </i>
-                                                                                                        </span>
-                                                                                                    </p>
-                                                                                                @endforeach
-                                                                                            </td>
-                                                                                        @endif
-                                                                                    </tr>
-                                                                                </tbody>
-
-                                                                            </table>
-                                                                        </td>
-                                                                    </tr>
-                                                                </table>
-                                                            </td>
+                                                                                </table>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </td>
+                                                            @endif
                                                         </tr>
+                                                        
+                                                        @if($authUser)
+                                                            <tr>
+                                                                @php
+                                                                    $hasMealPlan = !empty($day['pax_with_adults']);
+                                                                    $hasCNB = !empty($day['cnb']);
+                                                                    $hasCWM = !empty($day['cwm']);
+                                                                    $hasExtraMattress = !empty($day['extra_mattress']);
+                                                                @endphp
+
+                                                                <td colspan="2">
+                                                                    <table style="border: 1px solid rgba(1, 98, 232, 0.5) !important; width:100%;">
+                                                                        <tr>
+                                                                            <td style="padding:0 !important;">
+                                                                                <table style="table-layout:fixed;">
+                                                                                    <thead style="font-size:14px; font-weight:600; background: rgba(1, 98, 232, 0.1);
+                                                                                        color:#031b4e; border-bottom: 1px solid rgba(1, 98, 232, 0.5) !important;">
+                                                                                        <tr>
+                                                                                            @if($hasMealPlan)
+                                                                                                <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding:10px;">
+                                                                                                    Meal Plan
+                                                                                                </th>
+                                                                                            @endif
+
+                                                                                            @if($hasCNB)
+                                                                                                <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding:10px;">
+                                                                                                    CNB
+                                                                                                </th>
+                                                                                            @endif
+
+                                                                                            @if($hasCWM)
+                                                                                                <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding:10px;">
+                                                                                                    CWM
+                                                                                                </th>
+                                                                                            @endif
+
+                                                                                            @if($hasExtraMattress)
+                                                                                                <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding:10px;">
+                                                                                                    Extra Mattress
+                                                                                                </th>
+                                                                                            @endif
+                                                                                        </tr>
+                                                                                    </thead>
+
+                                                                                    <tbody>
+                                                                                        <tr style="text-align:center">
+                                                                                            @if($hasMealPlan)
+                                                                                                <td style="vertical-align:top;">
+                                                                                                    <p>
+                                                                                                        <span style="color:#031b4e; border:1px solid #ddd; display:inline-block;
+                                                                                                            font-size:11px; text-transform:uppercase; border-radius:5px;
+                                                                                                            padding:4px 6px; line-height:1;">
+                                                                                                            {{ $day['pax_with_adults']['name'] }}
+                                                                                                        </span>
+                                                                                                    </p>
+                                                                                                </td>
+                                                                                            @endif
+
+                                                                                            @if($hasCNB)
+                                                                                                <td style="vertical-align:top;">
+                                                                                                    @foreach($day['cnb'] as $cnb)
+                                                                                                        <p>
+                                                                                                            <span style="color:#031b4e; border:1px solid #ddd; display:inline-block;
+                                                                                                                font-size:11px; text-transform:uppercase; border-radius:5px;
+                                                                                                                padding:4px 6px; line-height:1;">
+                                                                                                                {{ $cnb['name'] }}
+                                                                                                                <i style="color:#ee335e;">
+                                                                                                                    ({{ $cnb['quantity'] }})
+                                                                                                                </i>
+                                                                                                            </span>
+                                                                                                        </p>
+                                                                                                    @endforeach
+                                                                                                </td>
+                                                                                            @endif
+
+                                                                                            @if($hasCWM)
+                                                                                                <td style="vertical-align:top;">
+                                                                                                    @foreach($day['cwm'] as $cwm)
+                                                                                                        <p>
+                                                                                                            <span style="color:#031b4e; border:1px solid #ddd; display:inline-block;
+                                                                                                                font-size:11px; text-transform:uppercase; border-radius:5px;
+                                                                                                                padding:4px 6px; line-height:1;">
+                                                                                                                {{ $cwm['name'] }}
+                                                                                                                <i style="color:#ee335e;">
+                                                                                                                    ({{ $cwm['quantity'] }})
+                                                                                                                </i>
+                                                                                                            </span>
+                                                                                                        </p>
+                                                                                                    @endforeach
+                                                                                                </td>
+                                                                                            @endif
+
+                                                                                            @if($hasExtraMattress)
+                                                                                                <td style="vertical-align:top;">
+                                                                                                    @foreach($day['extra_mattress'] as $extra)
+                                                                                                        <p>
+                                                                                                            <span style="color:#031b4e; border:1px solid #ddd; display:inline-block;
+                                                                                                                font-size:11px; text-transform:uppercase; border-radius:5px;
+                                                                                                                padding:4px 6px; line-height:1;">
+                                                                                                                {{ $extra['name'] }}
+                                                                                                                <i style="color:#ee335e;">
+                                                                                                                    ({{ $extra['quantity'] }})
+                                                                                                                </i>
+                                                                                                            </span>
+                                                                                                        </p>
+                                                                                                    @endforeach
+                                                                                                </td>
+                                                                                            @endif
+                                                                                        </tr>
+                                                                                    </tbody>
+
+                                                                                </table>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                        @endif
                                                     </table>
                                                 </td>
-                                               
-                                                <td style="vertical-align: top;">
-                                                    <div style="background: rgba(254, 215, 170, 0.2); border: 1px solid #fed7aa; padding: 20px; max-width: 419px;">
-                                                        
-                                                        <ul class="total-ex-list">
-                                                            @php 
-                                                                $day_total_price = 0; 
-                                                            @endphp
+                                                @if($authUser)
+                                                    <td style="vertical-align: top;">
+                                                        <div style="background: rgba(254, 215, 170, 0.2); border: 1px solid #fed7aa; padding: 20px; max-width: 419px;">
                                                             
-                                                            @foreach ($day_wise_amount_data[$key] as $day_wise_amount)
-                                                                @if($day_wise_amount->total_price > 0)
-                                                                    @php
-                                                                        $day_total_price += $day_wise_amount->total_price;
-                                                                        $fieldLabel = ucwords(str_replace('_', ' ', $day_wise_amount->field));
-                                                                        $unitPrice = $day_wise_amount->total_quantity > 0 
-                                                                            ? round($day_wise_amount->total_price / $day_wise_amount->total_quantity, 2) 
-                                                                            : 0;
-                                                                    @endphp
+                                                            <ul class="total-ex-list">
+                                                                @php 
+                                                                    $day_total_price = 0; 
+                                                                @endphp
+                                                                
+                                                                @foreach ($day_wise_amount_data[$key] as $day_wise_amount)
+                                                                    @if($day_wise_amount->total_price > 0)
+                                                                        @php
+                                                                            $day_total_price += $day_wise_amount->total_price;
+                                                                            $fieldLabel = ucwords(str_replace('_', ' ', $day_wise_amount->field));
+                                                                            $unitPrice = $day_wise_amount->total_quantity > 0 
+                                                                                ? round($day_wise_amount->total_price / $day_wise_amount->total_quantity, 2) 
+                                                                                : 0;
+                                                                        @endphp
 
-                                                                    @if(!in_array($day_wise_amount->field, ['day_sightseeing', 'day_activity', 'day_cab']))
-                                                                        <li>
-                                                                            <i class="fa-solid fa-circle-arrow-right"></i>
-                                                                            @if($fieldLabel === "Day Room Main Plan")
-                                                                                @php
-                                                                                    $unitPrice = $day_wise_amount->total_quantity > 0 
-                                                                                        ? $day_wise_amount->total_price / $leadData->number_of_rooms
-                                                                                        : 0;
-                                                                                @endphp
-                                                                                {{ $fieldLabel }} ({{ $leadData->number_of_rooms }} * {{ $unitPrice }}) = {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $day_wise_amount->total_price }}
-                                                                            @else
-                                                                                {{ $fieldLabel }} ({{ $day_wise_amount->total_quantity }} * {{ $unitPrice }}) = {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $day_wise_amount->total_price }}
-                                                                            @endif
-                                                                        </li>
-                                                                    @else
-                                                                        <li>
-                                                                            <i class="fa-solid fa-circle-arrow-right"></i>
-                                                                            {{ $fieldLabel }} = {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $day_wise_amount->total_price }}
-                                                                        </li>
+                                                                        @if(!in_array($day_wise_amount->field, ['day_sightseeing', 'day_activity', 'day_cab']))
+                                                                            <li>
+                                                                                <i class="fa-solid fa-circle-arrow-right"></i>
+                                                                                @if($fieldLabel === "Day Room Main Plan")
+                                                                                    @php
+                                                                                        $unitPrice = $day_wise_amount->total_quantity > 0 
+                                                                                            ? $day_wise_amount->total_price / $leadData->number_of_rooms
+                                                                                            : 0;
+                                                                                    @endphp
+                                                                                    {{ $fieldLabel }} ({{ $leadData->number_of_rooms }} * {{ $unitPrice }}) = {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $day_wise_amount->total_price }}
+                                                                                @else
+                                                                                    {{ $fieldLabel }} ({{ $day_wise_amount->total_quantity }} * {{ $unitPrice }}) = {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $day_wise_amount->total_price }}
+                                                                                @endif
+                                                                            </li>
+                                                                        @else
+                                                                            <li>
+                                                                                <i class="fa-solid fa-circle-arrow-right"></i>
+                                                                                {{ $fieldLabel }} = {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $day_wise_amount->total_price }}
+                                                                            </li>
+                                                                        @endif
                                                                     @endif
-                                                                @endif
-                                                            @endforeach
-                                                        </ul>
+                                                                @endforeach
+                                                            </ul>
 
-                                                        @if($day_total_price > 0)
-                                                            <hr style="border: 1px solid #fed7aa; background-color:#fed7aa; margin-top: 16px; margin-bottom: 10px;">
+                                                            @if($day_total_price > 0)
+                                                                <hr style="border: 1px solid #fed7aa; background-color:#fed7aa; margin-top: 16px; margin-bottom: 10px;">
 
-                                                            <h3 style="font-size: 13px;">
-                                                                Total Amount: {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ number_format($day_total_price) }}
-                                                            </h3>
-                                                        @endif
-                                                    </div>
+                                                                <h3 style="font-size: 13px;">
+                                                                    Total Amount: {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ number_format($day_total_price) }}
+                                                                </h3>
+                                                            @endif
+                                                        </div>
 
-                                                </td>
+                                                    </td>
+                                                @endif
                                             </tr>
                                         </table>
                                     </td>
@@ -519,7 +643,8 @@
                                                                 <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px; width:65px; border-right: 1px solid rgba(1, 98, 232, 0.5) !important;">SL.No</th>
                                                                 <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px; border-right: 1px solid rgba(1, 98, 232, 0.5) !important;">Route</th>
                                                                 <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px; border-right: 1px solid rgba(1, 98, 232, 0.5) !important;">sightseeing</th>
-                                                                <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">Activity</th>
+                                                                <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px; border-right: 1px solid rgba(1, 98, 232, 0.5) !important;">Activity</th>
+                                                                <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">Cab</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -527,7 +652,7 @@
                                                                 {{-- MAIN ROUTE ROW --}}
                                                                 <tr style="border-bottom:1px solid #ccc !important;">
                                                                     {{-- SL NO --}}
-                                                                    <td rowspan="{{ (!empty($route['cabs']) ? 2 : 1) }}"
+                                                                    <td
                                                                         style="vertical-align:top; border-right:1px solid #ccc !important;">
                                                                         <span style="border:1px solid rgba(34,192,60,.8);
                                                                             background:rgba(34,192,60,.1); color:#22c03c;
@@ -560,7 +685,7 @@
                                                                     </td>
 
                                                                     {{-- ACTIVITY --}}
-                                                                    <td style="vertical-align:top;">
+                                                                    <td style="vertical-align:top; border-right:1px solid #ccc !important;">
                                                                         @forelse($route['activitys'] ?? [] as $activity)
                                                                             <p>
                                                                                 <span style="color:#031b4e; border:1px solid #ddd;
@@ -574,102 +699,94 @@
                                                                             —
                                                                         @endforelse
                                                                     </td>
-                                                                </tr>
+                                                                    {{-- CAB --}}
+                                                                    <td style="vertical-align:top; min-width:10%;">
+                                                                        @if(!empty($route['cabs']))
+                                                                            {{-- <ul style="display:flex; align-items:center; flex-wrap:wrap; padding:0; margin:0;"> --}}
+                                                                                @foreach($route['cabs'] as $cab)
+                                                                                    <div style="list-style:none; text-align:center; width:180px;
+                                                                                        border:1px solid #ccc; margin:6px; padding:18px 0;">
+                                                                                        
+                                                                                        <img width="80"
+                                                                                            src="{{ $cab['image'] ?? asset('assets/img/cab.png') }}"
+                                                                                            alt="{{ $cab['name'] }}"
+                                                                                            style="margin:auto;">
 
-                                                                {{-- CAB ROW --}}
-                                                                @if(!empty($route['cabs']))
-                                                                <tr style="border-bottom:1px solid #ccc;">
-                                                                    <td colspan="4">
-                                                                        <table>
-                                                                            <tbody>
-                                                                                <tr>
-                                                                                    <td>
-                                                                                        <ul style="display:flex; align-items:center; flex-wrap:wrap; padding:0; margin:0;">
-                                                                                            @foreach($route['cabs'] as $cab)
-                                                                                                <li style="list-style:none; text-align:center; width:180px;
-                                                                                                    border:1px solid #ccc; margin:6px; padding:18px 0;">
-                                                                                                    
-                                                                                                    <img width="80"
-                                                                                                        src="{{ $cab['image'] ?? asset('assets/img/cab.png') }}"
-                                                                                                        alt="{{ $cab['name'] }}"
-                                                                                                        style="margin:auto;">
-
-                                                                                                    <p>
-                                                                                                        <span style="color:#22c03c; border:1px solid #ddd;
-                                                                                                            display:inline-block; font-size:11px;
-                                                                                                            text-transform:uppercase; border-radius:5px;
-                                                                                                            padding:4px 6px; background:rgba(34,192,60,.1);">
-                                                                                                            {{ $cab['name'] }}
-                                                                                                            <i style="color:#ee335e;">({{ $cab['quantity'] }})</i>
-                                                                                                        </span>
-                                                                                                    </p>
-                                                                                                </li>
-                                                                                            @endforeach
-                                                                                        </ul>
-                                                                                    </td>
-                                                                                </tr>
-                                                                            </tbody>
-                                                                        </table>
+                                                                                        <p>
+                                                                                            <span style="color:#22c03c; border:1px solid #ddd;
+                                                                                                display:inline-block; font-size:11px;
+                                                                                                text-transform:uppercase; border-radius:5px;
+                                                                                                padding:4px 6px; background:rgba(34,192,60,.1);">
+                                                                                                {{ $cab['name'] }}
+                                                                                                <i style="color:#ee335e;">({{ $cab['quantity'] }})</i>
+                                                                                            </span>
+                                                                                        </p>
+                                                                                    </div>
+                                                                                @endforeach
+                                                                            {{-- </ul> --}}
+                                                                          @endif
                                                                     </td>
                                                                 </tr>
-                                                                @endif
+                                                              
                                                             @endforeach
                                                         </tbody>
                                                     </table>
                                                 </td>
-                                                 @if($key == count($day_itinerary))
-                                                    <td style="vertical-align: top;">
-                                                        <div style="background: rgba(254, 215, 170, 0.2); border: 1px solid #fed7aa; padding: 20px; max-width: 419px;">
-    
-                                                            <ul class="total-ex-list">
-                                                                @php 
-                                                                    $day_total_price = 0; 
-                                                                @endphp
-                                                                
-                                                                @foreach ($day_wise_amount_data[$key] as $day_wise_amount)
-                                                                    @if($day_wise_amount->total_price > 0)
-                                                                        @php
-                                                                            $day_total_price += $day_wise_amount->total_price;
-                                                                            $fieldLabel = ucwords(str_replace('_', ' ', $day_wise_amount->field));
-                                                                            $unitPrice = $day_wise_amount->total_quantity > 0 
-                                                                                ? round($day_wise_amount->total_price / $day_wise_amount->total_quantity, 2) 
-                                                                                : 0;
-                                                                        @endphp
+                                                @if($authUser)
+                                                    @if($key == count($day_itinerary))
+                                                        <td style="vertical-align: top;">
+                                                            <div style="background: rgba(254, 215, 170, 0.2); border: 1px solid #fed7aa; padding: 20px; max-width: 419px;">
+        
+                                                                <ul class="total-ex-list">
+                                                                    @php 
+                                                                        $day_total_price = 0; 
+                                                                    @endphp
+                                                                    
+                                                                    @foreach ($day_wise_amount_data[$key] as $day_wise_amount)
+                                                                        @if($day_wise_amount->total_price > 0)
+                                                                            @php
+                                                                                $day_total_price += $day_wise_amount->total_price;
+                                                                                $fieldLabel = ucwords(str_replace('_', ' ', $day_wise_amount->field));
+                                                                                $unitPrice = $day_wise_amount->total_quantity > 0 
+                                                                                    ? round($day_wise_amount->total_price / $day_wise_amount->total_quantity, 2) 
+                                                                                    : 0;
+                                                                            @endphp
 
-                                                                        @if(!in_array($day_wise_amount->field, ['day_sightseeing', 'day_activity', 'day_cab']))
-                                                                            <li>
-                                                                                <i class="fa-solid fa-circle-arrow-right"></i>
-                                                                                @if($fieldLabel === "Day Room Main Plan")
-                                                                                    @php
-                                                                                        $unitPrice = $day_wise_amount->total_quantity > 0 
-                                                                                            ? $day_wise_amount->total_price / $leadData->number_of_rooms
-                                                                                            : 0;
-                                                                                    @endphp
-                                                                                    {{ $fieldLabel }} ({{ $leadData->number_of_rooms }} * {{ $unitPrice }}) = {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $day_wise_amount->total_price }}
-                                                                                @else
-                                                                                    {{ $fieldLabel }} ({{ $day_wise_amount->total_quantity }} * {{ $unitPrice }}) = {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $day_wise_amount->total_price }}
-                                                                                @endif
-                                                                            </li>
-                                                                        @else
-                                                                            <li>
-                                                                                <i class="fa-solid fa-circle-arrow-right"></i>
-                                                                                {{ $fieldLabel }} = {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $day_wise_amount->total_price }}
-                                                                            </li>
+                                                                            @if(!in_array($day_wise_amount->field, ['day_sightseeing', 'day_activity', 'day_cab']))
+                                                                                <li>
+                                                                                    <i class="fa-solid fa-circle-arrow-right"></i>
+                                                                                    @if($fieldLabel === "Day Room Main Plan")
+                                                                                        @php
+                                                                                            $unitPrice = $day_wise_amount->total_quantity > 0 
+                                                                                                ? $day_wise_amount->total_price / $leadData->number_of_rooms
+                                                                                                : 0;
+                                                                                        @endphp
+                                                                                        {{ $fieldLabel }} ({{ $leadData->number_of_rooms }} * {{ $unitPrice }}) = {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $day_wise_amount->total_price }}
+                                                                                    @else
+                                                                                        {{ $fieldLabel }} ({{ $day_wise_amount->total_quantity }} * {{ $unitPrice }}) = {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $day_wise_amount->total_price }}
+                                                                                    @endif
+                                                                                </li>
+                                                                            @else
+                                                                                <li>
+                                                                                    <i class="fa-solid fa-circle-arrow-right"></i>
+                                                                                    {{ $fieldLabel }} = {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $day_wise_amount->total_price }}
+                                                                                </li>
+                                                                            @endif
                                                                         @endif
-                                                                    @endif
-                                                                @endforeach
-                                                            </ul>
+                                                                    @endforeach
+                                                                </ul>
 
-                                                            @if($day_total_price > 0)
-                                                                <hr style="border: 1px solid #fed7aa; background-color:#fed7aa; margin-top: 16px; margin-bottom: 10px;">
+                                                                @if($day_total_price > 0)
+                                                                    <hr style="border: 1px solid #fed7aa; background-color:#fed7aa; margin-top: 16px; margin-bottom: 10px;">
 
-                                                                <h3 style="font-size: 13px;">
-                                                                    Total Amount: {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ number_format($day_total_price) }}
-                                                                </h3>
-                                                            @endif
-                                                        </div>
+                                                                    <h3 style="font-size: 13px;">
+                                                                        Total Amount: {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ number_format($day_total_price) }}
+                                                                    </h3>
+                                                                @endif
+                                                            </div>
 
-                                                    </td>
+                                                        </td>
+                                                    @endif
                                                 @endif
                                             </tr>
                                         </table>

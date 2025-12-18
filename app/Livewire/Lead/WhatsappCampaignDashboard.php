@@ -176,7 +176,7 @@ class WhatsappCampaignDashboard extends Component
     public function render()
     {
         return view('livewire.lead.whatsapp-campaign-dashboard', [
-            'whatsappTemplates' => $this->templates,
+            'whatsappTemplates' => [],
             'messages' => $this->messages,
             'search' => $this->search,
         ]);

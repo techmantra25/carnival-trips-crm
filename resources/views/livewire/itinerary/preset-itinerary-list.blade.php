@@ -78,7 +78,7 @@
                 <div class="box-body">
                     <div class="flex justify-between">
                         <div class="badge bg-outline-success cursor-pointer">
-                            <span>No of Result: {{count($preset_itineraries)}}</span>
+                            <span>No of Result: {{$presetitineraries->lastItem()}}</span>
                         </div>
                         <div>
                             <input
@@ -110,7 +110,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                   @forelse ($preset_itineraries as $k=> $pre_item)
+                                   @forelse ($presetitineraries as $k=> $pre_item)
                                     <tr>
                                         <td class="!text-center"><span class="badge bg-primary/10 text-primary">{{$k+1}}</span> </td>
                                         <td class="!text-center">{{ucwords($pre_item->type)}}</td>
@@ -154,6 +154,9 @@
                                    @endforelse
                                 </tbody>
                             </table>
+                            <div class="mt-4">
+                                {{ $presetitineraries->links() }}
+                            </div>
                         </div>
                         
                     </div>
