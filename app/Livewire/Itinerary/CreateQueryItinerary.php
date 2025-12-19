@@ -3352,12 +3352,12 @@ class CreateQueryItinerary extends Component
                 ]),
             ]);
 
-            
+      
 
         DB::commit();
 
         // Mailing section
-        if ($this->send_email) {
+        if ($this->send_whatsapp) {
         //   MailTemplateService::send(
         //         $this->leadData->customer_email,//mail to
         //         'customer_customized_itinerary_link', //mail template slug
@@ -3374,16 +3374,31 @@ class CreateQueryItinerary extends Component
         }
 
         // Whatspp Section
-        if($this->send_whatsapp){
-            $whatsapp_response = $this->whatsapp->sendTemplate(
-                phone: "8617207525",
-                templateName: "template-name",
-                languageCode: env('WHATSAPP_DEFAULT_TEMPLATE_LANGUAGE'),
-                headerParams: [],
-                bodyParams: ["John"] // Fills {{1}}
+        if ($this->send_email) {
+            $mailService = app(MailTemplateService::class);
+
+            $subject = "Hi {$this->leadData->customer_name}, Your Customized Itinerary ({$this->itineraryData->itinerary_syntax}) for {$this->leadData->destination->name} is Ready ✈️";
+
+            $mailService->send(
+                $this->leadData->customer_email,
+                'customize_itinerary_link',
+                $subject,
+                [
+                    'template_type'  => 'customize_itinerary_link',
+                    'recipient_name' => $this->leadData->customer_name,
+                    'itinerary_link' => $leadUrlShare->links,
+                    'itinerary'      => $this->itineraryData->itinerary_syntax,
+                    'total_amount'   => $this->total_amount,
+                    'company_name'   => env('MAIL_FROM_NAME'),
+                    'sender_name'    => Auth::guard('admin')->user()->name ?? env('MAIL_FROM_NAME'),
+                    'sender_mobile'  => Auth::guard('admin')->user()->phone ?? '',
+                    'subject'        => $subject,
+                ],
+                env('MAIL_FROM_ADDRESS'),
+                env('MAIL_FROM_NAME')
             );
-            dd($whatsapp_response);
         }
+
             session()->flash('success', 'Itinerary sent and details saved successfully!');
         } catch (\Exception $e) {
             DB::rollBack();

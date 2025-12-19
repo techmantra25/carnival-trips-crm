@@ -719,7 +719,6 @@ class LeadIndex extends Component
                 if(count($SharedIds)>0){
                     foreach($SharedIds as $link_index => $linkItem){
                         $LeadUrlShare = LeadUrlShare::find($linkItem);
-
                         CustomHelper::sendItineraryLinkOnWhatsapp($linkItem);
                         CustomHelper::sendItineraryLinkOnEmail($linkItem);
                     

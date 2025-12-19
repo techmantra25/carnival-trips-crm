@@ -109,9 +109,15 @@ class LeadManagementController extends Controller
         }
     }
 
-    function whatsapp_campaign_index(){
+    public function whatsapp_campaign_index(){
         $common = CustomHelper::setHeadersAndTitle('Campaign Management', 'WhatsApp Campaign');
         return view('admin.leads.whatsapp_campaign_index', compact('common'));
     }
+    public function manage_hotel_booking($lead_id){
+        $lead = Lead::findOrFail($lead_id); // Fetch lead with name/email
+        $common = CustomHelper::setHeadersAndTitle('Lead Management', 'Manage Hotel Booking');
+        return view('admin.leads.manage_hotel_booking', compact('lead_id', 'common','lead'));
+    }
+
 }
 

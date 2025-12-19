@@ -10,6 +10,7 @@
                     : null;
             @endphp
 
+    
             @if ($bannerSection && $bannerSection->value)
                 <img src="{{ asset($bannerSection->value) }}" alt="">
             @else

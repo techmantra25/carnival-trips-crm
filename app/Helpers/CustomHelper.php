@@ -25,6 +25,7 @@ use App\Models\ChangeLog;
 use App\Models\SendedLeadItinerary;
 use Illuminate\Support\Facades\Auth;
 use App\Models\InventoryLedger;
+use App\Services\MailTemplateService;
 
 class CustomHelper
 {
@@ -446,8 +447,8 @@ class CustomHelper
             'high intend lead'    => 'status-high-intend',
             'pipeline'            => 'status-pipeline',
             'negotiation'         => 'status-negotiation',
-            'confirmed dead'      => 'status-dead',
-            'lead cancelled'      => 'status-cancelled',
+            'confirmed'           => 'status-dead',
+            'cancelled'           => 'status-cancelled',
             'closed'              => 'status-closed',
             'hold'                => 'status-hold',
             default               => 'status-default',
@@ -457,8 +458,48 @@ class CustomHelper
     public static function sendItineraryLinkOnWhatsapp($shared_link_id){
         // dd($shared_link_id);
     }
-    public static function sendItineraryLinkOnEmail($shared_link_id){
-        // dd($shared_link_id);
+   public static function sendItineraryLinkOnEmail($shared_link_id)
+    {
+        // Load the shared link with itinerary and lead
+        $LeadUrlShare = LeadUrlShare::with(['itinerary', 'lead'])->find($shared_link_id);
+
+        // Safety check
+        if (!$LeadUrlShare || !$LeadUrlShare->lead || !$LeadUrlShare->lead->customer_email) {
+            return false;
+        }
+
+        try {
+            $mailService = app(MailTemplateService::class);
+
+            // Dynamic subject with "Drim" + itinerary syntax
+            $subject = "Hi, {$LeadUrlShare->lead->customer_name}, Your Dreem Itinerary ({$LeadUrlShare->itinerary->itinerary_syntax}) Awaits! 🎉";
+
+
+            // Send email using dynamic template
+            $mailService->send(
+                $LeadUrlShare->lead->customer_email,
+                'preset_itinerary_link',
+                $subject,
+                [
+                    'template_type'   => 'preset_itinerary_link',       // template type for dynamic Blade
+                    'recipient_name'  => $LeadUrlShare->lead->customer_name,
+                    'itinerary_link'  => $LeadUrlShare->links,
+                    'itinerary'       => $LeadUrlShare->itinerary->itinerary_syntax,
+                    'company_name'    => env('MAIL_FROM_NAME'),
+                    'sender_name'     => Auth::guard('admin')->user()->name ?? env('MAIL_FROM_NAME'),
+                    'sender_mobile'   => Auth::guard('admin')->user()->phone ?? '',
+                    'subject'         => $subject,
+                ],
+                env('MAIL_FROM_ADDRESS'),
+                env('MAIL_FROM_NAME')
+            );
+
+            return true;
+
+        } catch (Exception $e) {
+            report($e); // Log exception for debugging
+            return false;
+        }
     }
     public static function makePresetItineraryLink($lead_id)
     {

@@ -1358,3 +1358,12 @@ input[type="checkbox"]:checked + .hotel-card .checkmark {
     font-weight: 700;
     color: #4d5875;
 }
+
+.ti-btn-red {
+    background-color: #ff8e8ea8; /* Light red with opacity */
+    color: #b91c1c;
+}
+.ti-btn-red:hover {
+    color: #fff;
+    background-color: #b91c1c; /* Darker red on hover */
+}

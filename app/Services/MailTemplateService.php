@@ -6,18 +6,18 @@ use Illuminate\Support\Facades\Mail;
 
 class MailTemplateService
 {
-    public function send($to, $subject, $content, $fromAddress = null, $fromName = null)
+    public function send($to, $templateSlug, $subject, $content, $fromAddress = null, $fromName = null)
     {
-        // Create mail log (pending)
-        $log = MailLog::create([
-            'email' => $to,
-            'template_slug' => 'mail_send',    // No template slug anymore
-            'status' => 'pending',
-        ]);
-
         try {
+            // Create mail log (pending)
+            $log = MailLog::create([
+                'email'         => $to,
+                'template_slug' => $templateSlug, 
+                'subject'       => $subject,   //  email subject
+                'status'        => 'pending',
+            ]);
             // Send email using your static email wrapper view
-            Mail::send('emails.dynamic', ['html' => $content], function ($message) use ($to, $subject, $fromAddress, $fromName) {
+            Mail::send('emails.dynamic', $content, function ($message) use ($to, $subject, $fromAddress, $fromName) {
                 $message->to($to)
                         ->subject($subject);
 
@@ -29,7 +29,6 @@ class MailTemplateService
             // Update log after success
             $log->update([
                 'status' => 'success',
-                'subject' => $subject,
                 'mail_body' => $content,
             ]);
 

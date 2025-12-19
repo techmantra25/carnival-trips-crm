@@ -15,6 +15,9 @@
             line-height: 1;
             font-size: 11px;
         }
+        .status-dead{
+            background-color: #0ca316 !important;
+        }
     </style>
     @php
         use Illuminate\Support\Str;
@@ -247,14 +250,6 @@
                                             </div>
 
                                             <div class="!text-center">
-                                                <a href="javascript:void(0)" title="Click to update lead status">
-                                                    <span class="badge gap-2 {{ \App\Helpers\CustomHelper::getLeadStatusBadgeColor($lead_item->status) }}">
-                                                        <span class="w-1.5 h-1.5 inline-block bg-black rounded-full"></span>
-                                                        {{ ucwords($lead_item->status) }}
-                                                    </span>
-                                                </a>     
-                                            </div>  
-                                            <div class="!text-center">
 
                                                 {{-- View Lead Log / History --}}
                                                 <a href="{{route('admin.leads.log.history', $lead_item->id)}}"
@@ -269,11 +264,11 @@
                                                 </a>
                                                 
                                                 {{-- View Trip Preference Form --}}
-                                                <a href="{{ route('admin.leads.trip.preference.data', $lead_item->id) }}"
+                                                {{-- <a href="{{ route('admin.leads.trip.preference.data', $lead_item->id) }}"
                                                 class="ti-btn ti-btn-warning mt-[0.375rem] ml-2"
                                                 title="View Trip Preference Form">
                                                     <i class="fa-solid fa-clipboard-question mr-1"></i> 
-                                                </a>
+                                                </a> --}}
                                                 {{-- Assign Lead to Team Member --}}
                                                 @if($authUser->role !== 'member')
                                                     <button type="button"
@@ -291,20 +286,27 @@
                                                     {{-- <a href="{{route('admin.cost_calculator.query_edit',$encryptedId)}}" class="ti-btn ti-btn-orange  mt-[0.375rem]" title="Edit Lead"><i class="fa-regular fa-pen-to-square"></i></a> --}}
 
                                                     {{-- Itinerary --}}
-                                                    @if($lead_item->itinerary->night_journey && $lead_item->itinerary->stay_by_journey)
-                                                        <a href="{{route('admin.itinerary.query.build', $encryptedId)}}" class="ti-btn ti-btn-teal mt-[0.375rem]" title="Itinerary"><i class="fa-solid fa-arrows-up-down-left-right"></i></a> <br>
+                                                    {{-- @if($lead_item->itinerary->night_journey && $lead_item->itinerary->stay_by_journey)
+                                                        <a href="{{route('admin.itinerary.query.build', $encryptedId)}}" class="ti-btn ti-btn-teal mt-[0.375rem]" title="Itinerary"><i class="fa-solid fa-arrows-up-down-left-right"></i></a> 
+                                                    @endif --}}
+                                                    @if(count($lead_item->sent_itinerary()->orderBy('id', 'ASC')->get())>0)
+                                                        {{-- <a href="{{route('admin.leads.manage-hotel-booking', $lead_item->id)}}"
+                                                        class="ti-btn ti-btn-red mt-[0.375rem]"
+                                                        title="Manage Hotel Booking">
+                                                            <i class="fa-solid fa-bed"></i>
+                                                        </a> --}}
                                                     @endif
                                                      <br>
-                                                        @php
-                                                            $destination_slug = $lead_item->destination
-                                                            ? Str::slug($lead_item->destination->name)
-                                                            : 'destination';
-                                                            $lead_itinerary_journey = $lead_item->travel_in_days.'day-'.$lead_item->travel_in_nights.'nights';
-                                                            $LeadUrlShare = App\Models\LeadUrlShare::where('lead_id', $lead_item->id)->where('itinerary_id', $lead_item->itinerary->id)->first();
-                                                            $shared_link = App\Helpers\CustomHelper::secure_encode_id($LeadUrlShare?$LeadUrlShare->id:null);
-                                                        @endphp
                                                 @endif
                                             </div>
+                                            <div class="!text-center">
+                                                <a href="javascript:void(0)" title="Click to update lead status">
+                                                    <span class="badge gap-2 {{ \App\Helpers\CustomHelper::getLeadStatusBadgeColor($lead_item->status) }}">
+                                                        <span class="w-1.5 h-1.5 inline-block bg-black rounded-full"></span>
+                                                        {{ ucwords($lead_item->status) }}
+                                                    </span>
+                                                </a>     
+                                            </div>  
                                             <div>
                                                 <span class="badge bg-warning/10 text-warning" title="Assign Lead Member">
                                                     <span class="text-black"><i class="fa-regular fa-user me-1"></i></span>

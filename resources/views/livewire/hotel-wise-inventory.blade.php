@@ -127,7 +127,8 @@
                 <div class="col2">
                     <label class="cta-label">Bulk Blocking</label>
                     <div class="cta-row">
-                        <button type="button" class="yellow availability_mail" id="button_test" onclick="openModal('bulk_booking')">Availability Mail</button>
+                        {{-- <button type="button" class="yellow availability_mail" id="button_test" onclick="openModal('bulk_booking')">Availability Mail</button> --}}
+                        <button type="button" class="yellow availability_mail" id="button_test">Hotel</button>
                     </div>
                 </div>
                 {{-- bulk booking mail --}}
@@ -182,7 +183,8 @@
                 <div class="col2">
                     <label class="cta-label">Fresh Block</label>
                     <div class="cta-row">
-                        <button type="button" class="green" onclick="openModal('fresh_booking')">Availability Mail</button>
+                        {{-- <button type="button" class="green" onclick="openModal('fresh_booking')">Availability Mail</button> --}}
+                        <button type="button" class="green">Hotel</button>
                     </div>
                 </div>
                 {{-- Fresh booking mail --}}
