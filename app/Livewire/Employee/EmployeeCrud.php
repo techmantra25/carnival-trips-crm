@@ -134,7 +134,8 @@ class EmployeeCrud extends Component
                     'sender_mobile'       => Auth::guard('admin')->user()->phone, 
                 ],
                 env('MAIL_FROM_ADDRESS'),
-                env('MAIL_FROM_NAME')
+                env('MAIL_FROM_NAME'),
+                [],//attachments
             );
 
             //  Commit ONLY if email is successful
@@ -231,7 +232,8 @@ class EmployeeCrud extends Component
                         'sender_mobile'     => Auth::guard('admin')->user()->phone, 
                     ],
                     env('MAIL_FROM_ADDRESS'),
-                    env('MAIL_FROM_NAME')
+                    env('MAIL_FROM_NAME'),
+                    []//attachments
                 );
             }
 

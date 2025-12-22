@@ -2,7 +2,7 @@
 
 return [
     'domain' => env('WHATSAPP_API_DOMAIN'),
-    'version' => env('WHATSAPP_API_VERSION', 'v1.0'),
+    'version' => env('api_version', 'v1.0'),
     'channel' => env('WHATSAPP_CHANNEL_NUMBER'),
     'api_key' => env('WHATSAPP_API_KEY'),
 

@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Mail;
 
 class MailTemplateService
 {
-    public function send($to, $templateSlug, $subject, $content, $fromAddress = null, $fromName = null)
+    public function send($to, $templateSlug, $subject, $content, $fromAddress = null, $fromName = null, $attachments = [])
     {
         try {
             // Create mail log (pending)
@@ -17,15 +17,21 @@ class MailTemplateService
                 'status'        => 'pending',
             ]);
             // Send email using your static email wrapper view
-            Mail::send('emails.dynamic', $content, function ($message) use ($to, $subject, $fromAddress, $fromName) {
+            Mail::send('emails.dynamic', $content, function ($message) use ($to, $subject, $fromAddress, $fromName, $attachments) {
                 $message->to($to)
                         ->subject($subject);
 
                 if ($fromAddress) {
                     $message->from($fromAddress, $fromName);
                 }
-            });
 
+                // Attach multiple files
+                foreach ($attachments as $file) {
+                    if (file_exists($file)) {
+                        $message->attach($file);
+                    }
+                }
+            });
             // Update log after success
             $log->update([
                 'status' => 'success',

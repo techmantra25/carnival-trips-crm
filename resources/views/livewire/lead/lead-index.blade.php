@@ -139,9 +139,9 @@
                                      <input
                                     class="form-control placeholder:!text-headerprimecolor placeholder:opacity-70 placeholder:font-thin placeholder:text-sm custom_field refresh_component"
                                     placeholder="Search for anything..." 
-                                    type="search" 
+                                    type="text" 
                                     name="filter" 
-                                    wire:model.lazy="filter" wire:keyup="SetFilter($event.target.value)">
+                                    wire:model="filter" wire:keyup="SetFilter($event.target.value)">
                                 </td>
                                 <td width="13%">
                                     <div class="form-group">
@@ -199,6 +199,7 @@
                                             
                                             @php
                                                 $timeInfo = \App\Helpers\CustomHelper::formatLeadTime($lead_item->created_at);
+                                             
                                             @endphp
                                             <button type="button" class="badge bg-outline-secondary my-3 me-2 badge-custom-outline-secondary">
                                                 {{ $timeInfo['formatted_date'] }}
@@ -352,11 +353,11 @@
                                                         <a href="{{route('admin.itinerary.query.build', $encryptedId)}}" class="ti-btn ti-btn-teal mt-[0.375rem]" title="Cost Calculator"><i class="fa-solid fa-arrows-up-down-left-right"></i></a> 
                                                     @endif
                                                     @if(count($lead_item->sent_itinerary()->orderBy('id', 'ASC')->get())>0)
-                                                        {{-- <a href="{{route('admin.leads.manage-hotel-booking', $lead_item->id)}}"
+                                                        <a href="{{route('admin.leads.manage-hotel-booking', $lead_item->id)}}"
                                                         class="ti-btn ti-btn-red mt-[0.375rem]"
                                                         title="Manage Hotel Booking">
                                                             <i class="fa-solid fa-bed"></i>
-                                                        </a> --}}
+                                                        </a>
                                                     @endif
                                                     <br>
                                                 @endif

@@ -8,7 +8,6 @@ class WhatsAppService
 {
     public function sendTemplate($phone, $templateName, $languageCode = null, $headerParams = [], $bodyParams = [])
     {
-        // dd($bodyParams, $headerParams, $templateName, $languageCode, $phone);
         $url = config('whatsapp.domain') .
             "/api/" .
             config('whatsapp.version') .

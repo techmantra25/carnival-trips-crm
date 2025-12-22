@@ -110,7 +110,6 @@ class CustomHelper
 
         } else {
             $diffInDays = $createdAt->diffInDays($now);
-
             if ($diffInDays < 365) {
                 // Between 1 and 364 days
                 $roundedDays = round($diffInDays);
@@ -491,7 +490,8 @@ class CustomHelper
                     'subject'         => $subject,
                 ],
                 env('MAIL_FROM_ADDRESS'),
-                env('MAIL_FROM_NAME')
+                env('MAIL_FROM_NAME'),
+                []//attachments
             );
 
             return true;

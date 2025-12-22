@@ -853,12 +853,24 @@ class ConfirmedLeadIndex extends Component
         $this->divisions= City::where('state_id', $this->destination)->orderBy('name', 'ASC')->get();
         $leads = Lead::
         when($this->filter, function ($query) {
-            $searchTerm = '%' . $this->filter . '%';
-            $query->where(function ($q) use ($searchTerm) {
+
+            $rawFilter = trim($this->filter);
+
+            // Remove leading country code 91 if present
+            $normalizedMobile = preg_replace('/^91/', '', $rawFilter);
+
+            $searchTerm = '%' . $rawFilter . '%';
+            $mobileTerm = '%' . $normalizedMobile . '%';
+
+            $query->where(function ($q) use ($searchTerm, $mobileTerm) {
+
                 $q->where('customer_name', 'like', $searchTerm)
                 ->orWhere('customer_email', 'like', $searchTerm)
                 ->orWhere('unique_id', 'like', $searchTerm)
-                ->orWhere('customer_mobile', 'like', $searchTerm);
+
+                // 🔹 Mobile search WITHOUT country code
+                ->orWhere('customer_mobile', 'like', $mobileTerm)
+                ->orWhere('customer_whatsapp', 'like', $mobileTerm);
             });
         })
         ->when(count($this->search_destination)>0, function ($query){
@@ -874,16 +886,51 @@ class ConfirmedLeadIndex extends Component
             $query->where('source_type',$source_type);
         })
         ->when($this->start_date && $this->end_date, function ($query) {
-            $query->whereBetween('created_at', [
-                Carbon::parse($this->start_date)->startOfDay(),
-                Carbon::parse($this->end_date)->endOfDay()
-            ]);
+
+            $start = Carbon::parse($this->start_date)->startOfDay();
+            $end   = Carbon::parse($this->end_date)->endOfDay();
+
+            $query->where(function ($q) use ($start, $end) {
+
+                // Confirmed itinerary date
+                $q->whereHas('sent_itinerary', function ($sq) use ($start, $end) {
+                    $sq->where('is_confirmed', 1)
+                    ->whereBetween('confirmed_at', [$start, $end]);
+                })
+
+                // OR lead created date
+                ->orWhereBetween('created_at', [$start, $end]);
+            });
         })
+
         ->when($this->start_date && !$this->end_date, function ($query) {
-            $query->where('created_at', '>=', Carbon::parse($this->start_date)->startOfDay());
+
+            $start = Carbon::parse($this->start_date)->startOfDay();
+
+            $query->where(function ($q) use ($start) {
+
+                $q->whereHas('sent_itinerary', function ($sq) use ($start) {
+                    $sq->where('is_confirmed', 1)
+                    ->where('confirmed_at', '>=', $start);
+                })
+
+                ->orWhere('created_at', '>=', $start);
+            });
         })
+
         ->when(!$this->start_date && $this->end_date, function ($query) {
-            $query->where('created_at', '<=', Carbon::parse($this->end_date)->endOfDay());
+
+            $end = Carbon::parse($this->end_date)->endOfDay();
+
+            $query->where(function ($q) use ($end) {
+
+                $q->whereHas('sent_itinerary', function ($sq) use ($end) {
+                    $sq->where('is_confirmed', 1)
+                    ->where('confirmed_at', '<=', $end);
+                })
+
+                ->orWhere('created_at', '<=', $end);
+            });
         })
         ->when(true, function ($query) {
             $query->where('generate_from', 'lead');

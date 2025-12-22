@@ -3300,12 +3300,14 @@ class CreateQueryItinerary extends Component
             // Step 3: Prepare bulk insert data
             $bulkInsertData = [];
             foreach ($fetch_itineraries as $item) {
+                $day = str_replace('day_', '', $item->header);
                 $bulkInsertData[] = [
                     'sended_lead_itinerary_id' => $store->id,
                     'route_service_summary_id' => $item->route_service_summary_id,
                     'hotel_id' => $item->hotel_id,
                     'room_id' => $item->room_id,
                     'cab_id' => $item->cab_id,
+                    'day' => $day,
                     'header' => $item->header,
                     'field' => $item->field,
                     'value' => $item->value,
@@ -3395,7 +3397,8 @@ class CreateQueryItinerary extends Component
                     'subject'        => $subject,
                 ],
                 env('MAIL_FROM_ADDRESS'),
-                env('MAIL_FROM_NAME')
+                env('MAIL_FROM_NAME'),
+                []//attachments
             );
         }
 

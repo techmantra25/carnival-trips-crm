@@ -132,7 +132,68 @@
                       </td>
                   </tr>
 
+                @elseif($template_type === 'booking_confirmed')
+                    {{-- ================= BOOKING CONFIRMED TEMPLATE (PDF ATTACHED) ================= --}}
+
+                    <tr>
+                        <td style="background-color:#0c1b59; color:#fff; padding:0 30px; border-top-left-radius:20px; border-top-right-radius:20px; text-align:center;">
+                            <h2 style="color:#fff; font-size:28px; font-weight:700; margin:20px 0;">
+                                🎉 Booking Confirmed!
+                            </h2>
+                            <p style="color:#eaf6ee; font-size:14px; margin-bottom:20px;">
+                                Your trip details are attached as a PDF
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding:30px; background-color:#f8f9fb; border-radius:0 0 20px 20px;">
+
+                            <p style="font-size:16px; color:#333; font-weight:500; margin-bottom:10px;">
+                                Hi {{ $recipient_name ?? 'Customer' }},
+                            </p>
+
+                            <p style="font-size:15px; color:#555; line-height:1.6; margin-bottom:15px;">
+                                We’re happy to inform you that your booking for
+                                <strong style="color:#0c1b59;">{{ $itinerary }}</strong>
+                                has been successfully confirmed.
+                            </p>
+
+                            {{-- Booking Summary --}}
+                            <div style="background:#ffffff; border-radius:10px; padding:20px; margin-bottom:20px; border:1px solid #e5e7eb;">
+                                <p style="font-size:14px; margin:6px 0;">
+                                    <strong>📄 Booking ID:</strong>
+                                    {{ $booking_id ?? 'N/A' }}
+                                </p>
+
+                                <p style="font-size:14px; margin:6px 0;">
+                                    <strong>📅 Travel Dates:</strong>
+                                    {{ $travel_dates ?? 'As per itinerary' }}
+                                </p>
+
+                                <p style="font-size:14px; margin:6px 0;">
+                                    <strong>💰 Total Amount:</strong>
+                                    ₹ {{ number_format($total_amount ?? 0) }}
+                                </p>
+                            </div>
+
+                            {{-- PDF Notice --}}
+                            <div style="background:#eaf6ee; border-left:4px solid #0c1b59; padding:15px; border-radius:6px; margin-bottom:20px;">
+                                <p style="font-size:14px; color:#0c1b59; margin:0;">
+                                    📎 <strong>Your booking itinerary PDF is attached with this email.</strong><br>
+                                    Please download and keep it handy during your journey.
+                                </p>
+                            </div>
+
+                            <p style="font-size:13px; color:#777; line-height:1.5;">
+                                If you need any changes or assistance, feel free to reply to this email.
+                                Our team is always happy to help. Wishing you a wonderful trip!
+                            </p>
+
+                        </td>
+                    </tr>
                 @endif
+
                 {{-- ================= FOOTER / SIGNATURE ================= --}}
                 <tr>
                     <td style="padding:20px; text-align:center;">

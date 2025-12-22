@@ -1,353 +1,369 @@
 <div>
     <style>
-        /* Tabs container */
-        .tabs {
+
+        .hotel-booking-master .hb-tabs {
             display: flex;
-            border-bottom: 1px solid #dee2e6;
+            border-bottom: 1px solid #ddd;
         }
 
-        .tabs button {
-            padding: 0.5rem 1rem;
-            font-size: 0.9rem;
-            font-weight: 500;
-            border: none;
-            border-bottom: 2px solid transparent;
-            background: transparent;
+        .hotel-booking-master .hb-tab-btn {
+            padding: 8px 14px;
             cursor: pointer;
-            transition: all 0.2s ease-in-out;
+            background: none;
+            border: none;
         }
 
-        .tabs button.active {
-            border-bottom-color: #0d6efd; /* Bootstrap primary blue */
-            color: #0d6efd;
-            font-weight: 600;
-        }
-
-        .tabs button:not(.active):hover {
-            color: #0d6efd;
-        }
-
-        /* Confirmed badge next to tab */
-        .tabs .badge-confirmed {
-            margin-left: 0.25rem;
-            padding: 0.15rem 0.5rem;
-            font-size: 0.7rem;
-            font-weight: 600;
-            background-color: #d1e7dd; /* green-100 */
-            color: #0f5132; /* green-800 */
-            border-radius: 9999px;
-            vertical-align: middle;
-        }
-
-        /* Card style */
-        .itinerary-card {
-            background: #ffffff;
-            border: 1px solid #dee2e6;
-            border-radius: 0.5rem;
-            padding: 1rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-
-        .itinerary-card p {
-            margin: 0.25rem 0;
-        }
-
-        /* Highlight total cost */
-        .total-cost {
-            color: #dc3545;
-            font-weight: 600;
-            font-size: 1.05rem;
-        }
-
-        /* Nested day list */
-        .day-list {
-            margin: 0.5rem 0 0 0;
-            padding-left: 1rem;
-        }
-
-        .day-list li {
-            list-style-type: disc;
-            margin-bottom: 0.25rem;
-        }
-
-        /* Tab content spacing */
-        .tab-content {
-            margin-top: 1rem;
-        }
-
-        .day-card {
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            background: #ffffff;
-            overflow: hidden;
-        }
-
-        .day-card-header {
-            background: #dbeafe; /* light blue */
-            padding: 10px 14px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .day-badge {
-            font-size: 12px;
-            font-weight: 700;
+        .hotel-booking-master .hb-tab-btn.active {
+            border-bottom: 2px solid #2563eb;
             color: #2563eb;
         }
 
-        .day-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #1f2937;
+        .hotel-booking-master .hb-badge-confirmed {
+            background: #d1e7dd;
+            color: #065f46;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 20px;
         }
 
+        .hotel-booking-master .hb-grid {
+            margin-top: 16px;
+        }
 
-        .itinerary-summary-card {
+        .hotel-booking-master .hb-itinerary-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .hotel-booking-master .hb-summary-card {
             border: 1px solid #e5e7eb;
             border-radius: 8px;
-            background: #ffffff;
-            overflow: hidden;
-            margin-bottom: 1rem;
+            margin-bottom: 16px;
         }
 
-        /* Header */
-        .summary-header {
-            background: #eff6ff; /* light blue */
-            padding: 12px 14px;
+        .hotel-booking-master .hb-summary-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            padding: 12px;
+            background: #eff6ff;
         }
 
-        .summary-title {
-            font-size: 15px;
+        .hotel-booking-master .hb-summary-cost {
+            color: #16a34a;
             font-weight: 700;
-            color: #1e3a8a;
         }
 
-        .summary-cost {
-            font-size: 16px;
-            font-weight: 800;
-            color: #16a34a; /* green highlight */
-        }
-
-        /* Body */
-        .summary-body {
-            padding: 12px 14px;
+        .hotel-booking-master .hb-summary-body {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
+            padding: 12px;
             gap: 10px;
         }
 
-        .summary-item {
-            font-size: 14px;
+        .hotel-booking-master .hb-section-title {
+            font-weight: 600;
+            margin-bottom: 10px;
         }
 
-        .summary-item .label {
-            display: block;
+        .hotel-booking-master .hb-day-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .hotel-booking-master .hb-day-header {
+            background: #dbeafe;
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .hotel-booking-master .hb-room-card {
+            display: flex;
+            border-top: 1px solid #eee;
+        }
+
+        .hotel-booking-master .hb-room-left {
+            width: 65%;
+            padding: 12px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .hotel-booking-master .hb-room-right {
+            width: 35%;
+            padding: 12px;
+            background: #f9fafb;
+        }
+
+        .hotel-booking-master .hb-hotel-img {
+            width: 220px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .hotel-booking-master .hb-status-toggle {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .hotel-booking-master .hb-status {
+            padding: 6px 10px;
             font-size: 12px;
-            font-weight: 600;
-            color: #6b7280;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #fff;
         }
 
-        .summary-item .value {
-            font-weight: 600;
-            color: #111827;
+        .hotel-booking-master .hb-status.availability {
+            background: #16a34a;
+        }
+
+        .hotel-booking-master .hb-status.confirm {
+            background: #16a34a;
+        }
+
+        .hotel-booking-master .hb-status.inactive {
+            color: #000;
+            background: #fff;
+            border: 1px solid;
+        }
+
+        .hotel-booking-master .hb-btn {
+            display: block;
+            text-align: center;
+            padding: 8px;
+            border-radius: 6px;
+            color: #fff;
+            text-decoration: none;
+            margin-bottom: 6px;
+        }
+
+        .hotel-booking-master .hb-btn.whatsapp {
+            background: #ffffff;
+            color: #000;
+            border: 1px solid #ddd;
+        }
+
+        .hotel-booking-master .hb-btn.email {
+            background: #0c1b59;
+        }
+
+        .hotel-booking-master .hb-meta {
+            font-size: 11px;
+            color: #555;
+            border-top: 1px dashed #ccc;
+            padding-top: 8px;
+        }
+        .hotel-booking-master .hb-hotel-name {
+            font-size: 18px;
+            font-weight: 500;
+        }
+        .hotel-booking-master .hb-room-info, .hb-date-info {
+            font-size: 11px;
         }
 
     </style>
 
-    <div class="box custom-box p-4">
-        <div class="box-body">
+    <div class="hotel-booking-master">
+        <div class="box custom-box p-4">
+            <div class="box-body">
 
-            <!-- Tabs Navigation -->
-            <div class="tabs">
-                @foreach($sent_itinerary as $index => $itinerary)
-                    <button wire:click="$set('activeTab', {{ $index }})"
-                            class="{{ ($activeTab ?? 0) === $index ? 'active' : '' }}">
-                        {{ $itinerary->itinerary_code }}
-                        @if($itinerary->is_confirmed)
-                            <span class="badge-confirmed">✓ Confirmed</span>
-                        @endif
-                    </button>
-                @endforeach
+                <!-- ================= TABS ================= -->
+                <div class="hb-tabs">
+                    @foreach($leadData->sent_itinerary as $index => $itinerary)
+                        <button
+                            wire:click="$set('activeTab', {{ $index }})"
+                            class="hb-tab-btn {{ ($activeTab ?? 0) === $index ? 'active' : '' }}"
+                        >
+                            {{ $itinerary->itinerary_code }}
 
-            </div>
+                            @if($itinerary->is_confirmed)
+                                <span class="hb-badge-confirmed">✓ Confirmed</span>
+                            @endif
+                        </button>
+                    @endforeach
+                </div>
 
-            <!-- Tabs Content -->
-            <div class="tab-content">
-                @foreach($sent_itinerary as $index => $itinerary)
-                    <div class="{{ ($activeTab ?? 0) === $index ? 'block' : 'hidden' }}">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
-                            <div class="itinerary-card">
-                                <div class="itinerary-summary-card">
+                <!-- ================= TAB CONTENT ================= -->
+                <div class="hb-tab-content">
+                    @foreach($sent_itinerary as $index => $item_data)
 
-                                    <!-- Header -->
-                                    <div class="summary-header">
-                                        <span class="summary-title">
-                                            {{ optional($itinerary->destination)->name ?? 'N/A' }}
-                                        </span>
+                        @php $itinerary = $item_data['details']; @endphp
 
-                                        <span class="summary-cost">
-                                            ₹{{ number_format($itinerary->total_cost, 2) }}
-                                        </span>
+                        <div class="{{ ($activeTab ?? 0) === $index ? 'block' : 'hidden' }}">
+
+                            <div class="hb-grid">
+
+                                <!-- ================= SUMMARY ================= -->
+                                <div class="hb-itinerary-card">
+
+                                    <div class="hb-summary-card">
+                                        <div class="hb-summary-header">
+                                            <span class="hb-summary-title">
+                                                {{ optional($itinerary->destination)->name ?? 'N/A' }}
+                                            </span>
+
+                                            <span class="hb-summary-cost">
+                                                ₹{{ number_format($itinerary->total_cost, 2) }}
+                                            </span>
+                                        </div>
+
+                                        <div class="hb-summary-body">
+                                            <div>
+                                                <span class="hb-label">Hotel Category</span>
+                                                <span class="hb-value">{{ optional($itinerary->category)->name ?? 'N/A' }}</span>
+                                            </div>
+
+                                            <div>
+                                                <span class="hb-label">Days / Nights</span>
+                                                <span class="hb-value">{{ $itinerary->total_days }} / {{ $itinerary->total_nights }}</span>
+                                            </div>
+
+                                            <div>
+                                                <span class="hb-label">Route</span>
+                                                <span class="hb-value">{{ $itinerary->itinerary_journey }}</span>
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    <!-- Body -->
-                                    <div class="summary-body">
-                                        <div class="summary-item">
-                                            <span class="label">Hotel Category</span>
-                                            <span class="value">{{ optional($itinerary->category)->name ?? 'N/A' }}</span>
-                                        </div>
+                                    <p class="hb-section-title">Stay by Journey</p>
 
-                                        <div class="summary-item">
-                                            <span class="label">Days / Nights</span>
-                                            <span class="value">{{ $itinerary->total_days }} / {{ $itinerary->total_nights }}</span>
-                                        </div>
+                                    <!-- ================= DIVISIONS ================= -->
+                                    @foreach($item_data['day_journey'] as $division)
 
-                                        <div class="summary-item">
-                                            <span class="label">Itinerary Route</span>
-                                            <span class="value">{{ $itinerary->itinerary_journey }}</span>
-                                        </div>
-                                    </div>
-                                </div>
+                                        <div class="hb-day-card">
 
-                                <p class="font-semibold mt-4 mb-2">Stay by Journey:</p>
-                                {{-- {{dd($itinerary)}} --}}
-                                @php
-                                    // $SendedLeadItineraryDetail = SendedLeadItineraryDetail::where('sended_lead_itinerary_id', '')
-                                @endphp
-                                <div class="space-y-4">
-                                    @foreach(explode(',', $itinerary->stay_by_journey) as $key => $day)
+                                            <div class="hb-day-header">
+                                                <span class="hb-day-badge">
+                                                    DAY {{ implode(', ', $division['day_of_division']) }}
+                                                </span>
 
-                                        @php
-                                            $division = App\Models\City::find($day);
-
-                                            // Example placeholders (replace with real data if available)
-                                            $date = now()->addDays($key)->format('d M Y'); // dynamic date
-                                            $hotelName = 'Hotel Name';
-                                            $roomQty =  1;
-                                            $roomName = 'Deluxe Room';
-                                        @endphp
-
-                                        <div class="day-card">
-
-                                            <!-- Header -->
-                                            <div class="day-card-header">
-                                                <span class="day-badge">DAY {{ $key + 1 }}</span>
-                                                <span class="day-title">
-                                                    ({{ $date }})
-                                                    {{ $division?->name }}
+                                                <span class="hb-day-title">
+                                                    {{ $division['division_name'] }}
                                                 </span>
                                             </div>
 
-                                            <!-- Body -->
-                                           <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #ddd; border-radius:8px; overflow:hidden;">
-                                                <tr>
+                                            <!-- ================= ROOM BOOKINGS ================= -->
+                                            @foreach($division['room_bookings'] as $booking)
 
-                                                    <!-- LEFT : HOTEL DETAILS -->
-                                                    <td width="65%" style="vertical-align:top; padding:12px;">
+                                                <div class="hb-room-card">
 
-                                                        <table width="100%" cellpadding="0" cellspacing="0">
-                                                            <tr>
-                                                                <td width="220">
-                                                                    <img src="http://127.0.0.1:8000/build/assets/images/logo/demo.webp"
-                                                                        style="width:100%; max-width:220px; height:120px; object-fit:cover; border-radius:6px;">
-                                                                </td>
+                                                    <!-- LEFT -->
+                                                    <div class="hb-room-left">
+                                                        <img
+                                                            src="{{ $booking['hotel_image'] ?? asset('build/assets/images/logo/demo.webp') }}"
+                                                            class="hb-hotel-img"
+                                                        >
 
-                                                                <td style="vertical-align:top; padding-left:12px;">
-                                                                    <h4 style="margin:0; font-size:15px; color:#031b4e; text-transform:uppercase;">
-                                                                        La Vue Resort
-                                                                    </h4>
+                                                        <div>
+                                                            <h4 class="hb-hotel-name">
+                                                                {{ $booking['hotel_name'] }}
+                                                            </h4>
 
-                                                                    <p style="margin:4px 0 8px; font-size:12px; color:#555;">
-                                                                        Haldhibari, Bagari N.C., Assam 785609
-                                                                    </p>
+                                                            <p class="hb-hotel-address">
+                                                                {{ $booking['hotel_address'] }}
+                                                            </p>
 
-                                                                    <br><br>
+                                                            <p class="hb-room-info">
+                                                                🛏 {{ $booking['room_name'] }}
+                                                                ({{ $booking['no_of_room'] }} Room)
+                                                                | 🍽 {{ $division['rate_plan'] }}
+                                                            </p>
 
-                                                                    <span style="display:inline-block; font-size:12px; padding:5px 8px;
-                                                                        border-radius:4px; border:1px solid #ddd; color:#4e4e4e;">
-                                                                        Serene Deluxe Room - AC :
-                                                                        <strong style="color:#ee335e;">(2)</strong>
-                                                                    </span>
-                                                                </td>
-                                                            </tr>
-                                                        </table>
+                                                            <p class="hb-date-info">
+                                                                📅 {{ $booking['check_in'] }}
+                                                                → {{ $booking['check_out'] }}
+                                                                ({{ $booking['nights'] }} Night)
+                                                            </p>
+                                                        </div>
+                                                    </div>
 
-                                                    </td>
+                                                    <!-- RIGHT -->
+                                                    <div class="hb-room-right">
 
-                                                    <!-- RIGHT : ACTIONS -->
-                                                    <td width="35%" style="vertical-align:top; padding:12px; background:#f9fafb;">
-
-                                                        <!-- ACTION TABS -->
-                                                        <div style="margin-bottom:10px;">
-                                                            <span style="display:inline-block; padding:6px 10px; font-size:12px;
-                                                                background:#2563eb; color:#fff; border-radius:4px;">
+                                                        <!-- STATUS TOGGLE -->
+                                                        <div class="hb-status-toggle">
+                                                            <span
+                                                                wire:click="$set('bookingAction', 'availability')"
+                                                                class="hb-status availability {{ $bookingAction !== 'availability' ? 'inactive' : '' }}"
+                                                            >
                                                                 Availability
                                                             </span>
 
-                                                            <span style="display:inline-block; padding:6px 10px; font-size:12px;
-                                                                background:#16a34a; color:#fff; border-radius:4px; margin-left:6px;">
+                                                            <span
+                                                                wire:click="$set('bookingAction', 'confirm')"
+                                                                class="hb-status confirm {{ $bookingAction !== 'confirm' ? 'inactive' : '' }}"
+                                                            >
                                                                 Confirm Booking
                                                             </span>
                                                         </div>
 
-                                                        <!-- BUTTONS -->
-                                                        <div style="margin-bottom:10px;">
-                                                            <a href="#"
-                                                            style="display:block; text-align:center; text-decoration:none;
-                                                            background:#25D366; color:#fff; font-size:13px;
-                                                            padding:8px; border-radius:6px; margin-bottom:6px;">
-                                                                📲 Send via WhatsApp
-                                                            </a>
+                                                        
+                                                        <!-- META -->
+                                                        <div class="hb-meta">
 
-                                                            <a href="#"
-                                                            style="display:block; text-align:center; text-decoration:none;
-                                                            background:#0c1b59; color:#fff; font-size:13px;
-                                                            padding:8px; border-radius:6px;">
-                                                                📩 Send via Email
-                                                            </a>
+                                                            <p>
+                                                                🕒 <strong>Sent at:</strong> 12 Sep 2025, 03:45 PM<br>
+                                                                📩 <strong>Channel:</strong> Email<br>
+                                                                📌 <strong>Type:</strong> Availability
+                                                            </p>
+
+                                                            <hr style="border:none; border-top:1px dashed #ccc; margin:6px 0;">
+
+                                                            <p>
+                                                                🕒 <strong>Sent at:</strong> 13 Sep 2025, 10:20 AM<br>
+                                                                📩 <strong>Channel:</strong> WhatsApp<br>
+                                                                📌 <strong>Type:</strong> Availability
+                                                            </p>
+
+                                                            <hr style="border:none; border-top:1px dashed #ccc; margin:6px 0;">
+
+                                                            <p>
+                                                                🕒 <strong>Sent at:</strong> 14 Sep 2025, 06:15 PM<br>
+                                                                📩 <strong>Channel:</strong> Email<br>
+                                                                📌 <strong>Type:</strong> Confirm Booking
+                                                            </p>
+
                                                         </div>
+                                                        <hr style="border:none; border-top:1px dashed #ccc; margin:6px 0;">
+                                                        <!-- ACTIONS -->
+                                                        <a href="#" class="hb-btn whatsapp">
+                                                            📲 Send via WhatsApp
+                                                        </a>
 
-                                                        <!-- SENT LOG -->
-                                                        <div style="font-size:11px; color:#555; border-top:1px dashed #ccc; padding-top:8px;">
-                                                            <p style="margin:2px 0;">
-                                                                ✅ Availability Sent : WhatsApp
-                                                            </p>
-                                                            <p style="margin:2px 0;">
-                                                                ✅ Booking Sent : Email
-                                                            </p>
-                                                            <p style="margin:2px 0;">
-                                                                🕒 Last Sent : 12 Sep 2025, 03:45 PM
-                                                            </p>
-                                                        </div>
+                                                        <a href="#" class="hb-btn email">
+                                                            📩 Send via Email
+                                                        </a>
 
-                                                    </td>
 
-                                                </tr>
-                                            </table>
+                                                    </div>
 
+                                                </div>
+
+                                            @endforeach
 
                                         </div>
 
                                     @endforeach
+
                                 </div>
-
                             </div>
-
                         </div>
-                    </div>
-                @endforeach
-            </div>
 
+                    @endforeach
+                </div>
+            </div>
         </div>
-    </div>
-    <!-- Loader -->
-    <div wire:loading class="loader">
-        <div class="spinner">
-            <img src="{{ asset('build/assets/images/media/loader.svg') }}" alt="Loading...">
+
+        <!-- LOADER -->
+        <div wire:loading class="hb-loader">
+            <img src="{{ asset('build/assets/images/media/loader.svg') }}">
         </div>
+
     </div>
+
 </div>

@@ -136,7 +136,9 @@ class LeadIndex extends Component
     }
     public function SetFilter($value)
     {
+
         $this->filter = $value;
+        $this->resetPage();
     }
 
     public function toggleDestination($id)
@@ -1015,17 +1017,32 @@ class LeadIndex extends Component
             $this->leadAssignError = $e->getMessage();
         }
     }
+    public function getLead(){
+
+    }
     public function render()
     {
         $this->divisions= City::where('state_id', $this->destination)->orderBy('name', 'ASC')->get();
         $leads = Lead::
         when($this->filter, function ($query) {
-            $searchTerm = '%' . $this->filter . '%';
-            $query->where(function ($q) use ($searchTerm) {
+
+            $rawFilter = trim($this->filter);
+
+            // Remove leading country code 91 if present
+            $normalizedMobile = preg_replace('/^91/', '', $rawFilter);
+
+            $searchTerm = '%' . $rawFilter . '%';
+            $mobileTerm = '%' . $normalizedMobile . '%';
+
+            $query->where(function ($q) use ($searchTerm, $mobileTerm) {
+
                 $q->where('customer_name', 'like', $searchTerm)
                 ->orWhere('customer_email', 'like', $searchTerm)
                 ->orWhere('unique_id', 'like', $searchTerm)
-                ->orWhere('customer_mobile', 'like', $searchTerm);
+
+                // 🔹 Mobile search WITHOUT country code
+                ->orWhere('customer_mobile', 'like', $mobileTerm)
+                ->orWhere('customer_whatsapp', 'like', $mobileTerm);
             });
         })
         ->when(count($this->search_destination)>0, function ($query){
@@ -1051,6 +1068,7 @@ class LeadIndex extends Component
             ]);
         })
         ->when($this->start_date && !$this->end_date, function ($query) {
+            
             $query->where('created_at', '>=', Carbon::parse($this->start_date)->startOfDay());
         })
         ->when(!$this->start_date && $this->end_date, function ($query) {
@@ -1067,7 +1085,7 @@ class LeadIndex extends Component
             }
         })
         ->orderBy('id', 'DESC')
-        ->paginate(10);
+        ->paginate(5);
         return view('livewire.lead.lead-index',[
             'leads'=>$leads,
         ]);

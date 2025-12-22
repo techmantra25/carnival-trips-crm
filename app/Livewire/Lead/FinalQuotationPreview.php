@@ -15,6 +15,7 @@ use App\Helpers\CustomHelper;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Services\MailTemplateService;
 class FinalQuotationPreview extends Component
 {
    public $title = "Customized Itinerary";
@@ -251,8 +252,7 @@ class FinalQuotationPreview extends Component
         if ($this->send_email) {
             $methods[] = 'email';
         }
-        $pdfData = $this->generateQuotationPdf();
-        dd($pdfData);
+        // $pdfData = $this->generateQuotationPdf();
         if (empty($methods)) {
             session()->flash('error', 'No communication method selected.');
             return;
@@ -265,9 +265,50 @@ class FinalQuotationPreview extends Component
         try {
             /* ===================== SEND EMAIL ===================== */
             if ($this->send_email) {
-                // Uncomment when ready
-                // MailTemplateService::send(...);
+
+                $mailService = app(MailTemplateService::class);
+
+                // Dynamic subject
+               $subject = "hi, {$this->leadData->customer_name}, Your {$this->sent_lead_itinerary->itinerary_syntax} Trip Is Confirmed! 🎉";
+                // Send booking confirmed email (PDF attached inside Mail service)
+                $attachments = [
+                    public_path('assets/img/sample.pdf'),
+                ];
+                $mailSent = $mailService->send(
+                    $this->leadData->customer_email,
+                    'booking_confirmed',
+                    $subject,
+                    [
+                        'template_type'  => 'booking_confirmed',
+                        'recipient_name' => $this->leadData->customer_name,
+                        'itinerary'      => $this->sent_lead_itinerary->itinerary_syntax,
+
+                        // Booking details
+                        'start_date'     => Carbon::parse($this->leadData->arrival_date)->format('d M Y'),
+                        'end_date'       => Carbon::parse($this->leadData->departure_date)->format('d M Y'),
+                        'travel_dates'   => Carbon::parse($this->leadData->arrival_date)->format('d M Y')
+                                            . ' - ' .
+                                            Carbon::parse($this->leadData->departure_date)->format('d M Y'),
+                        'total_amount'   => $this->total_amount,
+                        'booking_id'     => $this->leadData->unique_id,
+
+                        // Email meta
+                        'company_name'   => env('MAIL_FROM_NAME'),
+                        'sender_name'    => Auth::guard('admin')->user()->name ?? env('MAIL_FROM_NAME'),
+                        'sender_mobile'  => Auth::guard('admin')->user()->phone ?? '',
+                        'subject'        => $subject,
+                        'attached_file'  => asset('assets/img/sample.pdf'),
+                    ],
+                    env('MAIL_FROM_ADDRESS'),
+                    env('MAIL_FROM_NAME'),
+                    $attachments
+                );
+                if(!$mailSent){
+                    session()->flash('error', 'Failed to send quotation on email. Please try again.');
+                    return false;
+                }
             }
+
 
             /* ===================== SEND WHATSAPP ===================== */
             if ($this->send_whatsapp) {

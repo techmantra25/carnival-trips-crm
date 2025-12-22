@@ -96,7 +96,7 @@
                                     placeholder="Search for anything..." 
                                     type="search" 
                                     name="filter" 
-                                    wire:model.lazy="filter" wire:keyup="SetFilter($event.target.value)">
+                                    wire:model="filter" wire:keyup="SetFilter($event.target.value)">
                                 </td>
                                 <td width="13%">
                                     <div class="form-group">
