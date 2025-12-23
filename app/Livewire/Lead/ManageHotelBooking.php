@@ -11,7 +11,9 @@ class ManageHotelBooking extends Component
 {
     public $leadData, $sent_itinerary =[];
     public $activeTab = 0;
-    public $bookingAction = 'availability';
+    public $bookingAction = 'availability', $active_checkin = null, $active_roomId = null;
+    public $whatsapp_modal = false;
+    public $email_modal = false;
     public function mount($lead_id){
         $this->leadData = Lead::findOrFail($lead_id);
         // $this->sent_itinerary = $this->leadData->sent_itinerary;
@@ -156,6 +158,24 @@ class ManageHotelBooking extends Component
         $confirmedIndex = collect($this->leadData->sent_itinerary)
         ->search(fn ($item) => $item->is_confirmed == 1);
         $this->activeTab = $confirmedIndex !== false ? $confirmedIndex : 0;
+    }
+
+    public function changebookingAction($action, $checkIn, $roomId){
+        $this->bookingAction = $action;
+        $this->active_checkin = $checkIn;
+        $this->active_roomId = $roomId;
+    }
+    public function activeTabChange($index){
+        $this->activeTab = $index;
+        $this->reset(['bookingAction', 'active_checkin', 'active_roomId']);
+    }
+    public function sendViaWhatsapp($modal){
+        $this->email_modal = false;
+        $this->whatsapp_modal = $modal;
+    }
+    public function sendViaEmail($modal){
+        $this->whatsapp_modal = false;
+        $this->email_modal = $modal;
     }
     public function render()
     {

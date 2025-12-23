@@ -52,6 +52,7 @@
         .hotel-booking-master .hb-summary-cost {
             color: #16a34a;
             font-weight: 700;
+            font-size: 18px;
         }
 
         .hotel-booking-master .hb-summary-body {
@@ -133,29 +134,41 @@
         }
 
         .hotel-booking-master .hb-btn {
-            display: block;
-            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
             padding: 8px;
             border-radius: 6px;
-            color: #fff;
             text-decoration: none;
             margin-bottom: 6px;
+            font-size: 14px;
         }
 
+        .hotel-booking-master .hb-btn img.hb-icon {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+        }
+
+        /* WhatsApp */
         .hotel-booking-master .hb-btn.whatsapp {
             background: #ffffff;
             color: #000;
             border: 1px solid #ddd;
         }
 
+        /* Email */
         .hotel-booking-master .hb-btn.email {
             background: #0c1b59;
+            color: #fff;
         }
+
 
         .hotel-booking-master .hb-meta {
             font-size: 11px;
             color: #555;
-            border-top: 1px dashed #ccc;
+            /* border-top: 1px dashed #ccc; */
             padding-top: 8px;
         }
         .hotel-booking-master .hb-hotel-name {
@@ -164,6 +177,13 @@
         }
         .hotel-booking-master .hb-room-info, .hb-date-info {
             font-size: 11px;
+        }
+        .hotel-booking-master .hb-label {
+            font-weight: 700;
+        }
+        .hotel-booking-master .hb-summary-title {
+            font-weight: 700;
+            color: #0c1b59;
         }
 
     </style>
@@ -176,7 +196,7 @@
                 <div class="hb-tabs">
                     @foreach($leadData->sent_itinerary as $index => $itinerary)
                         <button
-                            wire:click="$set('activeTab', {{ $index }})"
+                            wire:click="activeTabChange({{ $index }})"
                             class="hb-tab-btn {{ ($activeTab ?? 0) === $index ? 'active' : '' }}"
                         >
                             {{ $itinerary->itinerary_code }}
@@ -214,24 +234,23 @@
 
                                         <div class="hb-summary-body">
                                             <div>
-                                                <span class="hb-label">Hotel Category</span>
+                                                <span class="hb-label">Hotel Category:</span>
                                                 <span class="hb-value">{{ optional($itinerary->category)->name ?? 'N/A' }}</span>
                                             </div>
 
                                             <div>
-                                                <span class="hb-label">Days / Nights</span>
+                                                <span class="hb-label">Days / Nights:</span>
                                                 <span class="hb-value">{{ $itinerary->total_days }} / {{ $itinerary->total_nights }}</span>
                                             </div>
 
                                             <div>
-                                                <span class="hb-label">Route</span>
+                                                <span class="hb-label">Itinerary:</span>
                                                 <span class="hb-value">{{ $itinerary->itinerary_journey }}</span>
                                             </div>
                                         </div>
                                     </div>
 
                                     <p class="hb-section-title">Stay by Journey</p>
-
                                     <!-- ================= DIVISIONS ================= -->
                                     @foreach($item_data['day_journey'] as $division)
 
@@ -249,13 +268,14 @@
 
                                             <!-- ================= ROOM BOOKINGS ================= -->
                                             @foreach($division['room_bookings'] as $booking)
-
+                                                @php
+                                                    $check_in = \Carbon\Carbon::parse($booking['check_in'])->toDateString();
+                                                @endphp
                                                 <div class="hb-room-card">
-
                                                     <!-- LEFT -->
                                                     <div class="hb-room-left">
                                                         <img
-                                                            src="{{ $booking['hotel_image'] ?? asset('build/assets/images/logo/demo.webp') }}"
+                                                            src="{{ $booking['hotel_image'] ?asset($booking['hotel_image']): asset('build/assets/images/logo/demo.webp') }}"
                                                             class="hb-hotel-img"
                                                         >
 
@@ -288,34 +308,38 @@
                                                         <!-- STATUS TOGGLE -->
                                                         <div class="hb-status-toggle">
                                                             <span
-                                                                wire:click="$set('bookingAction', 'availability')"
-                                                                class="hb-status availability {{ $bookingAction !== 'availability' ? 'inactive' : '' }}"
+                                                                wire:click="changebookingAction('availability', '{{ $check_in }}', {{ $booking['room_id'] }})"
+                                                                class="hb-status availability
+                                                                {{ $bookingAction === 'availability'
+                                                                    && $active_checkin === $check_in
+                                                                    && $active_roomId === $booking['room_id']
+                                                                    ? ''
+                                                                    : 'inactive' }}"
                                                             >
                                                                 Availability
                                                             </span>
 
                                                             <span
-                                                                wire:click="$set('bookingAction', 'confirm')"
-                                                                class="hb-status confirm {{ $bookingAction !== 'confirm' ? 'inactive' : '' }}"
+                                                                wire:click="changebookingAction('confirm', '{{ $check_in }}', {{ $booking['room_id'] }})"
+                                                                class="hb-status confirm
+                                                                {{ $bookingAction === 'confirm'
+                                                                    && $active_checkin === $check_in
+                                                                    && $active_roomId === $booking['room_id']
+                                                                    ? ''
+                                                                    : 'inactive' }}"
                                                             >
                                                                 Confirm Booking
                                                             </span>
                                                         </div>
 
+
                                                         
                                                         <!-- META -->
                                                         <div class="hb-meta">
-
-                                                            <p>
-                                                                🕒 <strong>Sent at:</strong> 12 Sep 2025, 03:45 PM<br>
-                                                                📩 <strong>Channel:</strong> Email<br>
-                                                                📌 <strong>Type:</strong> Availability
-                                                            </p>
-
                                                             <hr style="border:none; border-top:1px dashed #ccc; margin:6px 0;">
 
                                                             <p>
-                                                                🕒 <strong>Sent at:</strong> 13 Sep 2025, 10:20 AM<br>
+                                                                🕒 <strong>Last Sent at:</strong> 13 Sep 2025, 10:20 AM<br>
                                                                 📩 <strong>Channel:</strong> WhatsApp<br>
                                                                 📌 <strong>Type:</strong> Availability
                                                             </p>
@@ -323,22 +347,25 @@
                                                             <hr style="border:none; border-top:1px dashed #ccc; margin:6px 0;">
 
                                                             <p>
-                                                                🕒 <strong>Sent at:</strong> 14 Sep 2025, 06:15 PM<br>
+                                                                🕒 <strong>Last Sent at:</strong> 14 Sep 2025, 06:15 PM<br>
                                                                 📩 <strong>Channel:</strong> Email<br>
                                                                 📌 <strong>Type:</strong> Confirm Booking
                                                             </p>
 
                                                         </div>
-                                                        <hr style="border:none; border-top:1px dashed #ccc; margin:6px 0;">
-                                                        <!-- ACTIONS -->
-                                                        <a href="#" class="hb-btn whatsapp">
-                                                            📲 Send via WhatsApp
-                                                        </a>
+                                                        @if($active_checkin === $check_in && $active_roomId === $booking['room_id'])
+                                                            <hr style="border:none; border-top:1px dashed #ccc; margin:6px 0;">
+                                                            <!-- ACTIONS -->
+                                                            <a href="javascript:void(0)" wire:click="sendViaWhatsapp(true)" class="hb-btn whatsapp">
+                                                                <img src="{{ asset('assets/img/whatsapp.png') }}" class="hb-icon" alt="WhatsApp">
+                                                                Send via WhatsApp
+                                                            </a>
 
-                                                        <a href="#" class="hb-btn email">
-                                                            📩 Send via Email
-                                                        </a>
-
+                                                            <a href="javascript:void(0)" wire:click="sendViaEmail(true)" class="hb-btn email">
+                                                                <img src="{{ asset('assets/img/gmail.png') }}" class="hb-icon" alt="Email">
+                                                                Send via Email
+                                                            </a>
+                                                        @endif
 
                                                     </div>
 
@@ -358,10 +385,40 @@
                 </div>
             </div>
         </div>
+        {{-- Whatsapp Modal --}}
+        <div id="whatsapp_modal_section" class="hs-overlay {{$whatsapp_modal?"":"hidden"}} fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div class="hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out lg:!max-w-4xl lg:w-full m-3 lg:!mx-auto modal_semi_lg_width bg-white rounded-lg">
+                <div class="ti-modal-content p-20">
+                    <div class="ti-modal-header flex justify-end items-center">
+                        <button type="button" class="text-gray-400 hover:text-gray-600 focus:outline-none badge gap-2 bg-danger/10 text-danger" wire:click="sendViaWhatsapp(false)">
+                            <i class="fa-solid fa-xmark text-lg text-dark"></i>
+                        </button>
+                    </div>
+                    <div class="ti-modal-body text-start">
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{-- Whatsapp Modal --}}
+        <div id="email_modal_section" class="hs-overlay {{$email_modal?"":"hidden"}} fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div class="hs-overlay-open:mt-7 ti-modal-box mt-0 ease-out lg:!max-w-4xl lg:w-full m-3 lg:!mx-auto modal_semi_lg_width bg-white rounded-lg">
+                <div class="ti-modal-content p-20">
+                    <div class="ti-modal-header flex justify-end items-center">
+                        <button type="button" class="text-gray-400 hover:text-gray-600 focus:outline-none badge gap-2 bg-danger/10 text-danger" wire:click="sendViaEmail(false)">
+                            <i class="fa-solid fa-xmark text-lg text-dark"></i>
+                        </button>
+                    </div>
+                    <div class="ti-modal-body text-start">
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- LOADER -->
-        <div wire:loading class="hb-loader">
-            <img src="{{ asset('build/assets/images/media/loader.svg') }}">
+        <div wire:loading class="loader" wire:target="activeTabChange, changebookingAction,sendViaWhatsapp,sendViaEmail">
+            <div class="spinner">
+                <img src="{{ asset('build/assets/images/media/loader.svg') }}">
+            </div>
         </div>
 
     </div>
