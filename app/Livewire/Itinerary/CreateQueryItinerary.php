@@ -234,6 +234,7 @@ class CreateQueryItinerary extends Component
             if($index<$this->leadData->travel_in_days){
 
                 $selectedDayHotelsId = [];
+                $this->selectedRestHotels[$index] = [];
                 if (isset($this->day_by_divisions[$index]['day_hotel'])) {
                     foreach ($this->day_by_divisions[$index]['day_hotel'] as $day_hotel_index => $day_hotel) {
                         $selectedDayHotelsId[$day_hotel_index] = isset($day_hotel['hotel_id']) && $day_hotel['hotel_id']
@@ -3379,7 +3380,7 @@ class CreateQueryItinerary extends Component
         if ($this->send_email) {
             $mailService = app(MailTemplateService::class);
 
-            $subject = "Hi {$this->leadData->customer_name}, Your Customized Itinerary ({$this->itineraryData->itinerary_syntax}) for {$this->leadData->destination->name} is Ready ✈️";
+            $subject = "Hi {$this->leadData->customer_name}, Your Customized Itinerary ({$this->itineraryData->itinerary_syntax}) for {$this->leadData->destination->name} is Ready.";
 
             $mailService->send(
                 $this->leadData->customer_email,

@@ -16,6 +16,7 @@ class MailTemplateService
                 'subject'       => $subject,   //  email subject
                 'status'        => 'pending',
             ]);
+            // dd($to, $templateSlug, $subject, $content, $fromAddress, $fromName, $attachments);
             // Send email using your static email wrapper view
             Mail::send('emails.dynamic', $content, function ($message) use ($to, $subject, $fromAddress, $fromName, $attachments) {
                 $message->to($to)
@@ -41,7 +42,7 @@ class MailTemplateService
             return true;
 
         } catch (\Exception $e) {
-
+            dd($e->getMessage());
             // Log the failure
             $log->update([
                 'status' => 'failed',

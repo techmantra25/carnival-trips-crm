@@ -5,13 +5,14 @@ namespace App\Livewire\Lead;
 use Livewire\Component;
 use App\Models\Lead;
 use App\Models\City;
- use Carbon\Carbon;
+use Carbon\Carbon;
+use App\Services\MailTemplateService;
 
 class ManageHotelBooking extends Component
 {
     public $leadData, $sent_itinerary =[];
     public $activeTab = 0;
-    public $bookingAction = 'availability', $active_checkin = null, $active_roomId = null;
+    public $bookingAction = 'availability', $active_checkin = null, $active_hotel_data = null;
     public $whatsapp_modal = false;
     public $email_modal = false;
     public function mount($lead_id){
@@ -133,6 +134,46 @@ class ManageHotelBooking extends Component
                 }
 
                 // 🔹 Final Division Result
+                $grouped = [];
+
+                foreach ($checkInOut as $booking) {
+
+                    $key = $booking['hotel_id'] . '_' . $booking['room_id'];
+                    $mail_tab = $item->id . '_' . $divisionId . '_' . $key;
+                    if (!isset($grouped[$key])) {
+
+                        // First entry → main check-in/out
+                        $grouped[$key] = [
+                            'mail_tab'      => $mail_tab,
+                            'hotel_id'      => $booking['hotel_id'],
+                            'hotel_name'    => $booking['hotel_name'],
+                            'hotel_email'   => $booking['hotel_email'],
+                            'hotel_image'   => $booking['hotel_image'],
+                            'hotel_address' => $booking['hotel_address'],
+
+                            'room_id'       => $booking['room_id'],
+                            'room_name'     => $booking['room_name'],
+                            'no_of_room'    => $booking['no_of_room'],
+
+                            'check_in'      => $booking['check_in'],
+                            'check_out'     => $booking['check_out'],
+                            'nights'        => $booking['nights'],
+
+                            're_stays'      => [], // store multiple re-checks
+                        ];
+
+                    } else {
+                        // Same hotel & room → add re-check-in/out
+                        $grouped[$key]['mail_tab'] = $mail_tab;
+                        $grouped[$key]['re_stays'][] = [
+                            're_check_in'  => $booking['check_in'],
+                            're_check_out' => $booking['check_out'],
+                        ];
+                    }
+                }
+
+                // Re-index array
+                $checkInOut = array_values($grouped);
                 $result[] = [
                     'day_of_division' => $days,
                     'division_name'   => $cityNames[$divisionId] ?? null,
@@ -144,6 +185,10 @@ class ManageHotelBooking extends Component
 
                     'rate_plan'       => $this->leadData->meal_type,
                     'guest_name'      => $this->leadData->customer_name,
+                    'adults'          => $this->leadData->number_of_adults,
+                    'children'        => $this->leadData->number_of_children,
+                    'extra_mattress'  => $this->leadData->extra_mattress,
+                    'children_data'   => $this->leadData->children_data,
                     'booking_id'      => $this->leadData->unique_id,
                 ];
             }
@@ -160,22 +205,78 @@ class ManageHotelBooking extends Component
         $this->activeTab = $confirmedIndex !== false ? $confirmedIndex : 0;
     }
 
-    public function changebookingAction($action, $checkIn, $roomId){
+    public function changebookingAction($action, $checkIn, $index, $dayJourneyKey){
         $this->bookingAction = $action;
         $this->active_checkin = $checkIn;
-        $this->active_roomId = $roomId;
+        $this->activeTab = $index;
+        $this->active_hotel_data = $this->sent_itinerary[$index]['day_journey'][$dayJourneyKey];
     }
     public function activeTabChange($index){
         $this->activeTab = $index;
-        $this->reset(['bookingAction', 'active_checkin', 'active_roomId']);
+        $this->reset(['bookingAction', 'active_checkin']);
     }
-    public function sendViaWhatsapp($modal){
+    public function openSendWhatsappModal($modal){
         $this->email_modal = false;
         $this->whatsapp_modal = $modal;
     }
-    public function sendViaEmail($modal){
+    public function openSendEmailModal($modal){
         $this->whatsapp_modal = false;
         $this->email_modal = $modal;
+    }
+    public function sendViaWhatsapp(){
+        dd('Send via WhatsApp');
+    }
+    public function sendViaEmail(){
+        // $to = $this->active_hotel_data['room_bookings'][0]['hotel_email'];
+        $to = "rajib.techmantra@gmail.com";
+        $recipient_name = $this->active_hotel_data['room_bookings'][0]['hotel_name'];
+        $room_name = $this->active_hotel_data['room_bookings'][0]['room_name'];
+        
+        if($to){
+            $mailService = app(MailTemplateService::class);
+            $nights = $this->active_hotel_data['number_of_day'] ?? 1;
+            $division = $this->active_hotel_data['division_name'] ?? '';
+            $booking_id = $this->active_hotel_data['booking_id'] ?? '';
+
+            if ($this->bookingAction === 'confirm') {
+                $subject = "Booking Confirmation | {$booking_id} | {$nights} Nights | {$room_name} | {$division}";
+            } else {
+                $subject = "Availability Request | {$nights} Night Stay | {$room_name} | {$division}";
+            }
+
+            $response = $mailService->send(
+                $to,
+                'hotel_availability_check_and_booking_confirmation',
+                $subject,
+                [
+                    'template_type'    => 'hotel_availability_check_and_booking_confirmation',
+                    'recipient_name'   => $recipient_name,
+                    'mail_type'        => $this->bookingAction,
+                    'booking_details'  => $this->active_hotel_data,
+                    'company_name'     => "Christmas Tree Hospitality",
+                    'sender_name'      => "Reservation Team",
+                    'subject'          => $subject,
+                ],
+                env('MAIL_FROM_ADDRESS'),
+                env('MAIL_FROM_NAME'),
+                []//attachments
+            );
+            if($response){
+
+
+                session()->flash('email_success', 'Email sent successfully to hotel.');
+            }else{
+                dd($this->active_hotel_data);
+                session()->flash('email_error', 'Failed to send email. Please try again.');
+                return;
+            }
+            
+        }else{
+           session()->flash('email_error', 'Hotel email address not found. Unable to send email.');
+             return;
+
+        }
+        
     }
     public function render()
     {
