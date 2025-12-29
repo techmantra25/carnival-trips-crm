@@ -18,6 +18,7 @@ use Carbon\Carbon;
 use App\Helpers\CustomHelper;
 use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
+use App\Jobs\SendEmailJob;
 
 
 
@@ -135,7 +136,10 @@ class LeadImport implements ToCollection, WithHeadingRow
                             $LeadUrlShare = LeadUrlShare::find($linkItem);
 
                             CustomHelper::sendItineraryLinkOnWhatsapp($linkItem);
-                            CustomHelper::sendItineraryLinkOnEmail($linkItem);
+                            // CustomHelper::sendItineraryLinkOnEmail($linkItem);
+
+                            // Dispatch email job
+                            SendEmailJob::dispatch($linkItem);
                         
                             //  Log success
                             LeadActivityLog::create([

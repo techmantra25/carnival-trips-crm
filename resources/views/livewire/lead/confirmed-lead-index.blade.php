@@ -157,10 +157,12 @@
                                                 $confirmed_by = optional($confirmed_itinerary?->confirmedBy);
                                                 $timeInfo = $confirmed_itinerary ? \App\Helpers\CustomHelper::formatLeadTime($confirmed_itinerary->confirmed_at) : null;
                                             @endphp
-                                            <button type="button" class="badge bg-outline-secondary my-3 me-2 badge-custom-outline-secondary">
-                                                {{ $timeInfo['formatted_date'] }}
-                                                <span class="badge bg-secondary ms-2 text-white">{{ $timeInfo['time_ago'] }}</span>
-                                            </button>
+                                            @if($timeInfo)
+                                                <button type="button" class="badge bg-outline-secondary my-3 me-2 badge-custom-outline-secondary">
+                                                    {{ $timeInfo?$timeInfo['formatted_date']:'N/A' }}
+                                                    <span class="badge bg-secondary ms-2 text-white">{{ $timeInfo?$timeInfo['time_ago']:'N/A' }}</span>
+                                                </button>
+                                            @endif
                                         </td>
                                         <td>
                                             <button type="button" class="badge bg-outline-secondary badge-custom-outline-secondary">

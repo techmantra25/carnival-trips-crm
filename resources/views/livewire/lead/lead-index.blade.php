@@ -278,8 +278,9 @@
                                                         ? Str::slug($lead_item->destination->name)
                                                         : 'destination';
                                                         $lead_itinerary_journey = $lead_item->travel_in_days.'day-'.$lead_item->travel_in_nights.'nights';
-                                                        $LeadUrlShare = App\Models\LeadUrlShare::where('lead_id', $lead_item->id)->where('itinerary_id', $lead_item->itinerary->id)->first();
-                                                        $shared_link = App\Helpers\CustomHelper::secure_encode_id($LeadUrlShare?$LeadUrlShare->id:null);
+                                                        $LeadUrlShare = App\Models\LeadUrlShare::where('lead_id', $lead_item->id)->where('itinerary_id', $lead_item->itinerary->id)->whereNotNull('itinerary_id')->first();
+                                                       
+                                                        $shared_link =$LeadUrlShare? App\Helpers\CustomHelper::secure_encode_id($LeadUrlShare->id):null;
                                                     @endphp
                                                     @if($shared_link)
                                                         <a href="{{route('website.lead.destination.preset-itinerary',[$destination_slug,$lead_itinerary_journey,$shared_link])}}" target="_blank"

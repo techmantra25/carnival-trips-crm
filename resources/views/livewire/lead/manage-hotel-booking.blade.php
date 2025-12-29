@@ -217,7 +217,7 @@
 
                         @php $itinerary = $item_data['details']; @endphp
 
-                        <div class="{{ ($activeTab ?? 0) === $index ? 'block' : 'hidden' }}">
+                        <div class="{{ ($activeTab ?? 0) === $index ? 'block' : 'hidden' }}" wire:key="itinerary-{{ $index }}">
 
                             <div class="hb-grid">
 
@@ -349,24 +349,28 @@
 
                                                         
                                                         <!-- META -->
+
                                                         <div class="hb-meta">
-                                                            <hr style="border:none; border-top:1px dashed #ccc; margin:6px 0;">
+                                                            @if(count($booking['log_data']) > 0)
+                                                                @foreach($booking['log_data'] as $log)
+                                                                    <div wire:key="log-{{ $booking['mail_tab'] }}-{{ $loop->index }}">
+                                                                       <hr style="border:none; border-top:1px dashed #ccc; margin:6px 0;">
+                                                                        <p>
+                                                                            🕒 <strong>Last Sent at:</strong>
+                                                                            {{ \Carbon\Carbon::parse($log['created_at'])->format('d M Y, h:i A') }}<br>
+                                                                            👤 <strong>Sent by:</strong>
+                                                                            {{ optional($log['sender'])['name'] ?? 'N/A' }}<br>
+                                                                            📩 <strong>Channel:</strong> {{ $log['channel'] }}<br>
 
-                                                            <p>
-                                                                🕒 <strong>Last Sent at:</strong> 13 Sep 2025, 10:20 AM<br>
-                                                                📩 <strong>Channel:</strong> WhatsApp<br>
-                                                                📌 <strong>Type:</strong> Availability
-                                                            </p>
+                                                                            📌 <strong>Type:</strong>
+                                                                            {{ ucfirst(str_replace('_', ' ', $log['type'])) }}
+                                                                        </p>
+                                                                    </div>
+                                                                @endforeach
 
-                                                            <hr style="border:none; border-top:1px dashed #ccc; margin:6px 0;">
-
-                                                            <p>
-                                                                🕒 <strong>Last Sent at:</strong> 14 Sep 2025, 06:15 PM<br>
-                                                                📩 <strong>Channel:</strong> Email<br>
-                                                                📌 <strong>Type:</strong> Confirm Booking
-                                                            </p>
-
+                                                            @endif
                                                         </div>
+
                                                         @if($active_checkin === $check_in && $activeTab === $index)
                                                             <hr style="border:none; border-top:1px dashed #ccc; margin:6px 0;">
                                                             <!-- ACTIONS -->
@@ -594,6 +598,44 @@
             </div>
         </div>
 
+    </div>
+    <!-- Toast Container (bottom right) -->
+    <div class="fixed bottom-5 inset-x-0 z-50 flex justify-end px-5 pointer-events-none">
+        @if (session()->has('success'))
+            <div
+                x-data="{ show: true }"
+                x-init="setTimeout(() => show = false, 3000)"
+                x-show="show"
+                x-transition:enter="transition ease-out duration-500"
+                x-transition:enter-start="opacity-0 translate-y-4"
+                x-transition:enter-end="opacity-100 translate-y-0"
+                x-transition:leave="transition ease-in duration-300"
+                x-transition:leave-start="opacity-100 translate-y-0"
+                x-transition:leave-end="opacity-0 translate-y-4"
+                class="bg-green-500 text-white px-5 py-3 rounded shadow-lg flex items-center space-x-2 pointer-events-auto"
+            >
+                <i class="ti ti-check text-xl"></i>
+                <span>{{ session('success') }}</span>
+            </div>
+        @endif
+
+        @if (session()->has('error'))
+            <div
+                x-data="{ show: true }"
+                x-init="setTimeout(() => show = false, 3000)"
+                x-show="show"
+                x-transition:enter="transition ease-out duration-500"
+                x-transition:enter-start="opacity-0 translate-y-4"
+                x-transition:enter-end="opacity-100 translate-y-0"
+                x-transition:leave="transition ease-in duration-300"
+                x-transition:leave-start="opacity-100 translate-y-0"
+                x-transition:leave-end="opacity-0 translate-y-4"
+                class="bg-red-500 text-white px-5 py-3 rounded shadow-lg flex items-center space-x-2 pointer-events-auto"
+            >
+                <i class="ti ti-alert-triangle text-xl"></i>
+                <span>{{ session('error') }}</span>
+            </div>
+        @endif
     </div>
 
 </div>

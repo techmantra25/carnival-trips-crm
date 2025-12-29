@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\Lead;
 use App\Models\City;
 use Carbon\Carbon;
+use App\Models\HotelAvailabilityOrBookingLog;
 use App\Services\MailTemplateService;
 
 class ManageHotelBooking extends Component
@@ -18,6 +19,9 @@ class ManageHotelBooking extends Component
     public function mount($lead_id){
         $this->leadData = Lead::findOrFail($lead_id);
         // $this->sent_itinerary = $this->leadData->sent_itinerary;
+        $this->loadItineraryData();
+    }
+    public function loadItineraryData(){
         $arrivalDate = Carbon::parse($this->leadData->arrival_date);
         foreach ($this->leadData->sent_itinerary as $key => $item) {
             $data = explode(',', $item->stay_by_journey);
@@ -137,14 +141,41 @@ class ManageHotelBooking extends Component
                 $grouped = [];
 
                 foreach ($checkInOut as $booking) {
-
                     $key = $booking['hotel_id'] . '_' . $booking['room_id'];
                     $mail_tab = $item->id . '_' . $divisionId . '_' . $key;
-                    if (!isset($grouped[$key])) {
+                    $availability = HotelAvailabilityOrBookingLog::with('sender')->where('itinerary_id', $item->id)
+                            ->where('code', $mail_tab)
+                            ->where('type', 'availability')
+                            ->latest()
+                            ->first();
 
+                    $confirmBooking = HotelAvailabilityOrBookingLog::with('sender')->where('itinerary_id', $item->id)
+                            ->where('code', $mail_tab)
+                            ->where('type', 'Confirm_booking')
+                            ->latest()
+                            ->first();
+
+                    $logData = collect([$availability, $confirmBooking])
+                    ->filter()
+                    ->map(function ($log) {
+                        return [
+                            'id'         => $log->id,
+                            'created_at' => $log->created_at,
+                            'channel'    => $log->channel,
+                            'type'       => $log->type,
+                            'sender'     => [
+                                'name' => optional($log->sender)->name,
+                            ],
+                        ];
+                    })
+                    ->values()
+                    ->toArray();
+
+                    if (!isset($grouped[$key])) {
                         // First entry → main check-in/out
                         $grouped[$key] = [
                             'mail_tab'      => $mail_tab,
+                            'log_data'      => $logData,
                             'hotel_id'      => $booking['hotel_id'],
                             'hotel_name'    => $booking['hotel_name'],
                             'hotel_email'   => $booking['hotel_email'],
@@ -165,6 +196,7 @@ class ManageHotelBooking extends Component
                     } else {
                         // Same hotel & room → add re-check-in/out
                         $grouped[$key]['mail_tab'] = $mail_tab;
+                        $grouped[$key]['log_data'] = $logData;
                         $grouped[$key]['re_stays'][] = [
                             're_check_in'  => $booking['check_in'],
                             're_check_out' => $booking['check_out'],
@@ -175,6 +207,7 @@ class ManageHotelBooking extends Component
                 // Re-index array
                 $checkInOut = array_values($grouped);
                 $result[] = [
+                    'itinerary_id' => $item->id,
                     'day_of_division' => $days,
                     'division_name'   => $cityNames[$divisionId] ?? null,
                     'division_id'     => (int) $divisionId,
@@ -202,7 +235,11 @@ class ManageHotelBooking extends Component
         }
         $confirmedIndex = collect($this->leadData->sent_itinerary)
         ->search(fn ($item) => $item->is_confirmed == 1);
-        $this->activeTab = $confirmedIndex !== false ? $confirmedIndex : 0;
+        if($this->activeTab === 0){
+            $this->activeTab = $confirmedIndex !== false ? $confirmedIndex : 0;
+        }else{
+            $this->activeTab = $this->activeTab;
+        }
     }
 
     public function changebookingAction($action, $checkIn, $index, $dayJourneyKey){
@@ -224,13 +261,14 @@ class ManageHotelBooking extends Component
         $this->email_modal = $modal;
     }
     public function sendViaWhatsapp(){
-        dd('Send via WhatsApp');
+        dd('Send via WhatsApp currently not implemented.');
     }
     public function sendViaEmail(){
         // $to = $this->active_hotel_data['room_bookings'][0]['hotel_email'];
         $to = "rajib.techmantra@gmail.com";
         $recipient_name = $this->active_hotel_data['room_bookings'][0]['hotel_name'];
         $room_name = $this->active_hotel_data['room_bookings'][0]['room_name'];
+        $code = $this->active_hotel_data['room_bookings'][0]['mail_tab'];
         
         if($to){
             $mailService = app(MailTemplateService::class);
@@ -262,15 +300,21 @@ class ManageHotelBooking extends Component
                 []//attachments
             );
             if($response){
-
-
-                session()->flash('email_success', 'Email sent successfully to hotel.');
+                $log = HotelAvailabilityOrBookingLog::create([
+                    'itinerary_id' => $this->active_hotel_data['itinerary_id'],
+                    'code'         => $code,
+                    'channel'      => 'Email',
+                    'type'         => $this->bookingAction === 'confirm' ? 'Confirm_booking' : 'availability',
+                    'sent_by'      => auth()->user()->id,
+                ]);
+                session()->flash('success', 'Email sent successfully to hotel.');
+                $this->loadItineraryData();
+                $this->dispatch('$refresh');
+                $this->email_modal = false;
             }else{
-                dd($this->active_hotel_data);
                 session()->flash('email_error', 'Failed to send email. Please try again.');
                 return;
             }
-            
         }else{
            session()->flash('email_error', 'Hotel email address not found. Unable to send email.');
              return;

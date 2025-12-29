@@ -457,7 +457,7 @@ class CustomHelper
     public static function sendItineraryLinkOnWhatsapp($shared_link_id){
         // dd($shared_link_id);
     }
-   public static function sendItineraryLinkOnEmail($shared_link_id)
+    public static function sendItineraryLinkOnEmail($shared_link_id)
     {
         // Load the shared link with itinerary and lead
         $LeadUrlShare = LeadUrlShare::with(['itinerary', 'lead'])->find($shared_link_id);
@@ -469,7 +469,6 @@ class CustomHelper
 
         try {
             $mailService = app(MailTemplateService::class);
-
             // Dynamic subject with "Drim" + itinerary syntax
             $subject = "Hi, {$LeadUrlShare->lead->customer_name}, Your Dreem Itinerary ({$LeadUrlShare->itinerary->itinerary_syntax}) Awaits! 🎉";
 
@@ -507,7 +506,7 @@ class CustomHelper
 
         $lead = Lead::find($lead_id);
 
-        if (!$lead || !$lead->itinerary) {
+        if (!$lead || !$lead->itinerary || !$lead->itinerary->itinerary_journey) {
             return $sharedLinkIds; // return empty array if lead or itinerary is missing
         }
 

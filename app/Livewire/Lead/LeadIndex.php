@@ -136,7 +136,6 @@ class LeadIndex extends Component
     }
     public function SetFilter($value)
     {
-
         $this->filter = $value;
         $this->resetPage();
     }
@@ -156,6 +155,7 @@ class LeadIndex extends Component
     }
 
     public function changeLeadStatus($value){
+        $this->resetPage();
         if (in_array($value, $this->filter_lead_status)) {
             $this->filter_lead_status = array_diff($this->filter_lead_status, [$value]);
         } else {
@@ -1085,7 +1085,7 @@ class LeadIndex extends Component
             }
         })
         ->orderBy('id', 'DESC')
-        ->paginate(5);
+        ->paginate(20);
         return view('livewire.lead.lead-index',[
             'leads'=>$leads,
         ]);
