@@ -1,12 +1,31 @@
 <div>
     <section class="itinerary-banner-section">
         <div class="background">
-            <img src="{{asset('front_assets/images/banner-bg.jpg')}}" alt="">
+            @php
+                $bannerSection = $template
+                    ? $template->detail
+                        ->where('header', 'banner_section')
+                        ->where('field', 'main_banner')
+                        ->first()
+                    : null;
+            @endphp
+
+            @if ($bannerSection && $bannerSection->value)
+                <img src="{{ asset($bannerSection->value) }}" alt="">
+            @else
+                <img src="{{ asset('front_assets/images/banner-bg.jpg') }}" alt="">
+            @endif
         </div>
+
         <div class="content">
             <div class="container">
                 <div class="row">
                     <div class="col-xl-8 col-lg-10 col-12">
+                        <div class="banner-logo">
+                            <a href="javascript:void(0)">
+                                <img src="{{asset('front_assets/images/footer-logo.png')}}" alt="Logo">
+                            </a>
+                        </div>
                         <h1>Hello {{$lead->customer_name}}</h1>
                         <h2>Here Is Your Dream Itinerary</h2>
                         <div class="duration">
@@ -19,19 +38,21 @@
                                 {{$divisions_journey['city_name'].'('.$divisions_journey['count'].'D)'}} @if (!$loop->last), @endif
                             @endforeach
                         </div>
-                        <div class="cta-row">
+                        {{-- <div class="cta-row">
                             <a href="#" class="cta">
                                 <img src="{{asset('front_assets/icons/telephone-white.png')}}" alt="">
                                 Call Us Now
                             </a>
                             <a href="#" class="cta-2">Send Enquiry</a>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
             </div>
         </div>
     </section>
-
+@php
+    $about_destination_slider_image = [];
+@endphp
     @if($template && $template->detail)
         @php
             $great_experience_title = $template->detail->where('header','great_experience')->where('field','great_experience_title')->first();
@@ -65,7 +86,7 @@
                             <div class="left-content">
                                 <h2>For Great Experience</h2>
                                 <h3><span>Travel</span> {{$great_experience_title?$great_experience_title->value:"...."}}</h3>
-                                <p class="desc">{{$great_experience_title?$great_experience_text->value:"...."}}</p>
+                                <p class="desc">{{$great_experience_text?$great_experience_text->value:"...."}}</p>
                                 <ul>
                                     @foreach($great_experience_sub_details as $great_experience_sub_detail)
                                         <li>
@@ -203,7 +224,7 @@
                                         </div>
                                     </div>
 
-                                    <h2 class="text-center">Shillong &amp; Cherrapunjee</h2>
+                                    <h2 class="text-center">Your Dream Itinerary</h2>
                                     <h2 class="text-center">Day by Day Brief</h2>
                                     
                                     <div class="content-wrap-box">
@@ -250,100 +271,33 @@
                                                             </div>
                                                             <ul class="hospitalities-list">
                                                                 <li>
-                                                                    <div class="hospitality-card">
+                                                                    <div class="hospitality-card selected">
                                                                         <div class="img-wrap">
                                                                             <img src="{{asset('front_assets/images/bedroom-suite.webp')}}" alt="Hospitality">
                                                                         </div>
                                                                         <div class="info-wrap">
                                                                             <div class="title">Lmosconsectetur adipisicing</div>
-                                                                            <div class="day-night-rated">
-                                                                                <div class="day-night">
-                                                                                    <img src="{{asset('front_assets/icons/map-pin-blue.png')}}" alt="">
-                                                                                    GTK(2N) + DRJ(2N)
-                                                                                </div>
-                                                                                <div class="rated">
-                                                                                    <img src="{{asset('front_assets/icons/yellow-star.png')}}" alt="">
-                                                                                    3 Start Hotels
-                                                                                </div>
+                                                                            <div class="address">Address</div>
+                                                                            <div class="bottom-row">
+                                                                                <h4>Semi Dlx</h4>
+                                                                                <span class="indicator"></span>
                                                                             </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
 
-                                                                            <div class="facilities-box">
-
-                                                                                <ul class="facilities-options">
-                                                                                    <li>
-                                                                                        <label for="semiDlx" class="custom-radio">
-                                                                                            <input type="radio" name="facilities1" id="semiDlx" value="">
-                                                                                            <span class="checkmark">
-                                                                                                <span class="mark-inner"></span>
-                                                                                            </span>
-                                                                                            <span class="text">SEMI-DLX</span>
-                                                                                        </label>
-                                                                                    </li>
-                                                                                    <li>
-                                                                                        <label for="dlx" class="custom-radio">
-                                                                                            <input type="radio" name="facilities1" id="dlx" value="">
-                                                                                            <span class="checkmark">
-                                                                                                <span class="mark-inner"></span>
-                                                                                            </span>
-                                                                                            <span class="text">DLX</span>
-                                                                                        </label>
-                                                                                    </li>
-                                                                                    <li>
-                                                                                        <label for="superDlx" class="custom-radio">
-                                                                                            <input type="radio" name="facilities1" id="superDlx" value="">
-                                                                                            <span class="checkmark">
-                                                                                                <span class="mark-inner"></span>
-                                                                                            </span>
-                                                                                            <span class="text">SUPER-DLX</span>
-                                                                                        </label>
-                                                                                    </li>
-                                                                                </ul>
-                                                                                
-                                                                                <ul class="list-of-facilities">
-                                                                                    <li>
-                                                                                        <div class="content-wrap">
-                                                                                            <div class="img-wrap"><img src="{{asset('front_assets/icons/car-white.png')}}" alt="Transfer"></div>
-                                                                                            <span>Transfer</span>
-                                                                                        </div>
-                                                                                    </li>
-                                                                                    <li>
-                                                                                        <div class="content-wrap">
-                                                                                            <div class="img-wrap"><img src="{{asset('front_assets/icons/bed-white.png')}}" alt="Transfer"></div>
-                                                                                            <span>Stay</span>
-                                                                                        </div>
-                                                                                    </li>
-                                                                                    <li>
-                                                                                        <div class="content-wrap">
-                                                                                            <div class="img-wrap"><img src="{{asset('front_assets/icons/breakfast-white.png')}}" alt="Transfer"></div>
-                                                                                            <span>Bearkfast</span>
-                                                                                        </div>
-                                                                                    </li>
-                                                                                    <li>
-                                                                                        <div class="content-wrap">
-                                                                                            <div class="img-wrap"><img src="{{asset('front_assets/icons/binoculars-white.png')}}" alt="Transfer"></div>
-                                                                                            <span>Sightseeing</span>
-                                                                                        </div>
-                                                                                    </li>
-                                                                                </ul>
-
-                                                                            </div>
-
-                                                                            <div class="price-n-contact">
-                                                                                <div class="price-wrap">
-                                                                                    <div class="price">&#8377; 17,100 (PP)</div>
-                                                                                    <div class="actual">
-                                                                                        <span class="original">&#8377; 20,000 (PP)</span>
-                                                                                        <span class="off">15% off</span>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="contact">
-                                                                                    <a href="#" class="cta">
-                                                                                        <img src="{{asset('front_assets/icons/telephone-white.png')}}" alt="">
-                                                                                        Let&apos;s Talk
-                                                                                    </a>
-                                                                                </div>
-                                                                            </div>
-                                                                            
+                                                                <li>
+                                                                    <div class="hospitality-card selected">
+                                                                        <div class="img-wrap">
+                                                                            <img src="{{asset('front_assets/images/bedroom-suite.webp')}}" alt="Hospitality">
+                                                                        </div>
+                                                                        <div class="info-wrap">
+                                                                            <div class="title">Lmosconsectetur adipisicing</div>
+                                                                            <div class="address">Address</div>
+                                                                            <div class="bottom-row">
+                                                                                <h4>Semi Dlx</h4>
+                                                                                <span class="indicator"></span>
+                                                                            </div>                                                                         
                                                                         </div>
                                                                     </div>
                                                                 </li>
@@ -355,193 +309,11 @@
                                                                         </div>
                                                                         <div class="info-wrap">
                                                                             <div class="title">Lmosconsectetur adipisicing</div>
-                                                                            <div class="day-night-rated">
-                                                                                <div class="day-night">
-                                                                                    <img src="{{asset('front_assets/icons/map-pin-blue.png')}}" alt="">
-                                                                                    GTK(2N) + DRJ(2N)
-                                                                                </div>
-                                                                                <div class="rated">
-                                                                                    <img src="{{asset('front_assets/icons/yellow-star.png')}}" alt="">
-                                                                                    3 Start Hotels
-                                                                                </div>
-                                                                            </div>
-
-                                                                            <div class="facilities-box">
-
-                                                                                <ul class="facilities-options">
-                                                                                    <li>
-                                                                                        <label for="semiDlx" class="custom-radio">
-                                                                                            <input type="radio" name="facilities1" id="semiDlx" value="">
-                                                                                            <span class="checkmark">
-                                                                                                <span class="mark-inner"></span>
-                                                                                            </span>
-                                                                                            <span class="text">SEMI-DLX</span>
-                                                                                        </label>
-                                                                                    </li>
-                                                                                    <li>
-                                                                                        <label for="dlx" class="custom-radio">
-                                                                                            <input type="radio" name="facilities1" id="dlx" value="">
-                                                                                            <span class="checkmark">
-                                                                                                <span class="mark-inner"></span>
-                                                                                            </span>
-                                                                                            <span class="text">DLX</span>
-                                                                                        </label>
-                                                                                    </li>
-                                                                                    <li>
-                                                                                        <label for="superDlx" class="custom-radio">
-                                                                                            <input type="radio" name="facilities1" id="superDlx" value="">
-                                                                                            <span class="checkmark">
-                                                                                                <span class="mark-inner"></span>
-                                                                                            </span>
-                                                                                            <span class="text">SUPER-DLX</span>
-                                                                                        </label>
-                                                                                    </li>
-                                                                                </ul>
-                                                                                
-                                                                                <ul class="list-of-facilities">
-                                                                                    <li>
-                                                                                        <div class="content-wrap">
-                                                                                            <div class="img-wrap"><img src="{{asset('front_assets/icons/car-white.png')}}" alt="Transfer"></div>
-                                                                                            <span>Transfer</span>
-                                                                                        </div>
-                                                                                    </li>
-                                                                                    <li>
-                                                                                        <div class="content-wrap">
-                                                                                            <div class="img-wrap"><img src="{{asset('front_assets/icons/bed-white.png')}}" alt="Transfer"></div>
-                                                                                            <span>Stay</span>
-                                                                                        </div>
-                                                                                    </li>
-                                                                                    <li>
-                                                                                        <div class="content-wrap">
-                                                                                            <div class="img-wrap"><img src="{{asset('front_assets/icons/breakfast-white.png')}}" alt="Transfer"></div>
-                                                                                            <span>Bearkfast</span>
-                                                                                        </div>
-                                                                                    </li>
-                                                                                    <li>
-                                                                                        <div class="content-wrap">
-                                                                                            <div class="img-wrap"><img src="{{asset('front_assets/icons/binoculars-white.png')}}" alt="Transfer"></div>
-                                                                                            <span>Sightseeing</span>
-                                                                                        </div>
-                                                                                    </li>
-                                                                                </ul>
-
-                                                                            </div>
-
-                                                                            <div class="price-n-contact">
-                                                                                <div class="price-wrap">
-                                                                                    <div class="price">&#8377; 17,100 (PP)</div>
-                                                                                    <div class="actual">
-                                                                                        <span class="original">&#8377; 20,000 (PP)</span>
-                                                                                        <span class="off">15% off</span>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="contact">
-                                                                                    <a href="#" class="cta">
-                                                                                        <img src="{{asset('front_assets/icons/telephone-white.png')}}" alt="">
-                                                                                        Let&apos;s Talk
-                                                                                    </a>
-                                                                                </div>
-                                                                            </div>
-                                                                            
-                                                                        </div>
-                                                                    </div>
-                                                                </li>
-
-                                                                <li>
-                                                                    <div class="hospitality-card">
-                                                                        <div class="img-wrap">
-                                                                            <img src="{{asset('front_assets/images/bedroom-suite.webp')}}" alt="Hospitality">
-                                                                        </div>
-                                                                        <div class="info-wrap">
-                                                                            <div class="title">Lmosconsectetur adipisicing</div>
-                                                                            <div class="day-night-rated">
-                                                                                <div class="day-night">
-                                                                                    <img src="{{asset('front_assets/icons/map-pin-blue.png')}}" alt="">
-                                                                                    GTK(2N) + DRJ(2N)
-                                                                                </div>
-                                                                                <div class="rated">
-                                                                                    <img src="{{asset('front_assets/icons/yellow-star.png')}}" alt="">
-                                                                                    3 Start Hotels
-                                                                                </div>
-                                                                            </div>
-
-                                                                            <div class="facilities-box">
-
-                                                                                <ul class="facilities-options">
-                                                                                    <li>
-                                                                                        <label for="semiDlx" class="custom-radio">
-                                                                                            <input type="radio" name="facilities1" id="semiDlx" value="">
-                                                                                            <span class="checkmark">
-                                                                                                <span class="mark-inner"></span>
-                                                                                            </span>
-                                                                                            <span class="text">SEMI-DLX</span>
-                                                                                        </label>
-                                                                                    </li>
-                                                                                    <li>
-                                                                                        <label for="dlx" class="custom-radio">
-                                                                                            <input type="radio" name="facilities1" id="dlx" value="">
-                                                                                            <span class="checkmark">
-                                                                                                <span class="mark-inner"></span>
-                                                                                            </span>
-                                                                                            <span class="text">DLX</span>
-                                                                                        </label>
-                                                                                    </li>
-                                                                                    <li>
-                                                                                        <label for="superDlx" class="custom-radio">
-                                                                                            <input type="radio" name="facilities1" id="superDlx" value="">
-                                                                                            <span class="checkmark">
-                                                                                                <span class="mark-inner"></span>
-                                                                                            </span>
-                                                                                            <span class="text">SUPER-DLX</span>
-                                                                                        </label>
-                                                                                    </li>
-                                                                                </ul>
-                                                                                
-                                                                                <ul class="list-of-facilities">
-                                                                                    <li>
-                                                                                        <div class="content-wrap">
-                                                                                            <div class="img-wrap"><img src="{{asset('front_assets/icons/car-white.png')}}" alt="Transfer"></div>
-                                                                                            <span>Transfer</span>
-                                                                                        </div>
-                                                                                    </li>
-                                                                                    <li>
-                                                                                        <div class="content-wrap">
-                                                                                            <div class="img-wrap"><img src="{{asset('front_assets/icons/bed-white.png')}}" alt="Transfer"></div>
-                                                                                            <span>Stay</span>
-                                                                                        </div>
-                                                                                    </li>
-                                                                                    <li>
-                                                                                        <div class="content-wrap">
-                                                                                            <div class="img-wrap"><img src="{{asset('front_assets/icons/breakfast-white.png')}}" alt="Transfer"></div>
-                                                                                            <span>Bearkfast</span>
-                                                                                        </div>
-                                                                                    </li>
-                                                                                    <li>
-                                                                                        <div class="content-wrap">
-                                                                                            <div class="img-wrap"><img src="{{asset('front_assets/icons/binoculars-white.png')}}" alt="Transfer"></div>
-                                                                                            <span>Sightseeing</span>
-                                                                                        </div>
-                                                                                    </li>
-                                                                                </ul>
-
-                                                                            </div>
-
-                                                                            <div class="price-n-contact">
-                                                                                <div class="price-wrap">
-                                                                                    <div class="price">&#8377; 17,100 (PP)</div>
-                                                                                    <div class="actual">
-                                                                                        <span class="original">&#8377; 20,000 (PP)</span>
-                                                                                        <span class="off">15% off</span>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="contact">
-                                                                                    <a href="#" class="cta">
-                                                                                        <img src="{{asset('front_assets/icons/telephone-white.png')}}" alt="">
-                                                                                        Let&apos;s Talk
-                                                                                    </a>
-                                                                                </div>
-                                                                            </div>
-                                                                            
+                                                                            <div class="address">Address</div>
+                                                                            <div class="bottom-row">
+                                                                                <h4>Semi Dlx</h4>
+                                                                                <span class="indicator"></span>
+                                                                            </div>                                                                           
                                                                         </div>
                                                                     </div>
                                                                 </li>
@@ -549,33 +321,228 @@
                                                         </div>
 
                                                         <div class="inner-content-wrap-box">
-                                                            <div class="heading">
+                                                            <div class="heading" data-bs-toggle="collapse" data-bs-target="#stack1">
                                                                 <img src="{{asset('front_assets/icons/car.png')}}" alt="">
-                                                                <span>2 Transfers:</span>
-                                                                <span class="total-selected">Total 2 Selected</span>
+                                                                <span>Kaziranga to Shillong Transfer</span>
                                                             </div>
-                                                            <div class="divider"></div>
-                                                            <ul class="description-list">
-                                                                <li>
-                                                                    <img src="{{asset('front_assets/icons/tick-circle.png')}}" alt="Bullet">
-                                                                    <div class="desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
-                                                                </li>
-                                                                <li>
-                                                                    <img src="{{asset('front_assets/icons/tick-circle.png')}}" alt="Bullet">
-                                                                    <div class="desc">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
-                                                                </li>
-                                                                <li>
-                                                                    <img src="{{asset('front_assets/icons/tick-circle.png')}}" alt="Bullet">
-                                                                    <div class="desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
-                                                                </li>
-                                                                <li>
-                                                                    <img src="{{asset('front_assets/icons/tick-circle.png')}}" alt="Bullet">
-                                                                    <div class="desc">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</div>
-                                                                </li>
-                                                            </ul>
+                                                            <div class="content-stack collapse show" id="stack1">
+                                                                <div class="divider"></div>
+                                                                <div class="booking-wrap">
+                                                                    <div class="grouping-list">
+                                                                        <h5>Sightseeing</h5>
+                                                                        <div class="grouping-stack">Kaziranga National Park <span>(1)<span></div>
+                                                                        <div class="grouping-stack">Umiam Lake <span>(1)<span></div>
+                                                                        <div class="grouping-stack">Police Bazar <span>(1)<span></div>
+                                                                    </div>
+                                                                    <div class="grouping-list">
+                                                                        <h5>Activity</h5>
+                                                                        <div class="grouping-stack">Jeep Safari for 1-6Pax <span>(2)<span></div>
+                                                                        <div class="grouping-stack">Elephant Safari <span>(2)<span></div>
+                                                                        <div class="grouping-stack">Boating at Umiam Lake <span>(2)<span></div>
+                                                                    </div>
+                                                                    <div class="grouping-list">
+                                                                        <h5>Cab</h5>
+                                                                        <div class="grouping-stack">Sedan (4S) <span>(1)<span></div>
+                                                                    </div>
+                                                                </div>
+
+
+                                                                <div class="activities-slider-wrap">
+                                                                    <div class="activities-slider-navigation">
+                                                                        <div class="swiper-button-next activities-swiper-button-next">
+                                                                            <img src="{{asset('front_assets/icons/slider-angle-right.png')}}" alt="next">
+                                                                        </div>
+                                                                        <div class="swiper-button-prev activities-swiper-button-prev">
+                                                                            <img src="{{asset('front_assets/icons/slider-angle-left.png')}}" alt="prev">
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="swiper activities-swiper">
+                                                                        <div class="swiper-wrapper">
+
+                                                                            <div class="swiper-slide" data-slide="1">
+                                                                                <div class="activity-content-box">
+                                                                                    <img src="{{asset('front_assets/images/activity-1.webp')}}" alt="Trip">
+                                                                                    <div class="info-holder">
+                                                                                        
+                                                                                        <div class="price">Starting with Rs.1,29,990/-</div>
+                                                                                        
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="swiper-slide" data-slide="2">
+                                                                                <div class="activity-content-box">
+                                                                                    <img src="{{asset('front_assets/images/activity-2.webp')}}" alt="Trip">
+                                                                                    <div class="info-holder">
+                                                                                       
+                                                                                        <div class="price">Starting with Rs.1,29,990/-</div>
+                                                                                        
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="swiper-slide" data-slide="3">
+                                                                                <div class="activity-content-box">
+                                                                                    <img src="{{asset('front_assets/images/activity-3.webp')}}" alt="Trip">
+                                                                                    <div class="info-holder">
+                                                                                        
+                                                                                        <div class="price">Starting with Rs.1,29,990/-</div>
+                                                                                        
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="swiper-slide" data-slide="4">
+                                                                                <div class="activity-content-box">
+                                                                                    <img src="{{asset('front_assets/images/activity-4.webp')}}" alt="Trip">
+                                                                                    <div class="info-holder">
+                                                                                        
+                                                                                        <div class="price">Starting with Rs.1,29,990/-</div>
+                                                                                       
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div class="swiper-slide" data-slide="5">
+                                                                                <div class="activity-content-box">
+                                                                                    <img src="{{asset('front_assets/images/activity-1.webp')}}" alt="Trip">
+                                                                                    <div class="info-holder">
+                                                                                        
+                                                                                        <div class="price">Starting with Rs.1,29,990/-</div>
+                                                                                        
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="swiper-slide" data-slide="6">
+                                                                                <div class="activity-content-box">
+                                                                                    <img src="{{asset('front_assets/images/activity-2.webp')}}" alt="Trip">
+                                                                                    <div class="info-holder">
+                                                                                       
+                                                                                        <div class="price">Starting with Rs.1,29,990/-</div>
+                                                                                        
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="swiper-slide" data-slide="7">
+                                                                                <div class="activity-content-box">
+                                                                                    <img src="{{asset('front_assets/images/activity-3.webp')}}" alt="Trip">
+                                                                                    <div class="info-holder">
+                                                                                        
+                                                                                        <div class="price">Starting with Rs.1,29,990/-</div>
+                                                                                        
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="swiper-slide" data-slide="8">
+                                                                                <div class="activity-content-box">
+                                                                                    <img src="{{asset('front_assets/images/activity-4.webp')}}" alt="Trip">
+                                                                                    <div class="info-holder">
+                                                                                        
+                                                                                        <div class="price">Starting with Rs.1,29,990/-</div>
+                                                                                        
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                        </div>
+                                                                    </div>
+                                                                    
+                                                                </div>
+
+                                                                <div class="content-wrap-box" id="details1">
+                                                                    <h2>slide1</h2>
+                                                                    <div class="detail-content">
+                                                                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident,</p>
+                                                                        <p>Sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem.</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="content-wrap-box" id="details2">
+                                                                    <h2>slide2</h2>
+                                                                    <div class="detail-content">
+                                                                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident,</p>
+                                                                        <p>Sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem.</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="content-wrap-box" id="details3">
+                                                                    <h2>slide3</h2>
+                                                                    <div class="detail-content">
+                                                                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident,</p>
+                                                                        <p>Sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem.</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="content-wrap-box" id="details4">
+                                                                    <h2>slide4</h2>
+                                                                    <div class="detail-content">
+                                                                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident,</p>
+                                                                        <p>Sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem.</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="content-wrap-box" id="details5">
+                                                                    <h2>slide5</h2>
+                                                                    <div class="detail-content">
+                                                                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident,</p>
+                                                                        <p>Sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem.</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="content-wrap-box" id="details6">
+                                                                    <h2>slide6</h2>
+                                                                    <div class="detail-content">
+                                                                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident,</p>
+                                                                        <p>Sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem.</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="content-wrap-box" id="details7">
+                                                                    <h2>slide7</h2>
+                                                                    <div class="detail-content">
+                                                                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident,</p>
+                                                                        <p>Sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem.</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="content-wrap-box" id="details8">
+                                                                    <h2>slide8</h2>
+                                                                    <div class="detail-content">
+                                                                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident,</p>
+                                                                        <p>Sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem.</p>
+                                                                    </div>
+                                                                </div>
+
+
+
+                                                            </div>
                                                         </div>
 
                                                         <div class="inner-content-wrap-box">
+                                                            <div class="heading"  data-bs-toggle="collapse" data-bs-target="#stack2">
+                                                                <img src="{{asset('front_assets/icons/car.png')}}" alt="">
+                                                                <span>Shillong to Cherrapunjee Transfer</span>
+                                                            </div>
+                                                            <div class="content-stack collapse" id="stack2">
+                                                                <div class="divider"></div>
+                                                                <div class="booking-wrap">
+                                                                    <div class="grouping-list">
+                                                                        <h5>Sightseeing</h5>
+                                                                        <div class="grouping-stack">Elephant Falls  <span>(1)<span></div>
+                                                                        <div class="grouping-stack">Mawkdok Dympep ViewPoint  <span>(1)<span></div>
+                                                                        <div class="grouping-stack">Nohkalikai Falls <span>(1)<span></div>
+                                                                        <div class="grouping-stack">Seven Sisters Falls <span>(1)<span></div>
+                                                                        <div class="grouping-stack">Mawsmai Cave <span>(1)<span></div>
+                                                                        <div class="grouping-stack">Arwah Cave <span>(1)<span></div>
+                                                                    </div>
+                                                                    <div class="grouping-list">
+                                                                        <h5>Activity</h5>
+                                                                        <div class="grouping-stack">Jeep Safari for 1-6Pax <span>(2)<span></div>
+                                                                        <div class="grouping-stack">Elephant Safari <span>(2)<span></div>
+                                                                        <div class="grouping-stack">Boating at Umiam Lake <span>(2)<span></div>
+                                                                    </div>
+                                                                    <div class="grouping-list">
+                                                                        <h5>Cab</h5>
+                                                                        <div class="grouping-stack">Sedan (4S) <span>(1)<span></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+
+
+                                                        {{-- <div class="inner-content-wrap-box">
                                                             <div class="heading">
                                                                 <img src="{{asset('front_assets/icons/activities.png')}}" alt="">
                                                                 <span>Activity:</span>
@@ -714,7 +681,7 @@
                                                                 <p>Sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem.</p>
                                                             </div>
                                                             
-                                                        </div>
+                                                        </div> --}}
 
                                                     </div>
                                                 </div>
@@ -790,6 +757,7 @@
                                     </div>
                                 </div>
                             </div>
+
                             <div class="tab-pane" id="inclusion" role="tabpanel" aria-labelledby="inclusion-tab">
                                 <div class="inclusion-content">
                                     @php
@@ -816,6 +784,7 @@
                                     </div>
                                 </div>
                             </div>
+
                             <div class="tab-pane" id="exclusion" role="tabpanel" aria-labelledby="exclusion-tab">
                                 <div class="exclusion-content">
                                      @php
@@ -849,7 +818,7 @@
         </div>
     </section>
 
-    <div class="two-sections-background">
+    {{-- <div class="two-sections-background">
         <div class="background">
             <img src="{{asset('front_assets/images/section-2-bg-last.png')}}" alt="">
         </div>
@@ -1001,9 +970,9 @@
                 </din>
             </div>
         </section>
-    </div>
+    </div> --}}
 
-    <div class="two-sections-background-2">
+    {{-- <div class="two-sections-background-2">
         <div class="background">
             <img src="{{asset('front_assets/images/section-2-bg-middle.png')}}" alt="">
         </div>
@@ -1099,9 +1068,9 @@
                 </div>
             </div>
         </section>
-    </div>
+    </div> --}}
 
-    <section class="itinerary-reviews-section">
+    {{-- <section class="itinerary-reviews-section">
         <div class="background">
             <img src="{{asset('front_assets/images/map-bg.png')}}" alt="">
         </div>
@@ -1287,9 +1256,9 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> --}}
 
-    <section class="itinerary-why-choose-section">
+    {{-- <section class="itinerary-why-choose-section">
         <div class="background">
             <div class="bg bg-2">
                 <img src="{{asset('front_assets/images/section-3-bg-2.png')}}" alt="Background">
@@ -1345,9 +1314,9 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> --}}
 
-    <section class="itinerary-statistics-section">
+    {{-- <section class="itinerary-statistics-section">
         <div class="background">
             <img src="{{asset('front_assets/images/listing-section-3-bg.png')}}" alt="">
         </div>
@@ -1373,7 +1342,7 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> --}}
 </div>
 @section('scripts')
     <script>
@@ -1410,5 +1379,177 @@
             }, 1000);
 
         });
+
+
+
+
+jQuery(document).ready(function($) {
+    var activitiesSwiper = new Swiper(".activities-swiper", {
+        slidesPerView: 4,
+        spaceBetween: 30,
+        navigation: {
+            nextEl: ".activities-swiper-button-next",
+            prevEl: ".activities-swiper-button-prev",
+        },
+        breakpoints: {
+            320: {
+              slidesPerView: 1
+            },
+            640: {
+              slidesPerView: 2
+            },
+            800: {
+              slidesPerView: 3
+            },
+            1025: {
+              slidesPerView: 4
+            },
+        }
+    });
+
+    // Get all slides and details containers
+    const slides = document.querySelectorAll('.swiper-slide');
+    const detailsContainers = document.querySelectorAll('.content-wrap-box');
+    //const closeButtons = document.querySelectorAll('.close-btn');
+
+    // Track currently active slide
+    let activeSlideId = null;
+
+    // Function to show details for a specific slide
+    function showDetails(slideId) {
+        // Hide all details containers first
+        detailsContainers.forEach(container => {
+            container.classList.remove('active');
+        });
+        
+        // Remove active class from all slides
+        slides.forEach(slide => {
+            slide.classList.remove('active');
+        });
+        
+        // Show the selected details container
+        const targetDetails = document.getElementById(`details${slideId}`);
+        if (targetDetails) {
+            targetDetails.classList.add('active');
+            // Scroll to the details container smoothly
+            // targetDetails.scrollIntoView({ 
+            //     behavior: 'smooth', 
+            //     block: 'start',
+            //     inline: 'nearest'
+            // });
+        }
+        
+        // Mark the clicked slide as active
+        const activeSlide = document.querySelector(`.swiper-slide[data-slide="${slideId}"]`);
+        if (activeSlide) {
+            activeSlide.classList.add('active');
+        }
+        
+        // Update active slide ID
+        activeSlideId = slideId;
+    }
+
+    // Function to close all details
+    function closeAllDetails() {
+        detailsContainers.forEach(container => {
+            container.classList.remove('active');
+        });
+        
+        slides.forEach(slide => {
+            slide.classList.remove('active');
+        });
+        
+        activeSlideId = null;
+    }
+
+    // Add click event to each slide
+    slides.forEach(slide => {
+        slide.addEventListener('click', () => {
+            const slideId = slide.getAttribute('data-slide');
+            
+            // If clicking the same slide, close it
+            if (activeSlideId === slideId) {
+                closeAllDetails();
+            } else {
+                showDetails(slideId);
+            }
+        });
+    });
+
+    // Add click event to close buttons
+    // closeButtons.forEach(button => {
+    //     button.addEventListener('click', (e) => {
+    //         e.stopPropagation(); // Prevent event bubbling
+    //         closeAllDetails();
+    //     });
+    // });
+
+    // Optional: Close details when clicking outside
+    document.addEventListener('click', (e) => {
+        // Check if click is outside details containers and not on a slide
+        if (!e.target.closest('.content-wrap-box') && 
+            !e.target.closest('.swiper-slide')) {
+            closeAllDetails();
+        }
+    });
+
+    // Optional: Close details with Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeAllDetails();
+        }
+    });
+
+    // Optional: Auto-close other details when opening a new one
+    function showDetailsExclusive(slideId) {
+        closeAllDetails(); // Close all first
+        setTimeout(() => {
+            showDetails(slideId); // Then open the selected one
+        }, 50); // Small delay for smoother transition
+    }
+
+    // If you want to toggle instead (click same slide to close)
+    function toggleDetails(slideId) {
+        const details = document.getElementById(`details${slideId}`);
+        const slide = document.querySelector(`.swiper-slide[data-slide="${slideId}"]`);
+        
+        if (details.classList.contains('active')) {
+            // Already active, so close it
+            details.classList.remove('active');
+            slide.classList.remove('active');
+            activeSlideId = null;
+        } else {
+            // Not active, so show it
+            closeAllDetails();
+            setTimeout(() => {
+                details.classList.add('active');
+                slide.classList.add('active');
+                details.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                activeSlideId = slideId;
+            }, 10);
+        }
+    }
+    
+    
+    /* -------------------------------- 22-12-2025 -------------------------------- */
+
+    document.querySelectorAll('.inner-content-wrap-box').forEach(parent => {
+        const boxes = parent.querySelectorAll('.content-wrap-box');
+        boxes.forEach(box => box.classList.remove('active'));
+        if (boxes.length > 0) {
+          boxes[0].classList.add('active');
+        }
+    });
+    
+    // document.addEventListener('click', e => {
+    //     if (e.target.matches('.content-wrap-box h2')) {
+    //     const box = e.target.closest('.content-wrap-box');
+    //     const parent = box.closest('.inner-content-wrap-box');
+    //     parent.querySelectorAll('.content-wrap-box').forEach(b => b.classList.remove('active'));
+    //     box.classList.add('active');
+    //     }
+    // });
+
+});
     </script>
 @endsection
