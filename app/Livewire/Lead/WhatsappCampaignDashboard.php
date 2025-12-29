@@ -7,6 +7,8 @@ use App\Models\LeadWhatsappMessage;
 use App\Models\WhatsappMessageTemplate;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Lead;
+use App\Services\WhatsAppService;
+use Illuminate\Support\Facades\Http;
 
 class WhatsappCampaignDashboard extends Component
 {
@@ -18,13 +20,8 @@ class WhatsappCampaignDashboard extends Component
         'hotLeads' => [],
         'cnpLeads' => [],
     ];
-    public $previewTemplate = [
-        'title' => '',
-        'body' => '',
-        'image' => '',
-        'external_link' => '',
-    ];
-    public $messageType = 'custom';
+    public $previewTemplate;
+    public $messageType = 'preset';
     public $selectedCustomer = [], $selectedLeads = []; // store selected lead IDs
 
     public function mount()
@@ -32,7 +29,56 @@ class WhatsappCampaignDashboard extends Component
         $this->authUser = Auth::guard('admin')->user();
         $this->messages = LeadWhatsappMessage::where('sent_by', $this->authUser->id)->get();
         $this->collectLead();
+        $this->getAllTemplates();
     }
+
+    public function getAllTemplates()
+    {
+        $url = config('whatsapp.domain') . "/api/" . config('whatsapp.version') . "/templates";
+        $apiKey = config('whatsapp.api_key');
+    
+        $ch = curl_init();
+
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => [
+                "Authorization: Bearer {$apiKey}",
+                "Accept: application/json"
+            ],
+        ]);
+
+        $response = curl_exec($ch);
+        
+        if (curl_errno($ch)) {
+            dd("cURL Error: " . curl_error($ch));
+        }
+
+        curl_close($ch);
+        // Convert to array
+      
+       $this->templates = collect(json_decode($response, true))
+        ->filter(function ($tpl) {
+            return isset($tpl['Status']) && $tpl['Status'] === 'APPROVED';
+        })
+        ->map(function ($tpl) {
+            return [
+                'Id'         => $tpl['Id'] ?? null,
+                'name'       => $tpl['name'] ?? '',
+                'category'   => $tpl['category'] ?? '',
+                'Status'     => $tpl['Status'] ?? '',
+                'language'   => $tpl['language'] ?? '',
+                'components' => $tpl['components'] ?? [],
+            ];
+        })
+        ->values()   // reset array keys
+        ->toArray();
+
+    // dd($this->templates);
+
+    
+    }
+
     public function collectLead(){
         $leads = Lead::when(in_array($this->authUser->role, ['team_lead', 'member']), function ($query) {
             if ($this->authUser->role === 'team_lead') {
@@ -42,6 +88,7 @@ class WhatsappCampaignDashboard extends Component
             }
         })
         ->where('customer_whatsapp', '!=', null) // Ensure whatsapp number is not null
+        ->where('generate_from', 'lead')
         ->orderBy('id', 'DESC')
         ->get();
         $allLeads = $leads;
@@ -59,13 +106,7 @@ class WhatsappCampaignDashboard extends Component
     }
     public function selectTemplate($templateId){
         $this->selectedTemplateId = $templateId;
-        $template = WhatsappMessageTemplate::find($templateId);
-        $this->previewTemplate = [
-            'title' => $template->title,
-            'body' => $template->body,
-            'image' => $template->image,
-            'external_link' => $template->external_link,
-        ];
+        $this->previewTemplate = $this->templates[array_search($templateId, array_column($this->templates, 'Id'))];
         $this->toggleCustomerSelection($this->selectedCustomerType);
     }
     public function toggleCustomerSelection($type){
@@ -91,9 +132,6 @@ class WhatsappCampaignDashboard extends Component
         $this->template_search = $query;
     }
 
-    public function messageContent($content){
-        $this->previewTemplate['body'] = $content;
-    }
      // Toggle selection when row clicked
     public function toggleLead($leadId)
     {
@@ -117,45 +155,28 @@ class WhatsappCampaignDashboard extends Component
         $this->dispatch('refreshComponent');
     }
 
-    public function selectMessageType($type)
+    public function sendWhatsAppMessage()
     {
-        $this->previewTemplate = [
-            'title' => '',
-            'body' => '',
-            'image' => '',
-            'external_link' => '',
-        ];
-        $this->template_search = '';
-        $this->messageType = $type;
-        $this->selectedTemplateId = null;
+        $template = $this->previewTemplate;
+        $service = new WhatsAppService();
+        foreach (array_unique($this->selectedCustomer) as $phone) {
+            $lead = Lead::where('customer_whatsapp', $phone)->first();
+            $v1 = $lead ? $lead->customer_name : 'Dear Customer';
+            // You can add more variables as needed
+            $response = $service->sendTemplate(
+                $phone,
+                $template['name'],
+                $template['language'],
+                [], // header params
+                [$v1]  // body params
+            );
+        }
     }
 
     public function render()
     {
-        // Start query
-        $query = WhatsappMessageTemplate::query();
-
-        // Apply search filter if provided
-        if ($this->template_search) {
-            $query->where('template_name', 'like', '%' . $this->template_search . '%');
-        }
-
-        // Fetch templates (limit 4 for non-selected templates)
-        $templates = $query->orderBy('created_at', 'desc')->limit(6)->get();
-
-        // Ensure selected template is included
-        if ($this->selectedTemplateId) {
-            $selectedTemplate = WhatsappMessageTemplate::find($this->selectedTemplateId);
-
-            if ($selectedTemplate && !$templates->contains('id', $selectedTemplate->id)) {
-                // Add selected template at the beginning
-                $templates->prepend($selectedTemplate);
-            }
-        }
-
-        $this->templates = $templates;
         return view('livewire.lead.whatsapp-campaign-dashboard', [
-            'templates' => $this->templates,
+            'whatsappTemplates' => [],
             'messages' => $this->messages,
             'search' => $this->search,
         ]);

@@ -27,6 +27,10 @@ class LeadManagementController extends Controller
     {
         return view('admin.leads.confirmed');
     }
+    public function final_quotation($code)
+    {
+        return view('admin.leads.final-quotation', compact('code'));
+    }
     public function lead_log_history($lead_id){
         $common = CustomHelper::setHeadersAndTitle('Lead Management', 'Log History');
 
@@ -96,7 +100,7 @@ class LeadManagementController extends Controller
     }
     public function update_status(Request $request){
         $data = $request->except('_token');
-        dd($data);
+        // dd($data);
         try {
             $this->leadRepository->updateLeadStatus($data);
             return redirect()->back()->with('success', 'Lead status updated successfully.');
@@ -105,9 +109,15 @@ class LeadManagementController extends Controller
         }
     }
 
-    function whatsapp_campaign_index(){
+    public function whatsapp_campaign_index(){
         $common = CustomHelper::setHeadersAndTitle('Campaign Management', 'WhatsApp Campaign');
         return view('admin.leads.whatsapp_campaign_index', compact('common'));
     }
+    public function manage_hotel_booking($lead_id){
+        $lead = Lead::findOrFail($lead_id); // Fetch lead with name/email
+        $common = CustomHelper::setHeadersAndTitle('Lead Management', 'Manage Hotel Booking');
+        return view('admin.leads.manage_hotel_booking', compact('lead_id', 'common','lead'));
+    }
+
 }
 

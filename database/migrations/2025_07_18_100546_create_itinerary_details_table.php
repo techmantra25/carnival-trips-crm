@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('itinerary_details', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->unsignedBigInteger('itinerary_id')->comment('Foreign key referencing itineraries table');
             $table->unsignedBigInteger('route_service_summary_id')->nullable()->comment('Foreign key referencing route_service_summaries table');
             $table->unsignedBigInteger('hotel_id')->nullable()->comment('Foreign key referencing hotels table');

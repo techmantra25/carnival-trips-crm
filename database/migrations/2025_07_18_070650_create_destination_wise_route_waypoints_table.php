@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('destination_wise_route_waypoints', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->unsignedBigInteger('route_id')->comment('Foreign key referencing destination_wise_routes');
             $table->string('point_name')->nullable()->comment('Name of the waypoint');
             $table->unsignedBigInteger('division_id')->comment('Foreign key referencing cities');

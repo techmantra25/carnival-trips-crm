@@ -181,7 +181,7 @@
                                                                                         <!--[if BLOCK]><![endif]-->
                                                                                         <th class="!text-center uppercase">Meal Plan
                                                                                         </th>
-                                                                                        <th class="!text-center uppercase">CWNB
+                                                                                        <th class="!text-center uppercase">CNB
                                                                                         </th>
                                                                                         <th class="!text-center uppercase">CWM
                                                                                         </th>
@@ -290,8 +290,8 @@
                                                                                         {{-- <td class="!text-center uppercase align-top !p-0">
                                                                                             <div class="small-btm">
                                                                                                 <select wire:key="existing-addon-plan-1-1-100"
-                                                                                                    wire:change="GetRoomAddonPlan('CWNB',1, 86, 44, $event.target.value, $event.target.selectedOptions[0].getAttribute('data-price'))">
-                                                                                                    <option value="">Choose CWNB</option>
+                                                                                                    wire:change="GetRoomAddonPlan('CNB',1, 86, 44, $event.target.value, $event.target.selectedOptions[0].getAttribute('data-price'))">
+                                                                                                    <option value="">Choose CNB</option>
                                                                                                     <!--[if BLOCK]><![endif]-->
                                                                                                     <option value="3-5 YEARS" data-price="800.00"
                                                                                                         wire:key="existing-addon-plan-1-1-0">3-5 YEARS</option>

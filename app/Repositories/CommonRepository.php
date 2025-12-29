@@ -214,8 +214,13 @@ class CommonRepository
     public function updateHotelSeasionPlan(array $data){
         try {
             DB::beginTransaction();
-            // dd($data);
+            // Trim all string values in the $data array
+            $data = array_map(function ($value) {
+                return is_string($value) ? trim($value) : $value;
+            }, $data);
+         
             $sessionPlan = SeasionPlan::findOrFail($data['id']);
+
             $existingPlanItem = explode(', ', $sessionPlan->plan_item);
 
             foreach ($existingPlanItem as $key => $existing_plan_item) {

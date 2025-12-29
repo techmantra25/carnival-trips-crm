@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('inventories', function (Blueprint $table) {
-            $table->id(); // bigint(20) UNSIGNED NOT NULL
+            $table->bigIncrements('id');
             $table->unsignedBigInteger('hotel_id'); // FK to hotels table
             $table->unsignedBigInteger('room_id')->nullable(); // FK to rooms table
             $table->date('date'); // inventory date

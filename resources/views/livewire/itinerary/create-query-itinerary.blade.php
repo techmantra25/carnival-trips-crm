@@ -93,7 +93,6 @@
                         </a>
                     </div> --}}
                     <div class="flex justify-between pb-2">
-                        
                         <div class="flex left-column">
                             <div class="bg-orange-200 rounded-lg shadow-md w-fit p-2 text-black-600 text-[13px] italic">
                                 <div class="px-2 flex justify-between">
@@ -203,7 +202,7 @@
                                         <table class="table min-w-full new-activity !mb-3" style="border-collapse: separate;border-spacing: 0;">
                                             <thead class="bg-primary/20">
                                                 <tr>
-                                                    <th class="border !border-warning bg-orange-300 rounded-t-md !text-center uppercase" style="border-top-left-radius: .5rem; border-top-right-radius: .5rem;"><span class="text-xl text-defaulttextcolor">Day {{$division_index}} ({{$division_item['division_name']}})</span></th>
+                                                    <th class="border !border-warning bg-orange-300 rounded-t-md !text-center uppercase" style="border-top-left-radius: .5rem; border-top-right-radius: .5rem;"><span class="text-xl text-defaulttextcolor">Day {{$division_index}} ({{$division_item['division_name']}})({{$division_item['division_date']}})</span></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -974,13 +973,26 @@
                                                                                                         
                                                                                                             <div class="custom-hotel-details !ml-0">
                                                                                                                 <div class="custom-hotel-details-top">
-                                                                                                                    <p class="text-black-600 text-base italic">{{$division_hotel_item['hotel_name']}}</p>
-                                                                                                                    <p class="badge gap-2 bg-danger/10 text-danger uppercase text-small my-2">Rooms</p>
-                                                                                                                    {{-- @if(isset($division_hotel_item['hotel_category_name']))
-                                                                                                                        <p class="text-black-500 text-small text-danger">
-                                                                                                                            {{ $division_hotel_item['hotel_category_name'] }}
+                                                                                                                    <p class="text-black-600 text-base italic">{{$division_hotel_item['hotel_name']}} </p>
+                                                                                                                    <p class="badge gap-2 bg-primary/10 text-primary uppercase text-small my-2">Rooms</p>
+                                                                                                                    @php
+                                                                                                                        $stock = App\Helpers\CustomHelper::checkRoomStockByDate(
+                                                                                                                            $division_item['division_date'],
+                                                                                                                            $division_hotel_item['selected_room'],
+                                                                                                                            max((int)$leadData->number_of_rooms, 1)
+                                                                                                                        );
+                                                                                                                    @endphp
+
+                                                                                                                    @if($stock == 0)
+                                                                                                                        <p class="badge gap-2 bg-danger/10 text-danger uppercase text-small my-2">
+                                                                                                                            Out of Stock
                                                                                                                         </p>
-                                                                                                                    @endif --}}
+                                                                                                                    @else
+                                                                                                                        <p class="badge gap-2 bg-success/10 text-success uppercase text-small my-2">
+                                                                                                                            {{ $stock }} Rooms Remaining
+                                                                                                                        </p>
+                                                                                                                    @endif
+
                                                                                                                     
                                                                                                                     <div class="small-btm">
                                                                                                                         <select class="w-full" 
@@ -1039,7 +1051,7 @@
                                                                                                 @endif
                                                                                             @endforeach
                                                                                         </div>
-                                                                                        @forelse ($division_item['day_hotel'] as $division_hotel_item_index=>$division_hotel_item)
+                                                                                            @forelse ($division_item['day_hotel'] as $division_hotel_item_index=>$division_hotel_item)
                                                                                                 @if($activeTab[$division_index]==$division_hotel_item_index)
                                                                                                     <div class="custom-card mt-2">
                                                                                                         {{-- <div>
@@ -1176,7 +1188,7 @@
                                                                                                                                     <td class="!text-left uppercase align-top border !border-info !border-t-0 !border-e-0">
                                                                                                                                         <div class="small-btm">
                                                                                                                                             <select wire:key="existing-addon-plan-{{$division_index}}-{{$index_addon_season_plan}}-100" wire:change="GetRoomAddonPlan('{{$addon_seasion_plan['title']}}',{{$division_index}}, {{$division_hotel_item['hotel_id']}}, {{$selectedRoomId}}, $event.target.value, $event.target.selectedOptions[0].getAttribute('data-price'))" class="w-full">
-                                                                                                                                                <option value="" selected hidden>Choose {{-- $addon_seasion_plan['title'] --}}</option>
+                                                                                                                                                <option value="" selected>Choose {{-- $addon_seasion_plan['title'] --}}</option>
                                                                                                                                                 @foreach($addon_seasion_plan['plan_type'] as $addon_plan_index=> $addon_plan_type)
                                                                                                                                                     <option value="{{$addon_plan_type['name']}}" data-price="{{$addon_plan_type['price']}}" wire:key="existing-addon-plan-{{$division_index}}-{{$index_addon_season_plan}}-{{$addon_plan_index}}">{{$addon_plan_type['name']}}</option>
                                                                                                                                                 @endforeach
@@ -1190,8 +1202,8 @@
                                                                                                                                                         <div class="custom-cab-details flex-1 !m-0">
                                                                                                                                                             <div class="custom-hotel-details-top flex items-center">
                                                                                                                                                                 {{-- <p class="text-black-600 italic" style="font-size:10px;"></p> --}}
-                                                                                                                                                                
-                                                                                                                                                                @if($selected_addon_plan['field']==='day_room_addon_plan_mattress')
+                                                                                                                                                               
+                                                                                                                                                                @if($selected_addon_plan['field']==='day_room_addon_plan_extra_mattress')
                                                                                                                                                                     @php
                                                                                                                                                                     $extra_mattress_price = isset($selected_addon_plan['price']) 
                                                                                                                                                                                     ? $selected_addon_plan['price'] / max((int)$leadData->extra_mattress, 1)
@@ -1204,17 +1216,15 @@
                                                                                                                                                                 @endif
                                                                                                                                                                 
                                                                                                                                                                 <!-- Quantity Controls -->
-                                                                                                                                                                @if($selected_addon_plan['field']!=="day_room_addon_plan_mattress")
+                                                                                                                                                                @if($selected_addon_plan['field']!=="day_room_addon_plan_extra_mattress")
                                                                                                                                                                     <div class="flex items-center space-x-2 justify-center">
-                                                                                                                                            <span style="font-size: 11px; font-weight: 700; color: #0a336b;">{{$selected_addon_plan['value']}} :&nbsp;</span>                                                                                                                         {{-- <i class="fas fa-minus-circle text-red-500 cursor-pointer text-base" wire:click="decreaseQuantity({{$division_index}},{{$selected_addon_plan['id']}})"></i> --}}
+                                                                                                                                                                        <span style="font-size: 11px; font-weight: 700; color: #0a336b;">{{$selected_addon_plan['value']}} :&nbsp;</span> 
                                                                                                                                                                         <input type="number"
                                                                                                                                                                             id="custom_quantity_input{{$selected_addon_plan['id']}}" 
                                                                                                                                                                             class="custom-quantity-input text-xs leading-none !py-1" 
                                                                                                                                                                             wire:model="itemQuantity.{{ $division_index }}.{{$selected_addon_plan['id']}}" 
                                                                                                                                                                             wire:keyup="updateQuantity({{$division_index}},{{$selected_addon_plan['id']}})" 
                                                                                                                                                                             min="1" value="{{$selected_addon_plan['value_quantity']}}" readonly/>
-                                                                                                                                                                        
-                                                                                                                                                                        {{-- <i class="fas fa-plus-circle text-green-500 cursor-pointer text-base" wire:click="increaseQuantity({{$division_index}},{{$selected_addon_plan['id']}})"></i> --}}
                                                                                                                                                                     </div>
                                                                                                                                                                 @endif
                                                                                                                                                                 
@@ -1258,7 +1268,7 @@
                                                                                 <div class="md:col-span-9 col-span-12 mb-4 itinerary-build">
                                                                                 </div> 
                                                                             @endif
-                                                                                <div class="md:col-span-3 col-span-12 mb-4 itinerary-build">
+                                                                                {{-- <div class="md:col-span-3 col-span-12 mb-4 itinerary-build">
                                                                                     <div class="p-1 border border-gray-300 rounded-md shadow-sm">
                                                                                         <table class="table w-full" style="border-collapse: separate; border-spacing: 0">
                                                                                             <thead class="bg-primary/5">
@@ -1277,7 +1287,7 @@
                                                                                                                 <span class="badge gap-2 bg-warning/10 text-warning uppercase w-full mb-1">Existing Per Day Cabs</span>
                                                                                                                 <select wire:key="existing-per-day-cab-{{ $division_index }}-100" 
                                                                                                                 wire:change="confirm_for_all_day_cab('per_day_cab',{{$division_index}}, $event.target.value, $event.target.selectedOptions[0].getAttribute('data-price'), $event.target.selectedOptions[0].getAttribute('data-id'))"
-                                                                                                                {{-- wire:change="getPerDayCab('per_day_cab',{{$division_index}}, $event.target.value, $event.target.selectedOptions[0].getAttribute('data-price'), $event.target.selectedOptions[0].getAttribute('data-id'))" --}}
+                                                                                                                
                                                                                                                 class="text-xs rounded-sm py-0 mb-2">
                                                                                                                     <option value="">Choose an Existing Per Day Cab</option>
                                                                                                                     @forelse ($division_per_day_cab['per_day_existing_cabs'] as $per_day_existing_cabs)
@@ -1360,19 +1370,8 @@
                                                                                                 @endforelse
                                                                                             </tbody>
                                                                                         </table>
-
-                                                                                        {{-- <div class="mt-4" wire:key="dayselectedCab-{{ $division_index }}">
-                                                                                            <span class="badge gap-2 bg-danger/10 text-danger uppercase text-small m-2">
-                                                                                                <i class="fas fa-route"></i> Route  
-                                                                                                <span class="custom-header-separator">|</span>  
-                                                                                                <i class="fas fa-binoculars"></i> Sightseeing  
-                                                                                                <span class="custom-header-separator">|</span>  
-                                                                                                <i class="fas fa-running"></i> Activity  
-                                                                                                <span class="custom-header-separator">|</span> in {{$division_item['division_name']}}
-                                                                                            </span>
-                                                                                        </div> --}}
                                                                                     </div>
-                                                                                </div>
+                                                                                </div> --}}
                                                                         </div>
                                                                     </div>
                                                                 {{-- <div class="mt-4"  wire:key="dayselectedCab-{{ $division_index }}">
@@ -1515,10 +1514,10 @@
                                 <input type="checkbox" wire:model="send_email" wire:change="messageChannelChanged" class="form-checkbox h-5 w-5 text-blue-600 focus:ring-blue-500">
                                 <span class="text-gray-800 font-medium cursor-pointer">Email</span>
                             </label>
-                            <label class="flex items-center gap-2">
+                            {{-- <label class="flex items-center gap-2">
                                 <input type="checkbox" wire:model="send_sms" wire:change="messageChannelChanged" class="form-checkbox h-5 w-5 text-blue-500 focus:ring-blue-500">
                                 <span class="text-gray-800 font-medium cursor-pointer">SMS</span>
-                            </label>
+                            </label> --}}
                         </div>
 
                         <!-- Status Badge -->
@@ -1568,29 +1567,61 @@
                 </div>
                 <!-- Right Card - Total & Send -->
                 <div class="flex flex-col justify-between bg-white shadow-lg rounded-2xl p-6 max-height-250">
-                    <div class="text-center mb-4">
-                        <p class="uppercase text-gray-500 text-sm">Total Estimated Amount</p>
-                        <p class="text-2xl font-bold text-gray-800">
-                            {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $total_amount }}
+
+                    {{-- If arrival date is valid (today or future) --}}
+                    @if($valid_panel)
+
+                        {{-- If lead is NOT confirmed --}}
+                        @if($leadData->status != "Confirmed")
+
+                            <div class="text-center mb-4">
+                                <p class="uppercase text-gray-500 text-sm">Total Estimated Amount</p>
+                                <p class="text-2xl font-bold text-gray-800">
+                                    {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $total_amount }}
+                                </p>
+                            </div>
+
+                            {{-- Show success/error messages --}}
+                            @if (session('success'))
+                                <div class="alert alert-success mb-2">
+                                    {{ session('success') }}
+                                </div>
+                            @endif
+
+                            @if (session('error'))
+                                <div class="alert alert-danger mb-2">
+                                    {!! session('error') !!}
+                                </div>
+                            @endif
+
+                            {{-- If any sending options are enabled --}}
+                            @if($send_whatsapp || $send_email || $send_sms)
+                                <button wire:click="sendMessages"
+                                    class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition-all">
+                                    Send Messages
+                                </button>
+                            @else
+                                <p class="text-gray-500 text-sm text-center mt-2">
+                                    No communication method selected.
+                                </p>
+                            @endif
+
+                        @else
+                            {{-- Lead is already confirmed --}}
+                            <p class="text-center text-green-600 font-semibold">
+                                This lead has already been confirmed. No further action required.
+                            </p>
+                        @endif
+
+                    @else
+                        {{-- Arrival date is in the past --}}
+                        <p class="text-center text-red-500 font-semibold">
+                            This lead is no longer active because the arrival date has passed.
                         </p>
-                    </div>
-                    @if($send_whatsapp || $send_email || $send_sms)
-                        @if (session('success'))
-                            <div class="alert alert-success mb-1">
-                                {{ session('success') }}
-                            </div>
-                        @endif
-                        @if (session('error'))
-                            <div class="alert alert-danger mb-1">
-                                {!! session('error') !!}
-                            </div>
-                        @endif
-                        <button wire:click="sendMessages"
-                            class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary-dark transition-all">
-                            Send
-                        </button>
                     @endif
+
                 </div>
+
                 
             </div>
 

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('leads', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->string('unique_id');
             $table->enum('generate_from', ['lead', 'query'])->default('lead');
             $table->enum('nationality_type', ['Indian', 'NRI'])->default('Indian');

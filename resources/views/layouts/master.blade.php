@@ -19,7 +19,12 @@
         <script src="{{asset('build/assets/main.js')}}"></script>
         <!-- ICONS CSS -->
         <link href="{{asset('build/assets/iconfonts/icons.css')}}" rel="stylesheet">
-      
+        <!-- Swiper CSS -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+        <!-- Swiper JS -->
+        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
         <!-- APP CSS & APP SCSS -->
         @vite(['resources/sass/app.scss' ])
         

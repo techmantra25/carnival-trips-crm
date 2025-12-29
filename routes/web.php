@@ -37,6 +37,16 @@ use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagem
         Route::get('login', [AdminAuthController::class, 'showLoginForm'])->name('login');
         // Handle admin login
         Route::post('login', [AdminAuthController::class, 'login']);
+
+        // forgot password
+        Route::get('/forgot-password', [AdminAuthController::class, 'showforgotPage'])
+        ->name('forgot.password');
+        Route::post('forgot-password/send-otp', [AdminAuthController::class, 'sendOtp'])
+            ->name('send.otp');
+        Route::post('forgot-password/verify-otp', [AdminAuthController::class, 'verifyOtp'])
+            ->name('verify.otp');
+        Route::post('forgot-password/reset-password', [AdminAuthController::class, 'resetPassword'])
+            ->name('reset.password');
     });
 
     // Route::get('dashboard', [DashboardsController::class, 'index'])->name('admin.dashboard');
@@ -51,6 +61,8 @@ use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagem
         Route::prefix('leads')->group(function(){
             Route::get('/', [LeadManagementController::class, 'index'])->name('admin.leads.index');
             Route::get('/confirmed', [LeadManagementController::class, 'confirmed'])->name('admin.leads.confirmed.index');
+            Route::get('/manage-hotel-booking/{lead_id}', [LeadManagementController::class, 'manage_hotel_booking'])->name('admin.leads.manage-hotel-booking');
+            Route::get('/confirmed/final-quotation/{code}', [LeadManagementController::class, 'final_quotation'])->name('admin.leads.final-quotation');
             Route::get('/log-history/{lead_id}', [LeadManagementController::class, 'lead_log_history'])->name('admin.leads.log.history');
             Route::get('/shared-history/{lead_id}', [LeadManagementController::class, 'lead_shared_history'])->name('admin.leads.shared.itinerary.history');
             Route::get('/trip-preference-form/{lead_id}', [LeadManagementController::class, 'trip_preference_data'])->name('admin.leads.trip.preference.data');
@@ -73,6 +85,8 @@ use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagem
             Route::get('/', [EmployeeManagement::class, 'index'])->name('admin.employee.index');
             Route::get('/designations', [EmployeeManagement::class, 'designationIndex'])->name('admin.designation.index');
             Route::get('/hierarchy', [EmployeeManagement::class, 'employeeHierarchy'])->name('admin.employee-hierarchy');
+            Route::get('/profile', [EmployeeManagement::class, 'employee_profile'])->name('admin.employee.profile');
+
         });
         // Route::get('/profile', [EmployeeManagement::class, 'employee_profile'])->name('admin.employee.profile');
     
@@ -228,7 +242,11 @@ use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagem
    
 
     Route::prefix('cron')->group(function(){
+        // Run this endpoint every 1 minute (set in server cron or scheduler)
         Route::get('update-lead-status', [CronController::class, 'update_lead_status']);
+        // Runs once per day (scheduled in server CRON or Laravel scheduler)
+        // This will auto-release hotel room stock based on release_trigger settings
+        Route::get('update-auto-release-room-stock', [CronController::class, 'update_auto_release_room_stock']);
     });
 
     Route::get('/trip-preference-form/{code}', TripPreferenceForm::class)->name('website.trip.preference.form');

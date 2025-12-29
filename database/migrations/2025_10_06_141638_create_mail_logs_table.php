@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('mail_logs', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->string('email');
             $table->string('template_slug');
             $table->string('subject')->nullable();

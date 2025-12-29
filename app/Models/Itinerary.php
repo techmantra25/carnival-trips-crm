@@ -23,7 +23,7 @@ class Itinerary extends Model
     }
     public function hotelCategory()
     {
-        return $this->belongsTo(Category::class, 'hotel_category');
+        return $this->belongsTo(Category::class, 'hotel_category', 'id');
     }
     public function details(){
         return $this->hasMany(ItineraryDetail::class, 'itinerary_id', 'id');

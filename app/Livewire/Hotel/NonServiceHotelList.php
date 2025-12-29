@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\NonServicesHotel;
 use App\Models\City;
 use App\Models\State;
+use App\Models\Category;
 use Livewire\WithFileUploads;
 use App\Helpers\CustomHelper;
 
@@ -14,18 +15,22 @@ class NonServiceHotelList extends Component
     use WithFileUploads;
     public $hotels = [];
     public $filter_hotels = [];
+    public $hotel_categories = [];
     public $divisions = [];
     public $destinations = [];
     public $division_id = '';
+    public $category_id = '';
     public $destination_id = '';
     public $hotel_id = '';
     public $hotel_name, $hotel_address, $image;
     public $active_new_hotel_modal = 0;
     public $edit_mode = false;
+
     public function mount(){
         $this->divisions = City::where('status',1)->orderBy('state_id','ASC')->get();
         $this->destinations = State::where('status',1)->orderBy('name','ASC')->get();
         $this->filter_hotels = NonServicesHotel::orderBy('hotel_name','ASC')->get();
+        $this->hotel_categories = Category::where('status',1)->orderBy('name','ASC')->get();
     }
     public function updatedImage()
     {
@@ -37,6 +42,7 @@ class NonServiceHotelList extends Component
      public function saveHotel()
     {
         $this->validate([
+            'category_id'    => 'required|exists:categories,id',
             'destination_id' => 'required|exists:states,id',
             'division_id'    => 'required|exists:cities,id',
             'hotel_name'     => 'required|string|max:255',
@@ -57,6 +63,7 @@ class NonServiceHotelList extends Component
           
             $hotel->update([
                 'city_id'    => $this->division_id,
+                'category_id'=> $this->category_id,
                 'hotel_name' => $this->hotel_name,
                 'address'    => $this->hotel_address,
                 'image'      => $uploadedPath ?: $set_image,
@@ -66,9 +73,10 @@ class NonServiceHotelList extends Component
             // Create
             NonServicesHotel::create([
                 'city_id'    => $this->division_id,
+                'category_id'=> $this->category_id,
                 'hotel_name' => $this->hotel_name,
                 'address'    => $this->hotel_address,
-                'image'      => $uploadedPath,
+                'image'      => $uploadedPath ?? 'front_assets/images/bedroom-suite.webp',
             ]);
             session()->flash('success', 'Hotel added successfully!');
         }
@@ -79,6 +87,12 @@ class NonServiceHotelList extends Component
     public function getDivision($value){
         $this->division_id = $value;
     }
+
+    public function getCategory($value){
+        $this->category_id = $value;
+    }
+
+
     public function getDestination($value){
         $this->reset(['divisions']);
         $this->destination_id = $value;
@@ -114,6 +128,7 @@ class NonServiceHotelList extends Component
         $hotel = NonServicesHotel::findOrFail($id);
 
         $this->hotel_id = $hotel->id;
+        $this->category_id = $hotel->category_id;
         $this->hotel_name = $hotel->hotel_name;
         $this->hotel_address = $hotel->address;
         $this->division_id = $hotel->city_id;

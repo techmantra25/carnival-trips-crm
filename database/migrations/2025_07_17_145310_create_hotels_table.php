@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
           Schema::create('hotels', function (Blueprint $table) {
-            $table->id(); // bigint unsigned primary key
+           $table->bigIncrements('id');
 
             $table->string('name');
             $table->string('image')->nullable();
@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string('phone_code');
             $table->string('mobile_number');
             $table->string('whatsapp_number');
-            $table->string('email1');
+            $table->string('email1')->nullable();
             $table->string('email2')->nullable();
 
             $table->tinyInteger('status')->default(1)->comment('0:Inactive, 1:Active');

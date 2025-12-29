@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('hotel_price_charts', function (Blueprint $table) {
-            $table->id(); // bigint(20) UNSIGNED NOT NULL
+           $table->bigIncrements('id');
             
             $table->string('type')->default('2')->comment('1:Actual Price, 2:Selling Price');
             $table->unsignedBigInteger('price_chart_type_id');

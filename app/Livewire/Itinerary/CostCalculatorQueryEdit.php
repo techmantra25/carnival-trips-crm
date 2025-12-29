@@ -102,22 +102,39 @@ class CostCalculatorQueryEdit extends Component
         $this->mealTypes = SeasionPlan::where('status', 1)->where('type', 'main')->orderBy('position', 'ASC')->first();
         $this->categories = Category::where('status', 1)->orderBy('name', 'ASC')->get();
         $this->fetchItinerary();
+
+        // $rawItems = SeasionPlan::where('status', 1)
+        // ->where('type', 'addon')
+        // ->where('plan_item', 'like', '%YEAR%')
+        // ->pluck('plan_item')
+        // ->toArray();
+
+        // $flattened = collect($rawItems)
+        //     ->flatMap(function ($item) {
+        //         return array_map('trim', explode(',', $item));
+        //     })
+        //     ->unique()
+        //     ->values()
+        //     ->toArray();
+
+        // $this->childsData = $flattened;
         $rawItems = SeasionPlan::where('status', 1)
         ->where('type', 'addon')
-        ->where('plan_item', 'like', '%YEAR%')
+        ->where('title', 'CNB')
         ->pluck('plan_item')
         ->toArray();
 
         $flattened = collect($rawItems)
-            ->flatMap(function ($item) {
-                return array_map('trim', explode(',', $item));
-            })
-            ->unique()
-            ->values()
-            ->toArray();
-
+        ->flatMap(function ($item) {
+            return array_map('trim', explode(',', $item));
+        })
+        ->filter(function ($item) {
+            return str_contains($item, "[{$this->meal_type}]");
+        })
+        ->unique()
+        ->values()
+        ->toArray();
         $this->childsData = $flattened;
-
     }
     public function EditQuery($lead_id){
         $leadExists = Lead::find($lead_id);
@@ -153,13 +170,14 @@ class CostCalculatorQueryEdit extends Component
                 $this->childs[$index]=[
                     'quantity'=>$child_item->quantity,
                     'age'=>$child_item->age,
+                    'addon_type'=>$child_item->addon_type,
                 ];
            }
         } 
        
     }
     public function addExtraChild(){
-        $this->childs[] = ['quantity'=>'', 'age'=>''];
+        $this->childs[] = ['addon_type'=>'','quantity'=>'', 'age'=>''];
     }
     public function removeExtraChild($index){
         unset($this->childs[$index]);
@@ -178,12 +196,33 @@ class CostCalculatorQueryEdit extends Component
         $this->dispatch('refreshComponent');
     }
     public function changeMealPlan($value){
+        $this->reset(['childs']);
         $this->meal_type = $value;
     }
     public function changeNationalityType($value){
         $this->nationality_type = $value;
     }
 
+    public function changeAddonType($value){
+        $this->reset(['childsData']);
+        $rawItems = SeasionPlan::where('status', 1)
+        ->where('type', 'addon')
+        ->where('title', $value)
+        ->pluck('plan_item')
+        ->toArray();
+
+        $flattened = collect($rawItems)
+        ->flatMap(function ($item) {
+            return array_map('trim', explode(',', $item));
+        })
+        ->filter(function ($item) {
+            return str_contains($item, "[{$this->meal_type}]");
+        })
+        ->unique()
+        ->values()
+        ->toArray();
+        $this->childsData = $flattened;
+    }
     public function fetchItinerary(){
         $this->existing_night_halt_details = Itinerary::select('id', 'itinerary_journey')
         // ->whereIn('type', ['post_inquiry', 'query'])
@@ -436,12 +475,13 @@ class CostCalculatorQueryEdit extends Component
             'total_members' => 'required|numeric|min:1',
             'number_of_adults' => 'required|numeric|min:1',
             // 'number_of_childs' => 'nullable|numeric',
+            'childs.*.addon_type' => 'required_if:enableChildren,true',
             'childs.*.quantity' => 'required_if:enableChildren,true',
             'childs.*.age' => 'required_if:enableChildren,true',
 
             // 'source_type' => 'required|string',
             'mobile_number' => 'nullable|digits:10',
-            'arrival_date' => 'required|date',
+            'arrival_date' => 'required|date|after_or_equal:today',
             'departure_date' => 'required|date|after_or_equal:arrival_date',
             // 'company_name' => 'required|string',
             'whatsapp_number' => 'nullable|digits:10',
@@ -474,6 +514,7 @@ class CostCalculatorQueryEdit extends Component
             'night_halt_details.required' => 'Night halt is required.',
             'meal_type.required' => 'Meal type is required.',
             'nationality_type.required' => 'Nationality type is required.',
+            'childs.*.addon_type.required_if' => 'Type is required.',
             'childs.*.quantity.required_if' => 'Quantity is required.',
             'childs.*.age.required_if' => 'Child age is required.',
             'number_of_rooms.required' => 'Number of rooms required.',
@@ -494,7 +535,6 @@ class CostCalculatorQueryEdit extends Component
             foreach ($childs as $child_item) {
                 $quantity += (int) $child_item['quantity'];
             }
-        
             $total_member = $this->number_of_adults + $quantity;
         } else {
             $total_member = $this->number_of_adults;
@@ -554,7 +594,7 @@ class CostCalculatorQueryEdit extends Component
             $lead->number_of_rooms =$this->number_of_rooms;
             $lead->extra_mattress =$this->extra_mattress;
             $lead->created_by = Auth::guard('admin')->user()->id;
-        
+            $number_of_travellor = $lead->number_of_travellor;
             // Save the model to the database
             $lead->save();
 
@@ -579,7 +619,7 @@ class CostCalculatorQueryEdit extends Component
                     $create->stay_by_journey = $fetch->stay_by_journey;
                     $create->itinerary_journey = $fetch->itinerary_journey;
                     $create->save();
-                    $this->cloneItineraryDetails($this->night_halt, $create->id);
+                    // $this->cloneItineraryDetails($this->night_halt, $create->id);
                     $itinerary_id = $create->id;
 
 
@@ -617,9 +657,11 @@ class CostCalculatorQueryEdit extends Component
                             ])
                         ]);
                     }
+                }else{
+                    $this->resetItineraryDetails($itinerary_id);
                 }
+
                 DB::commit();
-            
                 $encryptedId = Crypt::encrypt($itinerary_id);
                 return redirect()->route('admin.itinerary.query.build', $encryptedId);
             }
@@ -629,6 +671,20 @@ class CostCalculatorQueryEdit extends Component
             // session()->flash('error', 'Failed to save itinerary: ' . $e->getMessage());
         }
     }
+    public function resetItineraryDetails($itinerary_id)
+    {
+        // Get only the IDs that should NOT be deleted
+        $keepIds = ItineraryDetail::where('itinerary_id', $itinerary_id)
+            ->whereNotNull('route_service_summary_id')
+            ->where('field', 'day_route')
+            ->pluck('id');
+
+        // Delete everything else in a single query
+        ItineraryDetail::where('itinerary_id', $itinerary_id)
+            ->whereNotIn('id', $keepIds)
+            ->delete();
+    }
+
      public function cloneItineraryDetails($old_itinerary_id, $new_itinerary_id){
         $fetchDetails = ItineraryDetail::where('itinerary_id', $old_itinerary_id)->whereNotNull('route_service_summary_id')->orderBy('id', 'ASC')->get();
         foreach($fetchDetails as $item){

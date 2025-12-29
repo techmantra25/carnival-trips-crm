@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('route_service_summaries', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->enum('service_type', ['Route Wise', 'Per Day']);
             $table->unsignedBigInteger('route_id')->nullable()->comment('Foreign key referencing destination_wise_routes');
             $table->unsignedBigInteger('destination_id')->comment('Foreign key referencing states');

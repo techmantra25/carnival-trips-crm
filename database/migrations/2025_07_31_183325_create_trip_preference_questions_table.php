@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('trip_preference_questions', function (Blueprint $table) {
-            $table->id(); // id is unsignedBigInteger
+            $table->bigIncrements('id');
             $table->string('title');
             $table->integer('step')->unique();
             $table->timestamps();

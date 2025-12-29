@@ -17,6 +17,7 @@ class HotelPriceChart extends Model
         'plan_title',
         'plan_item',
         'item_price',
+        'type',
     ];
 
     // Relationships

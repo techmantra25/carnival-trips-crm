@@ -12,6 +12,9 @@ use App\Services\MailTemplateService;
 use App\Jobs\SendEmployeeWelcomeMail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use Exception;
 
 class EmployeeCrud extends Component
 {
@@ -74,56 +77,80 @@ class EmployeeCrud extends Component
         $this->resetValidation();
     }
 
-   public function store()
+   public function store(MailTemplateService $mailService)
     {
         $this->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:admins,email',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('admins', 'email')->whereNull('deleted_at'),
+                'regex:/^[A-Za-z0-9._%+-]+@carrnivaltrips\.com$/i'
+            ],
             'role' => 'required|in:admin,team_lead,member',
             'phone' => 'required|string|max:10',
-            'whatsapp' => 'nullable|string|max:10',
+            'whatsapp' => 'required|string|max:10',
             'address' => 'nullable|string',
             'designation_id' => 'required|exists:designations,id',
             'password' => 'required|string|min:6',
             'team_lead' => 'required|exists:admins,id',
             'destination_ids' => 'array',
             'destination_ids.*' => 'exists:states,id',
+        ], [
+            'email.regex' => 'The email must be a valid email address ending with @carrnivaltrips.com',
         ]);
 
-        $password = $this->password ? Hash::make($this->password) : null;
+        DB::beginTransaction();
 
-        $employee = Admin::create([
-            'name'           => ucwords($this->name),
-            'email'          => $this->email,
-            'phone'          => $this->phone,
-            'role'          => $this->role,
-            'whatsapp'       => $this->whatsapp,
-            'address'        => $this->address,
-            'designation_id' => $this->designation_id,
-            'team_lead'      => $this->team_lead,
-            'password'       => $password, // stored hashed or null
-        ]);
+        try {
+            $password = Hash::make($this->password);
 
-        $employee->destinations()->sync($this->destination_ids); // <-- Sync here
+            $employee = Admin::create([
+                'name'           => ucwords($this->name),
+                'email'          => $this->email,
+                'phone'          => $this->phone,
+                'role'           => $this->role,
+                'whatsapp'       => $this->whatsapp,
+                'address'        => $this->address,
+                'designation_id' => $this->designation_id,
+                'team_lead'      => $this->team_lead,
+                'password'       => $password,
+            ]);
 
-        // Send welcome mail immediately
-         MailTemplateService::send(
-            $employee->email,
-            'employee_welcome',
-            [
-                'employee_name' => $employee->name,
-                'company_name' => 'TechOrigin Pvt. Ltd.',
-                'portal_link' => 'https://portal.techorigin.in/login',
-                'temporary_password' => $this->password,
-            ],
-              [ 'company_name' => ENV('MAIL_FROM_NAME')],
-            ENV('MAIL_FROM_ADDRESS'),     // From Email
-            ENV('MAIL_FROM_NAME')         // From Name
-        );
-        // SendEmployeeWelcomeMail::dispatch($employee, $this->password);
+            // Sync destinations
+            $employee->destinations()->sync($this->destination_ids);
+            // Send welcome email
+            $mailService->send(
+                $employee->email,
+                'employee_welcome',                 // Template slug
+                'Welcome to Carrnival Trips 🎉',     // Subject
+                [
+                    'employee_name'     => $employee->name,
+                    'company_name'      => env('MAIL_FROM_NAME'),
+                    'portal_link'       => asset('/'),
+                    'temporary_password'=> $this->password,
+                    'template_type'=> "employee_welcome",
+                    'sender_name'         => Auth::guard('admin')->user()->name,
+                    'sender_mobile'       => Auth::guard('admin')->user()->phone, 
+                ],
+                env('MAIL_FROM_ADDRESS'),
+                env('MAIL_FROM_NAME'),
+                [],//attachments
+            );
 
-        $this->resetInput();
-        session()->flash('success', 'Employee created successfully.');
+            //  Commit ONLY if email is successful
+            DB::commit();
+
+            $this->resetInput();
+            session()->flash('success', 'Employee created successfully.');
+
+        } catch (Exception $e) {
+            DB::rollBack();
+
+            report($e);
+
+            session()->flash('error', 'Employee creation failed. Email could not be sent.');
+        }
     }
 
    public function edit($id)
@@ -145,59 +172,84 @@ class EmployeeCrud extends Component
         $this->modalMode = true;
     }
 
-    public function updateData()
+    public function updateData(MailTemplateService $mailService)
     {
-         $this->validate([
+        $this->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:admins,email,' . $this->employee_id,
+            'email' => [
+                'required',
+                'email',
+                'regex:/^[A-Za-z0-9._%+-]+@carrnivaltrips\.com$/i',
+                Rule::unique('admins', 'email')->ignore($this->employee_id)->whereNull('deleted_at'),
+            ],
             'phone' => 'required|string|max:10',
             'role' => 'required|in:admin,team_lead,member',
-            'whatsapp' => 'nullable|string|max:10',
+            'whatsapp' => 'required|string|max:10',
             'address' => 'nullable|string',
             'designation_id' => 'required|exists:designations,id',
             'team_lead' => 'required|exists:admins,id',
             'destination_ids' => 'array',
             'destination_ids.*' => 'exists:states,id',
+        ],[
+            'email.regex' => 'The email must be a valid email address ending with @carrnivaltrips.com',
         ]);
 
         $employee = Admin::findOrFail($this->employee_id);
 
-        $employee->update([
-            'name' => ucwords($this->name),
-            'email' => $this->email,
-            'role' => $this->role,
-            'phone' => $this->phone,
-            'whatsapp' => $this->whatsapp,
-            'address' => $this->address,
-            'designation_id' => $this->designation_id,
-            'team_lead' => $this->team_lead,
-        ]);
+        DB::beginTransaction();
 
-        if ($this->password) {
+        try {
+            // Update main fields
             $employee->update([
-                'password' => Hash::make($this->password)
+                'name' => ucwords($this->name),
+                'email' => $this->email,
+                'role' => $this->role,
+                'phone' => $this->phone,
+                'whatsapp' => $this->whatsapp,
+                'address' => $this->address,
+                'designation_id' => $this->designation_id,
+                'team_lead' => $this->team_lead,
             ]);
+
+            // Update password only if provided
+            if ($this->password) {
+                $employee->update([
+                    'password' => Hash::make($this->password)
+                ]);
+
+                // Send welcome email with new password
+                $mailService->send(
+                    $employee->email,
+                    'employee_welcome',                 // Template slug
+                    'Welcome to Carrnival Trips 🎉',     // Subject
+                    [
+                        'employee_name'     => $employee->name,
+                        'company_name'      => env('MAIL_FROM_NAME'),
+                        'portal_link'       => asset('/'),
+                        'temporary_password'=> $this->password,
+                        'template_type'     => "employee_welcome",
+                        'sender_name'       => Auth::guard('admin')->user()->name,
+                        'sender_mobile'     => Auth::guard('admin')->user()->phone, 
+                    ],
+                    env('MAIL_FROM_ADDRESS'),
+                    env('MAIL_FROM_NAME'),
+                    []//attachments
+                );
+            }
+
+            // Sync destinations
+            $employee->destinations()->sync($this->destination_ids);
+
+            DB::commit();
+
+            $this->resetInput();
+            session()->flash('success', 'Employee updated successfully.');
+
+        } catch (Exception $e) {
+            DB::rollBack();
+            report($e);
+            session()->flash('error', 'Employee update failed. Email could not be sent.');
         }
-        // Send welcome mail immediately
-        MailTemplateService::send(
-            $employee->email,
-            'employee_welcome',
-            [
-                'employee_name' => $employee->name,
-                'company_name' => 'TechOrigin Pvt. Ltd.',
-                'portal_link' => 'https://portal.techorigin.in/login',
-                'temporary_password' => "123456",
-            ],
-            [ 'company_name' => ENV('MAIL_FROM_NAME')],
-            ENV('MAIL_FROM_ADDRESS'),     // From Email
-            ENV('MAIL_FROM_NAME')         // From Name
-        );
-
-        // SendEmployeeWelcomeMail::dispatch($employee, $this->password);
-        $employee->destinations()->sync($this->destination_ids); // <-- Sync here
-
-        $this->resetInput();
-        session()->flash('success', 'Employee updated successfully.');
     }
 
     public function delete($id)

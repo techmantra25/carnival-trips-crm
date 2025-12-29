@@ -1,316 +1,975 @@
-<style>
-.container.itinerary-theme {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    max-width: 900px;
-    margin: auto;
-    padding: 20px;
-    background: #fefefe;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-}
+<div class="container">
+    <style>
+    .table{
+        width:100%;
+        background:#fff;
+    }
+    table{
+        width:100%;
+    }
+    .table tr td {
+        font-size:15px;
+        color:#000;
+    }
+    .table thead i {
+        color:#1e58a3;
+    }
+    .route-style {
+        position:relative;
+    }
+    .route-style:after {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1px;
+        height: 100%;
+        background: #0162e8;
+    }
+    .route-style li {
+        position: relative;
+        padding: 3px 12px;
+        color:#838383;
+    }
+    .route-style li:after {
+        content: "";
+        width: 7px;
+        height: 7px;
+        position: absolute;
+        border-radius: 50%;
+        background: #0162e8;
+        left: -3px;
+        top: 8px;
+        z-index: 2;
+        border: 2px solid #fff;
+    }
 
-.itinerary-header {
-    display: flex;
-    justify-content: space-between;
-    background: #2bb2a5;
-    color: white;
-    padding: 20px;
-    border-radius: 8px 8px 0 0;
-}
+    .total-ex-list {
+        list-style:none;
+    }
+    .total-ex-list li {
+        color:rgb(0, 0, 0);
+        font-size: 11px;
+        margin-bottom: 7px;
+    }
+    .total-ex-list li i {
+        color: #f2a144;
+        margin-right:10px;
+    }
 
-.itinerary-header h1 {
-    margin-top: 0;
-    font-size: 28px;
-}
+    .hotel-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(297px, 1fr));
+        gap:8px;
+    }
+     .hotel-list li {
+        border:1px solid #ccc;
+        border-top-left-radius:6px;
+        border-top-right-radius:6px;
+     }
+    .hotel-list li figure {
+        overflow:hidden;
+        border-top-left-radius:6px;
+        border-top-right-radius:6px;
+        height: 200px;
+    }
+    .hotel-list li figcaption {
+        padding: 12px;
+    }
 
-.header-text p {
-    margin: 4px 0;
-}
+    .hotel-list li figcaption h3 {
+        font-size: 12px;
+        text-transform: uppercase;
+        color: #1e58a3;
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+    .hotel-list li figcaption h2 {
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+    .hotel-list li figcaption p {
+        font-size: 12px;
+    }
 
-.header-graphic img {
-    height: 100px;
-}
+    .activity-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap:8px;
+    }
 
-.day-box {
-    margin-top: 30px;
-    border: 1px solid #2bb2a5;
-    border-radius: 8px;
-    overflow: hidden;
-}
+    .activity-list li {
+        border-radius:6px;
+        overflow:hidden;
+        position:relative;
+        z-index: 1;
+        height: 187px;
+    }
 
-.day-label {
-    background: #d4f1ef;
-    padding: 10px 20px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    border-bottom: 1px solid #2bb2a5;
-}
+     .activity-list li:after {
+        content:"";
+        position:absolute;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        background: linear-gradient(1deg,rgba(0, 0, 0, 1) 14%, rgba(0, 0, 0, 0) 100%);
+        z-index: -1;
+     }
+     .activity-list li figcaption {
+        padding: 22px;
+        color: #fff;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+     }
 
-.check-icon {
-    color: green;
-    font-size: 20px;
-    margin-right: 10px;
-}
+     .activity-list li figcaption h2 {
+        color:#fff;
+        font-size:13px;
+     }
 
-.day-title {
-    font-size: 18px;
-    color: #003d4d;
-}
+    .keep-together {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
 
-.info-blocks {
-    padding: 15px 20px;
-    background-color: #f3fafa;
-    font-size: 14px;
-    border-bottom: 1px solid #ddd;
-}
+    .page-break-after {
+    page-break-after: always;
+    break-after: page;
+    }
 
-.route-title {
-    padding: 10px 20px;
-    font-weight: bold;
-    font-size: 16px;
-    background: #eef9f8;
-    color: #004e5a;
-}
 
-.activity-table {
-    padding: 15px 20px;
-}
+    @media print {
 
-.activity-table table {
-    width: 100%;
-    border-collapse: collapse;
-    background: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    overflow: hidden;
-}
-
-.activity-table th, .activity-table td {
-    padding: 10px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
-
-.activity-table th {
-    background-color: #f0f8f7;
-    font-weight: bold;
-    color: #333;
-}
-
-.sightseeing-title {
-    font-weight: bold;
-    margin-top: 20px;
-    margin-bottom: 10px;
-    color: #004e5a;
-}
-.itinerary-theme .route-section {
-    margin-bottom: 2rem;
-}
-
-.itinerary-theme .route-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #333;
-}
-
-.itinerary-theme .tables-row {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-}
-
-.itinerary-theme .table-box {
-    flex: 1;
-    min-width: 200px;
-    background: #fff;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-.itinerary-theme table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.itinerary-theme th {
-    background: #f5f5f5;
-    padding: 10px;
-    text-align: left;
-    border-bottom: 1px solid #ccc;
-    font-weight: 600;
-}
-
-.itinerary-theme td {
-    padding: 10px;
-    border-bottom: 1px solid #eee;
-}
-
-.activity-table table td{
-    padding: 5px;
-    font-size: 12px;
-}
-</style>
-<div class="container itinerary-theme">
-    <div class="itinerary-header">
-        <div class="header-text">
-            <h1>Customized Trip Itinerary</h1>
-            <p><strong>Start Date:</strong> {{ $itinerary['arrival_date'] }}</p>
-            <p><strong>End Date:</strong> {{ $itinerary['departure_date'] }}</p>
-            <p><strong>Duration:</strong> {{ $itinerary['travel_duration'] }}</p>
-            <p><strong>Meal Plan:</strong> {{ $itinerary['meal_type'] }}</p>
-            <p><strong>Travellers:</strong> {{ $itinerary['number_of_travellor'] }} ({{ $itinerary['number_of_adults'] }} Adults, {{ $itinerary['number_of_children'] }} Children)</p>
-        </div>
-        <div class="header-graphic">
-            <img src="https://cdn-icons-png.flaticon.com/512/201/201623.png" alt="Trip Graphic">
-        </div>
-    </div>
-
-    @foreach($day_itinerary as $day)
-        <div class="day-box">
-            <div class="day-label">
-                <span class="check-icon">✔</span>
-                <span class="day-title">Day {{ $day['day'] }} - {{ $day['division'] }}</span>
-            </div>
-
-            <div class="info-blocks">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <p class="mb-1"><strong>Hotel:</strong> {{ $day['hotel']['name'] ?? 'N/A' }}</p>
-                        <p class="mb-1"><strong>Room Type:</strong> {{ $day['hotel_room']['name'] ?? 'N/A' }}</p>
-                    </div>
-                    <div>
-                        <p class="mb-1"><strong>Meal Plan:</strong> {{ $day['pax_with_adults']['name'] ?? 'N/A' }}</p>
-                        <p class="mb-1"><strong>Rooms:</strong> {{ $itinerary['number_of_rooms']?? 'N/A' }}</p>
-                    </div>
-                </div>
-            </div>
-
-            @foreach($day['route'] as $route)
-                <div class="activity-table">
-                    @foreach($day['route'] as $route)
-                    <div class="route-section">
-                        <div class="route-title"><strong>{{ ucwords($route['name']) }}</strong></div>
-
-                        <div class="tables-row">
-                            <!-- Activity Table -->
-                            <div class="table-box">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Activity</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($route['activitys'] ?? [] as $activity)
-                                        <tr>
-                                            <td>{{ $activity['name'] }}</td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-
-                            <!-- Sightseeing Table -->
-                            <div class="table-box">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Sightseeing</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($route['sightseeings'] ?? [] as $sight)
-                                        <tr>
-                                            <td>{{ $sight['name'] }}</td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-                    <div class="tables-row">
-                        {{-- Cab Table --}}
-                        <div class="table-box">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th colspan="3">Cab</th>
-                                    </tr>
-                                    <tr>
-                                        <th>Cab Name</th>
-                                        <th>Qty</th>
-                                        <th>Price</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($day['cab'] ?? [] as $cab)
-                                        <tr>
-                                            <td>{{ $cab['name'] }}</td>
-                                            <td>{{ $cab['quantity'] }}</td>
-                                            <td>{{ $cab['total_price'] }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-
-                        {{-- Addon Table: CWNB + CWM + Extra Mattress --}}
-                        <div class="table-box">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th colspan="3">Addon Items</th>
-                                    </tr>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Qty</th>
-                                        <th>Price</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {{-- CWNB --}}
-                                    @foreach($day['cwnb'] ?? [] as $addon)
-                                        <tr>
-                                            <td>{{ $addon['name'] ?? 'CWNB' }}</td>
-                                            <td>{{ $addon['quantity'] ?? '-' }}</td>
-                                            <td>{{ $addon['total_price'] ?? '-' }}</td>
-                                        </tr>
-                                    @endforeach
-
-                                    {{-- CWM --}}
-                                    @foreach($day['cwm'] ?? [] as $addon)
-                                        <tr>
-                                            <td>{{ $addon['name'] }}</td>
-                                            <td>{{ $addon['quantity'] }}</td>
-                                            <td>{{ $addon['total_price'] }}</td>
-                                        </tr>
-                                    @endforeach
-
-                                    {{-- Extra Mattress --}}
-                                    @foreach($day['extra_mattress'] ?? [] as $addon)
-                                        <tr>
-                                            <td>{{ $addon['name'] }}</td>
-                                            <td>{{ $addon['quantity'] }}</td>
-                                            <td>{{ $addon['total_price'] }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-
-        </div>
-         {{-- CAB + Addons Table Row --}}
+        body {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        .bg-color {
+            background-color:#d2e8ff !important;
+        }
+    }
     
-    @endforeach
+</style>
+    <div class="card">
+        <table class="table" id="print-section">
+            <tr>
+                <td>
+                    <table style="background: rgba(254, 215, 170, 0.2);  border: 1px solid #fed7aa;">
+                        <tr>
+                            <td>
+                                <table>
+                                    <tr>
+                                        <td style="font-size:16px; color:#000; text-transform:uppercase; padding-left:15px !important; padding-right:15px !important; padding-bottom:0px !important;">
+                                            Customized Trip Itinerary
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        {{-- {{dd($itinerary)}} --}}
+                                        <td style="padding:15px !important;">
+                                            <p style="font-size:13px; color:#000; margin-bottom:9px;"><strong>Client:</strong>{{$itinerary['name']}} </p>
+                                            <p style="font-size:13px; color:#000; margin-bottom:9px;"><strong>Client Email:</strong> {{$itinerary['email']}} </p>
+                                            <p style="font-size:13px; color:#000; margin-bottom:9px;"><strong>Client Mobile:</strong> +{{$itinerary['mobile']}} </p>
+                                            <p style="font-size:13px; color:#000; margin-bottom:9px;"><strong>Travel Date:</strong> {{$itinerary['travel_dates']}} </p>
+                                            
+                                        </td>
+                                        <td style="padding:15px !important;">
+                                            <p style="font-size:13px; color:#000; margin-bottom:9px;"><strong>PAX:</strong> {{$itinerary['number_of_travellor']}} </p>
+                                            <p style="font-size:13px; color:#000; margin-bottom:9px;"><strong>Adults:</strong> {{$itinerary['number_of_adults']}} </p>
+                                            <p style="font-size:13px; color:#000; margin-bottom:9px;"><strong>Child:</strong> {{$itinerary['number_of_children']}} </p>
+                                            <p style="font-size:13px; color:#000; margin-bottom:9px;"><strong>Extra Mattress:</strong> {{$itinerary['extra_mattress']}} </p>
+                                        </td>
+                                        <td style="padding:15px !important;">
+                                            <p style="font-size:13px; color:#000; margin-bottom:9px;"><strong>{{$itinerary['destination']}} Trip:</strong> {{$itinerary['travel_duration']}} </p>
+                                            <p style="font-size:13px; color:#000; margin-bottom:9px;"><strong>Total Room:</strong> {{$itinerary['number_of_rooms']}} </p>
+                                            <p style="font-size:13px; color:#000; margin-bottom:9px;"><strong>Meal Type:</strong> {{$itinerary['meal_type']}} </p>
+                                            
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                            <td style="vertical-align: top; text-align: center;">
+                                <a class="navbar-brand py-0" href="#" style="display: inline-block;">
+                                    <img src="{{asset('front_assets/images/logo.png')}}" 
+                                        alt="logo"
+                                        style="max-width: 120px; width: 100%; height: auto; display: block; margin: 0 auto;">
+                                </a>
+
+                                <table style="background:#1e58a3; color:#fff; text-align:center; width:100%; margin-top:10px;">
+                                    <tr>
+                                        <td style="text-align:center; padding:10px;">
+                                            <h4 style="color:#fff; text-transform:uppercase; font-size: 13px; margin:0;">
+                                                Total Amount
+                                            </h4>
+                                            <strong style="color:#fff; font-size:18px;">{{env('DEFAULT_CURRENCY_SYMBOL')}}{{$total_amount}}</strong>
+
+                                            <p style="color:#fff; font-size: 12px; margin:5px 0 0 0;">
+                                                Itinerary Code : <strong style="color:#fff;">{{$sent_lead_itinerary->itinerary_code}}</strong>
+                                            </p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+
+
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="2">
+                    @foreach($day_itinerary as $key=> $day)
+                    {{-- {{dd($day_itinerary)}} --}}
+                        <table style="border:1px solid rgba(1, 98, 232, 0.5) !important">
+                            <thead class="bg-color" style="background-color:#d2e8ff;">
+                                <tr>
+                                    <td><h4 style="font-size:22px; color:#031b4e; text-align:center;"> <i class="fa-solid fa-circle-check" style="font-size:20px; color:#1e58a3; text-transform: uppercase;"></i>  DAY {{ $day['day'] }} ({{ $day['division'] }})({{$day['division_date']}})<h4></td>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                @if($key < count($day_itinerary))
+                                <tr>
+                                    <td >
+                                        <table>
+                                            <tr>
+                                                <td>
+                                                    <span style="background:rgba(238, 51, 94, 0.2); color:rgb(238, 51, 94); border:1px solid rgb(238, 51, 94); display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:7px; line-height: 1;">
+                                                        <i class="fas fa-hotel"></i> Hotel | in {{ $day['division'] }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                           
+                                            <tr>
+                                                <td style="width:{{$authUser?'70':'100'}}%; vertical-align:top;">
+                                                    <table style="border:1px solid #ccc;">
+                                                        <tr>
+                                                            <td>
+                                                                <img src="{{ optional($day['hotel'])['image'] 
+                                                                    ? asset(optional($day['hotel'])['image']) 
+                                                                    : asset('build/assets/images/logo/demo.webp') }}"
+                                                                    style="width:225px; height:120px; object-fit:cover;">
+                                                            </td>
+
+
+                                                            <td style="vertical-align:top;">
+                                                                <h5 style="font-size:15px; text-transform: uppercase; color: #031b4e;">{{$day['hotel']['name']}}<h5>
+                                                                    <p style="font-size:12px; color:#000; margin-bottom:15px;">{{$day['hotel']['address']}}</p>
+                                                                <p>
+                                                                    <span style="background:rgba(238, 51, 94, 0.2); color:rgb(238, 51, 94); border:1px solid rgb(238, 51, 94); display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px; line-height: 1;">
+                                                                        ROOMS
+                                                                    </span>
+                                                                </p>
+
+                                                                <span style=" color:#4e4e4e; border:1px solid #ddd; display: inline-block; font-size: 12px; text-transform: uppercase; border-radius: 5px; padding:4px; line-height: 1;">{{$day['hotel_room']['name']}} : 
+                                                                    <i style="color:#ee335e;">
+                                                                    <strong>({{$itinerary['number_of_rooms']}})</strong>
+                                                                    </i>
+                                                                </span>
+                                                            </td>
+                                                             @if(!$authUser)
+                                                                <td width="50%">
+                                                                    <table>
+                                                                        <tr>
+                                                                            @php
+                                                                                $hasMealPlan = !empty($day['pax_with_adults']);
+                                                                                $hasCNB = !empty($day['cnb']);
+                                                                                $hasCWM = !empty($day['cwm']);
+                                                                                $hasExtraMattress = !empty($day['extra_mattress']);
+                                                                            @endphp
+
+                                                                            <td colspan="2">
+                                                                                <table style="border: 1px solid rgba(1, 98, 232, 0.5) !important; width:100%;">
+                                                                                    <tr>
+                                                                                        <td style="padding:0 !important;">
+                                                                                            <table style="table-layout:fixed;">
+                                                                                                <thead style="font-size:14px; font-weight:600; background: rgba(1, 98, 232, 0.1);
+                                                                                                    color:#031b4e; border-bottom: 1px solid rgba(1, 98, 232, 0.5) !important;">
+                                                                                                    <tr>
+                                                                                                        @if($hasMealPlan)
+                                                                                                            <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding:10px;">
+                                                                                                                Meal Plan
+                                                                                                            </th>
+                                                                                                        @endif
+
+                                                                                                        @if($hasCNB)
+                                                                                                            <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding:10px;">
+                                                                                                                CNB
+                                                                                                            </th>
+                                                                                                        @endif
+
+                                                                                                        @if($hasCWM)
+                                                                                                            <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding:10px;">
+                                                                                                                CWM
+                                                                                                            </th>
+                                                                                                        @endif
+
+                                                                                                        @if($hasExtraMattress)
+                                                                                                            <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding:10px;">
+                                                                                                                Extra Mattress
+                                                                                                            </th>
+                                                                                                        @endif
+                                                                                                    </tr>
+                                                                                                </thead>
+
+                                                                                                <tbody>
+                                                                                                    <tr style="text-align:center">
+                                                                                                        @if($hasMealPlan)
+                                                                                                            <td style="vertical-align:top;">
+                                                                                                                <p>
+                                                                                                                    <span style="color:#031b4e; border:1px solid #ddd; display:inline-block;
+                                                                                                                        font-size:11px; text-transform:uppercase; border-radius:5px;
+                                                                                                                        padding:4px 6px; line-height:1;">
+                                                                                                                        {{ $day['pax_with_adults']['name'] }}
+                                                                                                                    </span>
+                                                                                                                </p>
+                                                                                                            </td>
+                                                                                                        @endif
+
+                                                                                                        @if($hasCNB)
+                                                                                                            <td style="vertical-align:top;">
+                                                                                                                @foreach($day['cnb'] as $cnb)
+                                                                                                                    <p>
+                                                                                                                        <span style="color:#031b4e; border:1px solid #ddd; display:inline-block;
+                                                                                                                            font-size:11px; text-transform:uppercase; border-radius:5px;
+                                                                                                                            padding:4px 6px; line-height:1;">
+                                                                                                                            {{ $cnb['name'] }}
+                                                                                                                            <i style="color:#ee335e;">
+                                                                                                                                ({{ $cnb['quantity'] }})
+                                                                                                                            </i>
+                                                                                                                        </span>
+                                                                                                                    </p>
+                                                                                                                @endforeach
+                                                                                                            </td>
+                                                                                                        @endif
+
+                                                                                                        @if($hasCWM)
+                                                                                                            <td style="vertical-align:top;">
+                                                                                                                @foreach($day['cwm'] as $cwm)
+                                                                                                                    <p>
+                                                                                                                        <span style="color:#031b4e; border:1px solid #ddd; display:inline-block;
+                                                                                                                            font-size:11px; text-transform:uppercase; border-radius:5px;
+                                                                                                                            padding:4px 6px; line-height:1;">
+                                                                                                                            {{ $cwm['name'] }}
+                                                                                                                            <i style="color:#ee335e;">
+                                                                                                                                ({{ $cwm['quantity'] }})
+                                                                                                                            </i>
+                                                                                                                        </span>
+                                                                                                                    </p>
+                                                                                                                @endforeach
+                                                                                                            </td>
+                                                                                                        @endif
+
+                                                                                                        @if($hasExtraMattress)
+                                                                                                            <td style="vertical-align:top;">
+                                                                                                                @foreach($day['extra_mattress'] as $extra)
+                                                                                                                    <p>
+                                                                                                                        <span style="color:#031b4e; border:1px solid #ddd; display:inline-block;
+                                                                                                                            font-size:11px; text-transform:uppercase; border-radius:5px;
+                                                                                                                            padding:4px 6px; line-height:1;">
+                                                                                                                            {{ $extra['name'] }}
+                                                                                                                            <i style="color:#ee335e;">
+                                                                                                                                ({{ $extra['quantity'] }})
+                                                                                                                            </i>
+                                                                                                                        </span>
+                                                                                                                    </p>
+                                                                                                                @endforeach
+                                                                                                            </td>
+                                                                                                        @endif
+                                                                                                    </tr>
+                                                                                                </tbody>
+
+                                                                                            </table>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                </table>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </td>
+                                                            @endif
+                                                        </tr>
+                                                        
+                                                        @if($authUser)
+                                                            <tr>
+                                                                @php
+                                                                    $hasMealPlan = !empty($day['pax_with_adults']);
+                                                                    $hasCNB = !empty($day['cnb']);
+                                                                    $hasCWM = !empty($day['cwm']);
+                                                                    $hasExtraMattress = !empty($day['extra_mattress']);
+                                                                @endphp
+
+                                                                <td colspan="2">
+                                                                    <table style="border: 1px solid rgba(1, 98, 232, 0.5) !important; width:100%;">
+                                                                        <tr>
+                                                                            <td style="padding:0 !important;">
+                                                                                <table style="table-layout:fixed;">
+                                                                                    <thead style="font-size:14px; font-weight:600; background: rgba(1, 98, 232, 0.1);
+                                                                                        color:#031b4e; border-bottom: 1px solid rgba(1, 98, 232, 0.5) !important;">
+                                                                                        <tr>
+                                                                                            @if($hasMealPlan)
+                                                                                                <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding:10px;">
+                                                                                                    Meal Plan
+                                                                                                </th>
+                                                                                            @endif
+
+                                                                                            @if($hasCNB)
+                                                                                                <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding:10px;">
+                                                                                                    CNB
+                                                                                                </th>
+                                                                                            @endif
+
+                                                                                            @if($hasCWM)
+                                                                                                <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding:10px;">
+                                                                                                    CWM
+                                                                                                </th>
+                                                                                            @endif
+
+                                                                                            @if($hasExtraMattress)
+                                                                                                <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding:10px;">
+                                                                                                    Extra Mattress
+                                                                                                </th>
+                                                                                            @endif
+                                                                                        </tr>
+                                                                                    </thead>
+
+                                                                                    <tbody>
+                                                                                        <tr style="text-align:center">
+                                                                                            @if($hasMealPlan)
+                                                                                                <td style="vertical-align:top;">
+                                                                                                    <p>
+                                                                                                        <span style="color:#031b4e; border:1px solid #ddd; display:inline-block;
+                                                                                                            font-size:11px; text-transform:uppercase; border-radius:5px;
+                                                                                                            padding:4px 6px; line-height:1;">
+                                                                                                            {{ $day['pax_with_adults']['name'] }}
+                                                                                                        </span>
+                                                                                                    </p>
+                                                                                                </td>
+                                                                                            @endif
+
+                                                                                            @if($hasCNB)
+                                                                                                <td style="vertical-align:top;">
+                                                                                                    @foreach($day['cnb'] as $cnb)
+                                                                                                        <p>
+                                                                                                            <span style="color:#031b4e; border:1px solid #ddd; display:inline-block;
+                                                                                                                font-size:11px; text-transform:uppercase; border-radius:5px;
+                                                                                                                padding:4px 6px; line-height:1;">
+                                                                                                                {{ $cnb['name'] }}
+                                                                                                                <i style="color:#ee335e;">
+                                                                                                                    ({{ $cnb['quantity'] }})
+                                                                                                                </i>
+                                                                                                            </span>
+                                                                                                        </p>
+                                                                                                    @endforeach
+                                                                                                </td>
+                                                                                            @endif
+
+                                                                                            @if($hasCWM)
+                                                                                                <td style="vertical-align:top;">
+                                                                                                    @foreach($day['cwm'] as $cwm)
+                                                                                                        <p>
+                                                                                                            <span style="color:#031b4e; border:1px solid #ddd; display:inline-block;
+                                                                                                                font-size:11px; text-transform:uppercase; border-radius:5px;
+                                                                                                                padding:4px 6px; line-height:1;">
+                                                                                                                {{ $cwm['name'] }}
+                                                                                                                <i style="color:#ee335e;">
+                                                                                                                    ({{ $cwm['quantity'] }})
+                                                                                                                </i>
+                                                                                                            </span>
+                                                                                                        </p>
+                                                                                                    @endforeach
+                                                                                                </td>
+                                                                                            @endif
+
+                                                                                            @if($hasExtraMattress)
+                                                                                                <td style="vertical-align:top;">
+                                                                                                    @foreach($day['extra_mattress'] as $extra)
+                                                                                                        <p>
+                                                                                                            <span style="color:#031b4e; border:1px solid #ddd; display:inline-block;
+                                                                                                                font-size:11px; text-transform:uppercase; border-radius:5px;
+                                                                                                                padding:4px 6px; line-height:1;">
+                                                                                                                {{ $extra['name'] }}
+                                                                                                                <i style="color:#ee335e;">
+                                                                                                                    ({{ $extra['quantity'] }})
+                                                                                                                </i>
+                                                                                                            </span>
+                                                                                                        </p>
+                                                                                                    @endforeach
+                                                                                                </td>
+                                                                                            @endif
+                                                                                        </tr>
+                                                                                    </tbody>
+
+                                                                                </table>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                        @endif
+                                                    </table>
+                                                </td>
+                                                @if($authUser)
+                                                    <td style="vertical-align: top;">
+                                                        <div style="background: rgba(254, 215, 170, 0.2); border: 1px solid #fed7aa; padding: 20px; max-width: 419px;">
+                                                            
+                                                            <ul class="total-ex-list">
+                                                                @php 
+                                                                    $day_total_price = 0; 
+                                                                @endphp
+                                                                
+                                                                @foreach ($day_wise_amount_data[$key] as $day_wise_amount)
+                                                                    @if($day_wise_amount->total_price > 0)
+                                                                        @php
+                                                                            $day_total_price += $day_wise_amount->total_price;
+                                                                            $fieldLabel = ucwords(str_replace('_', ' ', $day_wise_amount->field));
+                                                                            $unitPrice = $day_wise_amount->total_quantity > 0 
+                                                                                ? round($day_wise_amount->total_price / $day_wise_amount->total_quantity, 2) 
+                                                                                : 0;
+                                                                        @endphp
+
+                                                                        @if(!in_array($day_wise_amount->field, ['day_sightseeing', 'day_activity', 'day_cab']))
+                                                                            <li>
+                                                                                <i class="fa-solid fa-circle-arrow-right"></i>
+                                                                                @if($fieldLabel === "Day Room Main Plan")
+                                                                                    @php
+                                                                                        $unitPrice = $day_wise_amount->total_quantity > 0 
+                                                                                            ? $day_wise_amount->total_price / $leadData->number_of_rooms
+                                                                                            : 0;
+                                                                                    @endphp
+                                                                                    {{ $fieldLabel }} ({{ $leadData->number_of_rooms }} * {{ $unitPrice }}) = {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $day_wise_amount->total_price }}
+                                                                                @else
+                                                                                    {{ $fieldLabel }} ({{ $day_wise_amount->total_quantity }} * {{ $unitPrice }}) = {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $day_wise_amount->total_price }}
+                                                                                @endif
+                                                                            </li>
+                                                                        @else
+                                                                            <li>
+                                                                                <i class="fa-solid fa-circle-arrow-right"></i>
+                                                                                {{ $fieldLabel }} = {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $day_wise_amount->total_price }}
+                                                                            </li>
+                                                                        @endif
+                                                                    @endif
+                                                                @endforeach
+                                                            </ul>
+
+                                                            @if($day_total_price > 0)
+                                                                <hr style="border: 1px solid #fed7aa; background-color:#fed7aa; margin-top: 16px; margin-bottom: 10px;">
+
+                                                                <h3 style="font-size: 13px;">
+                                                                    Total Amount: {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ number_format($day_total_price) }}
+                                                                </h3>
+                                                            @endif
+                                                        </div>
+
+                                                    </td>
+                                                @endif
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                @endif
+                                {{-- <tr>
+                                    <td style="vertical-align:top;">
+                                        <table>
+                                            <tr>
+                                                <td>
+                                                    <span style="background:rgba(238, 51, 94, 0.2); color:rgb(238, 51, 94); border:1px solid rgb(238, 51, 94); display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:7px; line-height: 1;">
+                                                        <i class="fas fa-taxi"></i> Cabs | in Port Blair
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="vertical-align:top;">
+                                                    <table style="border: 1px solid rgba(1, 98, 232, 0.5) !important;">
+                                                        <thead style="font-size:14px; font-weight:600; background: rgba(1, 98, 232, 0.1); color:#031b4e; width:180px; border-bottom: 1px solid rgba(1, 98, 232, 0.5) !important; text-align:left;">
+                                                            <tr>
+                                                                <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">CAB</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>
+                                                                    <table style=" margin-bottom:6px; width:100%;">
+                                                                        <tr>
+                                                                            <td style="text-align:center;">
+                                                                                <ul style="display:flex; align-items:center; flex-wrap:wrap;">
+                                                                                    <li style="text-align:center; width:180px; border:1px solid #ccc; margin-bottom:6px; margin-right:6px; padding: 18px 0;">
+                                                                                        <img width="80" src="https://christmastree.quickdemo.in/assets/img/cab.png" style="margin:auto;">
+                                                                                        <p>
+                                                                                            <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1; background-color: rgba(34, 192, 60, 0.1);
+                                                                                            color: #22c03c;">Tempo (17S) <i style="color:#ee335e;">(1)</i></span>
+                                                                                        </p>
+                                                                                    </li>
+                                                                                    <li style="text-align:center; width:180px; border:1px solid #ccc; margin-bottom:6px; margin-right:6px; padding: 18px 0;">
+                                                                                        <img width="80" src="https://christmastree.quickdemo.in/assets/img/cab.png" style="margin:auto;">
+                                                                                        <p>
+                                                                                            <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:4px 6px; line-height: 1; background-color: rgba(34, 192, 60, 0.1);
+                                                                                            color: #22c03c;">Tempo (17S) <i style="color:#ee335e;">(1)</i></span>
+                                                                                        </p>
+                                                                                    </li>
+                                                                                </ul>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr> --}}
+
+                                <tr >
+                                    <td style="vertical-align:top;" >
+                                        <table>
+                                            <tr>
+                                                <td>
+                                                    <span style="background:rgba(238, 51, 94, 0.2); color:rgb(238, 51, 94); border:1px solid rgb(238, 51, 94); display: inline-block; font-size: 11px; text-transform: uppercase; border-radius: 5px; padding:7px; line-height: 1;">
+                                                        <i class="fas fa-route"></i> Route | <i class="fas fa-binoculars"></i> Sight | <i class="fas fa-running"></i> Activity |  seen in Port Blair
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td style="vertical-align:top;">
+                                                    <table style="border: 1px solid rgba(1, 98, 232, 0.5) !important;">
+                                                        <thead style="font-size:14px; font-weight:600; background: rgba(1, 98, 232, 0.1); color:#031b4e; width:180px; border-bottom: 1px solid rgba(1, 98, 232, 0.5) !important; text-align:left;">
+                                                            <tr>
+                                                                <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px; width:65px; border-right: 1px solid rgba(1, 98, 232, 0.5) !important;">SL.No</th>
+                                                                <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px; border-right: 1px solid rgba(1, 98, 232, 0.5) !important;">Route</th>
+                                                                <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px; border-right: 1px solid rgba(1, 98, 232, 0.5) !important;">sightseeing</th>
+                                                                <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px; border-right: 1px solid rgba(1, 98, 232, 0.5) !important;">Activity</th>
+                                                                <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">Cab</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach($day['route'] ?? [] as $routeIndex => $route)
+                                                                {{-- MAIN ROUTE ROW --}}
+                                                                <tr style="border-bottom:1px solid #ccc !important;">
+                                                                    {{-- SL NO --}}
+                                                                    <td
+                                                                        style="vertical-align:top; border-right:1px solid #ccc !important;">
+                                                                        <span style="border:1px solid rgba(34,192,60,.8);
+                                                                            background:rgba(34,192,60,.1); color:#22c03c;
+                                                                            border-radius:4px; padding:2px 3px; font-size:11px;">
+                                                                            {{ $routeIndex + 1 }}
+                                                                        </span>
+                                                                    </td>
+
+                                                                    {{-- ROUTE NAME --}}
+                                                                    <td style="vertical-align:top; border-right:1px solid #ccc !important;">
+                                                                        <h6 style="font-size:14px; text-transform:uppercase; color:#031b4e; margin-bottom:5px;">
+                                                                            {{ $route['name'] ?? '-' }}
+                                                                        </h6>
+                                                                    </td>
+
+                                                                    {{-- SIGHTSEEING --}}
+                                                                    <td style="vertical-align:top; border-right:1px solid #ccc !important;">
+                                                                        @forelse($route['sightseeings'] ?? [] as $sight)
+                                                                            <p>
+                                                                                <span style="color:#031b4e; border:1px solid #ddd;
+                                                                                    display:inline-block; font-size:11px;
+                                                                                    border-radius:5px; padding:4px 6px;">
+                                                                                    {{ $sight['name'] }}
+                                                                                    <i style="color:#ee335e;">({{ $sight['quantity'] }})</i>
+                                                                                </span>
+                                                                            </p>
+                                                                        @empty
+                                                                            —
+                                                                        @endforelse
+                                                                    </td>
+
+                                                                    {{-- ACTIVITY --}}
+                                                                    <td style="vertical-align:top; border-right:1px solid #ccc !important;">
+                                                                        @forelse($route['activitys'] ?? [] as $activity)
+                                                                            <p>
+                                                                                <span style="color:#031b4e; border:1px solid #ddd;
+                                                                                    display:inline-block; font-size:11px;
+                                                                                    border-radius:5px; padding:4px 6px;">
+                                                                                    {{ $activity['name'] }}
+                                                                                    <i style="color:#ee335e;">({{ $activity['quantity'] }})</i>
+                                                                                </span>
+                                                                            </p>
+                                                                        @empty
+                                                                            —
+                                                                        @endforelse
+                                                                    </td>
+                                                                    {{-- CAB --}}
+                                                                    <td style="vertical-align:top; min-width:10%;">
+                                                                        @if(!empty($route['cabs']))
+                                                                            {{-- <ul style="display:flex; align-items:center; flex-wrap:wrap; padding:0; margin:0;"> --}}
+                                                                                @foreach($route['cabs'] as $cab)
+                                                                                    <div style="list-style:none; text-align:center; width:180px;
+                                                                                        border:1px solid #ccc; margin:6px; padding:18px 0;">
+                                                                                        
+                                                                                        <img width="80"
+                                                                                            src="{{ $cab['image'] ?? asset('assets/img/cab.png') }}"
+                                                                                            alt="{{ $cab['name'] }}"
+                                                                                            style="margin:auto;">
+
+                                                                                        <p>
+                                                                                            <span style="color:#22c03c; border:1px solid #ddd;
+                                                                                                display:inline-block; font-size:11px;
+                                                                                                text-transform:uppercase; border-radius:5px;
+                                                                                                padding:4px 6px; background:rgba(34,192,60,.1);">
+                                                                                                {{ $cab['name'] }}
+                                                                                                <i style="color:#ee335e;">({{ $cab['quantity'] }})</i>
+                                                                                            </span>
+                                                                                        </p>
+                                                                                    </div>
+                                                                                @endforeach
+                                                                            {{-- </ul> --}}
+                                                                          @endif
+                                                                    </td>
+                                                                </tr>
+                                                              
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </td>
+                                                @if($authUser)
+                                                    @if($key == count($day_itinerary))
+                                                        <td style="vertical-align: top;">
+                                                            <div style="background: rgba(254, 215, 170, 0.2); border: 1px solid #fed7aa; padding: 20px; max-width: 419px;">
+        
+                                                                <ul class="total-ex-list">
+                                                                    @php 
+                                                                        $day_total_price = 0; 
+                                                                    @endphp
+                                                                    
+                                                                    @foreach ($day_wise_amount_data[$key] as $day_wise_amount)
+                                                                        @if($day_wise_amount->total_price > 0)
+                                                                            @php
+                                                                                $day_total_price += $day_wise_amount->total_price;
+                                                                                $fieldLabel = ucwords(str_replace('_', ' ', $day_wise_amount->field));
+                                                                                $unitPrice = $day_wise_amount->total_quantity > 0 
+                                                                                    ? round($day_wise_amount->total_price / $day_wise_amount->total_quantity, 2) 
+                                                                                    : 0;
+                                                                            @endphp
+
+                                                                            @if(!in_array($day_wise_amount->field, ['day_sightseeing', 'day_activity', 'day_cab']))
+                                                                                <li>
+                                                                                    <i class="fa-solid fa-circle-arrow-right"></i>
+                                                                                    @if($fieldLabel === "Day Room Main Plan")
+                                                                                        @php
+                                                                                            $unitPrice = $day_wise_amount->total_quantity > 0 
+                                                                                                ? $day_wise_amount->total_price / $leadData->number_of_rooms
+                                                                                                : 0;
+                                                                                        @endphp
+                                                                                        {{ $fieldLabel }} ({{ $leadData->number_of_rooms }} * {{ $unitPrice }}) = {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $day_wise_amount->total_price }}
+                                                                                    @else
+                                                                                        {{ $fieldLabel }} ({{ $day_wise_amount->total_quantity }} * {{ $unitPrice }}) = {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $day_wise_amount->total_price }}
+                                                                                    @endif
+                                                                                </li>
+                                                                            @else
+                                                                                <li>
+                                                                                    <i class="fa-solid fa-circle-arrow-right"></i>
+                                                                                    {{ $fieldLabel }} = {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ $day_wise_amount->total_price }}
+                                                                                </li>
+                                                                            @endif
+                                                                        @endif
+                                                                    @endforeach
+                                                                </ul>
+
+                                                                @if($day_total_price > 0)
+                                                                    <hr style="border: 1px solid #fed7aa; background-color:#fed7aa; margin-top: 16px; margin-bottom: 10px;">
+
+                                                                    <h3 style="font-size: 13px;">
+                                                                        Total Amount: {{ env('DEFAULT_CURRENCY_SYMBOL') }}{{ number_format($day_total_price) }}
+                                                                    </h3>
+                                                                @endif
+                                                            </div>
+
+                                                        </td>
+                                                    @endif
+                                                @endif
+                                            </tr>
+                                        </table>
+                                    </td>
+                                      {{-- {{dd($day)}} --}}
+                                </tr>
+                               
+                            </tbody>
+                        </table>
+                    @endforeach
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <table style="border:1px solid rgba(1, 98, 232, 0.5) !important">
+                        <thead style="background-color:#d2e8ff;">
+                            <tr>
+                                <th>
+                                    <h4 style="font-size:22px; color:#031b4e; text-align:center;"> <i class="fa-solid fa-circle-check" style="font-size:20px; color:#1e58a3;"></i> Hotel Summery </h4>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <ul class="hotel-list">
+                                        @foreach($day_itinerary as $key=> $day)
+                                            @if($key < count($day_itinerary))
+                                                <li>
+                                                    <figure>
+                                                        <img src="{{ optional($day['hotel'])['image'] 
+                                                                        ? asset(optional($day['hotel'])['image']) 
+                                                                        : asset('build/assets/images/logo/demo.webp') }}">
+                                                    </figure>
+                                                    <figcaption>
+                                                        <h3>Day {{$key}}</h3>
+                                                        <h2>{{$day['hotel']['name']}}</h2>
+                                                        <p>{{$day['hotel']['address']}}</p>
+                                                    </figcaption>
+                                                </li>
+                                            @endif
+                                        @endforeach
+                                    </ul>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td>
+                    <table style="border:1px solid rgba(1, 98, 232, 0.5) !important; width:100%;">
+                        <thead style="background-color:#d2e8ff;">
+                            <tr>
+                                <th>
+                                    <h4 style="font-size:22px; color:#031b4e; text-align:center;">
+                                        <i class="fa-solid fa-circle-check"
+                                        style="font-size:20px; color:#1e58a3;"></i>
+                                        Activities Summary
+                                    </h4>
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                        @foreach($day_itinerary as $dayData)
+                            @php
+                                $day = $dayData['day'];
+
+                                // Check if this day has at least one activity
+                                $hasActivity = collect($dayData['route'])
+                                    ->pluck('activitys')
+                                    ->flatten(1)
+                                    ->isNotEmpty();
+                            @endphp
+
+                            @if($hasActivity)
+                                {{-- DAY HEADING --}}
+                                <tr>
+                                    <td style="padding:10px; background:#f4f8ff;">
+                                        <h3 style="margin:0; color:#1e58a3;">
+                                            Day {{ $day }}
+                                        </h3>
+                                    </td>
+                                </tr>
+
+                                {{-- ACTIVITIES --}}
+                                <tr>
+                                    <td>
+                                        <ul class="activity-list">
+                                            @foreach($dayData['route'] as $route)
+                                                @foreach($route['activitys'] as $activity)
+                                                    <li style="
+                                                        background:url('{{ $activity['image'] }}');
+                                                        background-repeat:no-repeat;
+                                                        background-size:cover;
+                                                        background-position:center center;
+                                                    ">
+                                                        <figcaption>
+                                                            <h2>{{ $activity['name'] }}</h2>
+                                                        </figcaption>
+                                                    </li>
+                                                @endforeach
+                                            @endforeach
+                                        </ul>
+                                    </td>
+                                </tr>
+                            @endif
+                        @endforeach
+
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td>
+                    <table style="border:1px solid rgba(1, 98, 232, 0.5) !important">
+                        <thead style="background-color:#d2e8ff;">
+                            <tr>
+                                <th>
+                                    <h4 style="font-size:22px; color:#031b4e; text-align:center;">
+                                        <i class="fa-solid fa-circle-check" style="font-size:20px; color:#1e58a3;"></i>
+                                        Exclusions
+                                    </h4>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    @foreach($itinerary['exclusions'] as $index => $exclusion)
+                                        <p>
+                                            <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; border-radius: 5px; padding:4px 6px; line-height: 1; margin-bottom:5px;">
+                                                {{ $index + 1 }}. {{ $exclusion }}
+                                            </span>
+                                        </p>
+                                    @endforeach
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+
+
+            <tr class="keep-together">
+                <td>
+                    <table style="border:1px solid rgba(1, 98, 232, 0.5) !important">
+                        <thead style="background-color:#d2e8ff;">
+                            <tr>
+                                <th>
+                                    <h4 style="font-size:22px; color:#031b4e; text-align:center;">
+                                        <i class="fa-solid fa-circle-check" style="font-size:20px; color:#1e58a3;"></i>
+                                        Inclusions
+                                    </h4>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    @foreach($itinerary['inclusions'] as $index => $inclusion)
+                                        <p>
+                                            <span style=" color:#031b4e; border:1px solid #ddd; display: inline-block; font-size: 11px; border-radius: 5px; padding:4px 6px; line-height: 1; margin-bottom:5px;">
+                                                {{ $index + 1 }}. {{ $inclusion }}
+                                            </span>
+                                        </p>
+                                    @endforeach
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+
+
+        </table>
+    </div>
 </div>
 @section('scripts')
     <script>

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('email_templates', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->string('slug')->unique(); // e.g., "employee_welcome"
             $table->string('name')->nullable();
             $table->string('subject')->nullable();

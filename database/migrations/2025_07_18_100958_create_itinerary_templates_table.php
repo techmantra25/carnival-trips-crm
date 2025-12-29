@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('itinerary_templates', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->unsignedBigInteger('destination_id')->comment('Foreign key referencing states table');
             $table->timestamps();
 

@@ -7,6 +7,10 @@ use App\Models\Lead;
 use App\Models\LeadUrlClick;
 use App\Models\LeadUrlShare;
 use App\Models\Admin;
+use App\Models\InventoryLedger;
+use App\Models\Inventory;
+use App\Models\Hotel;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Helpers\CustomHelper;
 use Illuminate\Support\Facades\Log;
@@ -126,5 +130,96 @@ class CronController extends Controller
             ]);
         }
     }
+
+    public function update_auto_release_room_stock()
+    {
+        $today = Carbon::today();
+        $totalReleased = 0; // Count how many rooms released in total
+
+        // Get all hotels that have release trigger enabled
+        $all_hotels = Hotel::where('release_trigger', '>', 0)
+                            ->whereNull('deleted_at')
+                            ->get();
+
+        foreach ($all_hotels as $hotel) {
+
+            $releaseDays = (int)$hotel->release_trigger;
+
+            /**
+             * 1. FUTURE AUTO-RELEASE DATE
+             */
+            $thresholdDate = $today->copy()->addDays($releaseDays);
+
+            $inventories = Inventory::where('hotel_id', $hotel->id)
+                                    ->where('date', $thresholdDate->format('Y-m-d'))
+                                    ->get();
+
+            foreach ($inventories as $inventory) {
+
+                $beforeUnsold = $inventory->total_unsold;
+
+                if ($beforeUnsold > 0) {
+
+                    // Count released rooms
+                    $totalReleased += $beforeUnsold;
+
+                    $inventory->total_unsold = 0;
+                    $inventory->save();
+
+                    InventoryLedger::create([
+                        'inventory_id'   => $inventory->id,
+                        'hotel_id'       => $inventory->hotel_id,
+                        'lead_id'        => null,
+                        'room_id'        => $inventory->room_id,
+                        'inventory_date' => $inventory->date,
+                        'entry_type'     => 'auto_release',
+                        'quantity'       => -$beforeUnsold,
+                        'description'    => "Auto-release (Future Date). Unsold Before: $beforeUnsold, After: 0",
+                    ]);
+                }
+            }
+
+            /**
+             * 2. AUTO-RELEASE PAST DATES
+             */
+            $pastInventories = Inventory::where('hotel_id', $hotel->id)
+                                        ->where('date', '<', $today->format('Y-m-d'))
+                                        ->get();
+
+            foreach ($pastInventories as $inventory) {
+
+                $beforeUnsold = $inventory->total_unsold;
+
+                if ($beforeUnsold > 0) {
+
+                    // Count released rooms
+                    $totalReleased += $beforeUnsold;
+
+                    $inventory->total_unsold = 0;
+                    $inventory->save();
+
+                    InventoryLedger::create([
+                        'inventory_id'   => $inventory->id,
+                        'hotel_id'       => $inventory->hotel_id,
+                        'lead_id'        => null,
+                        'room_id'        => $inventory->room_id,
+                        'inventory_date' => $inventory->date,
+                        'entry_type'     => 'auto_release',
+                        'quantity'       => -$beforeUnsold,
+                        'description'    => "Auto-release (Past Date). Unsold Before: $beforeUnsold, After: 0",
+                    ]);
+                }
+            }
+        }
+
+        Log::info("Auto-release executed. Total rooms released: {$totalReleased}");
+        return "Auto-release completed. {$totalReleased} rooms updated.";
+    }
+
+
+
+
+
+    
 
 }

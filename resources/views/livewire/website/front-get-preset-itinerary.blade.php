@@ -229,13 +229,24 @@
                                     
                                     <div class="content-wrap-box">
                                         <div class="accordion itinerary-content-accordion" id="itineraryAccordion1">
-
+                                           @foreach (explode(',',$itinerary->stay_by_journey) as $division_key=> $item)
+                                            @php
+                                                $division = App\Models\City::findOrFail($item);
+                                                $headingId = 'heading_'.$division_key;
+                                                $collapseId = 'collapse_'.$division_key;
+                                                $division_hotels = $division->nonServiceHotels()
+                                                    ->where('category_id', $itinerary->hotel_category)
+                                                    ->with('category')->get();
+                                            @endphp
                                             <div class="accordion-item">
-                                                <h2 class="accordion-header" id="headingOne">
-                                                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                                <h2 class="accordion-header" id="{{ $headingId }}">
+                                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#{{$collapseId}}" 
+                                                    aria-expanded="false"
+                                                    aria-controls="{{ $collapseId }}"
+                                                    >
                                                         <div class="accordion-head">
-                                                            <div class="day-count">Day<span>01</span></div>
-                                                            <div class="location-name">Singapore</div>
+                                                            <div class="day-count">Day<span>0{{$division_key+1}}</span></div>
+                                                            <div class="location-name">{{$division->name}}</div>
                                                             <div class="accordion-head-info-box">
                                                                 <div class="inner-info">
                                                                     <img src="{{asset('front_assets/icons/activities-white.png')}}" alt="">
@@ -247,7 +258,7 @@
                                                                 </div>
                                                                 <div class="inner-info">
                                                                     <img src="{{asset('front_assets/icons/bed-white.png')}}" alt="">
-                                                                    <span>3</span>
+                                                                    <span>{{count($division->nonServiceHotels)}}</span>
                                                                 </div>
                                                             </div>
                                                             <div class="accordion-status-indicator">
@@ -256,69 +267,48 @@
                                                         </div>
                                                     </button>
                                                 </h2>
-                                                <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#itineraryAccordion1">
+                                                <div id="{{$collapseId }}" class="accordion-collapse collapse" aria-labelledby="{{$headingId}}" data-bs-parent="#itineraryAccordion1">
                                                     <div class="accordion-body">
+                                                        {{-- @if($itinerary->hotel_category && $division_hotels->count() > 0) --}}
                                                         <h2 class="text-center">Stay Cetegory</h2>
                                                         <ul class="stay-category-tabs">
                                                             <li>
-                                                                <a href="javascript:void(0)" class="active">Delexue</a>
+                                                                <a href="javascript:void(0)" class="active">{{ $division_hotels->first()->category->name ?? '' }}
+
+                                                                </a>
                                                             </li>
                                                         </ul>
+
+                                                         
+                                                            
+                                                        
                                                         <div class="itinerary-hospitalities">
                                                             <div class="info-header">
                                                                 <label>Hotels &amp; Hospitalities</label>
-                                                                <span>Total 3 Selected</span>
+                                                                <span>Total {{count($division->nonServiceHotels)}} Selected</span>
                                                             </div>
                                                             <ul class="hospitalities-list">
-                                                                <li>
+                                                                
+                                                                @foreach ($division->nonServiceHotels as $hotels_key =>$division_hotels_item)
+                                                                    <li>
                                                                     <div class="hospitality-card selected">
                                                                         <div class="img-wrap">
-                                                                            <img src="{{asset('front_assets/images/bedroom-suite.webp')}}" alt="Hospitality">
+                                                                            <img src="{{asset($division_hotels_item->image)}}" alt="Hospitality">
                                                                         </div>
                                                                         <div class="info-wrap">
-                                                                            <div class="title">Lmosconsectetur adipisicing</div>
-                                                                            <div class="address">Address</div>
-                                                                            <div class="bottom-row">
+                                                                            <div class="title">{{$division_hotels_item->hotel_name ?? ''}}</div>
+                                                                            <div class="address">{{$division_hotels_item->address ?? ''}}</div>
+                                                                            {{-- <div class="bottom-row">
                                                                                 <h4>Semi Dlx</h4>
                                                                                 <span class="indicator"></span>
-                                                                            </div>
+                                                                            </div> --}}
                                                                         </div>
                                                                     </div>
                                                                 </li>
-
-                                                                <li>
-                                                                    <div class="hospitality-card selected">
-                                                                        <div class="img-wrap">
-                                                                            <img src="{{asset('front_assets/images/bedroom-suite.webp')}}" alt="Hospitality">
-                                                                        </div>
-                                                                        <div class="info-wrap">
-                                                                            <div class="title">Lmosconsectetur adipisicing</div>
-                                                                            <div class="address">Address</div>
-                                                                            <div class="bottom-row">
-                                                                                <h4>Semi Dlx</h4>
-                                                                                <span class="indicator"></span>
-                                                                            </div>                                                                         
-                                                                        </div>
-                                                                    </div>
-                                                                </li>
-
-                                                                <li>
-                                                                    <div class="hospitality-card">
-                                                                        <div class="img-wrap">
-                                                                            <img src="{{asset('front_assets/images/bedroom-suite.webp')}}" alt="Hospitality">
-                                                                        </div>
-                                                                        <div class="info-wrap">
-                                                                            <div class="title">Lmosconsectetur adipisicing</div>
-                                                                            <div class="address">Address</div>
-                                                                            <div class="bottom-row">
-                                                                                <h4>Semi Dlx</h4>
-                                                                                <span class="indicator"></span>
-                                                                            </div>                                                                           
-                                                                        </div>
-                                                                    </div>
-                                                                </li>
+                                                                @endforeach
                                                             </ul>
                                                         </div>
+                                                        {{-- @endif --}}
 
                                                         <div class="inner-content-wrap-box">
                                                             <div class="heading" data-bs-toggle="collapse" data-bs-target="#stack1">
@@ -540,154 +530,13 @@
                                                             </div>
                                                         </div>
 
-
-
-                                                        {{-- <div class="inner-content-wrap-box">
-                                                            <div class="heading">
-                                                                <img src="{{asset('front_assets/icons/activities.png')}}" alt="">
-                                                                <span>Activity:</span>
-                                                                <span class="total-selected">Total 6 Selected</span>
-                                                            </div>
-                                                            <div class="divider"></div>
-
-                                                            <div class="activities-slider-wrap">
-                                                                <div class="activities-slider-navigation">
-                                                                    <div class="swiper-button-next activities-swiper-button-next">
-                                                                        <img src="{{asset('front_assets/icons/slider-angle-right.png')}}" alt="next">
-                                                                    </div>
-                                                                    <div class="swiper-button-prev activities-swiper-button-prev">
-                                                                        <img src="{{asset('front_assets/icons/slider-angle-left.png')}}" alt="prev">
-                                                                    </div>
-                                                                </div>
-
-                                                                <div class="swiper activities-swiper">
-                                                                    <div class="swiper-wrapper">
-
-                                                                        <div class="swiper-slide">
-                                                                            <div class="activity-content-box">
-                                                                                <img src="{{asset('front_assets/images/activity-1.webp')}}" alt="Trip">
-                                                                                <div class="info-holder">
-                                                                                    <div class="title">Lorem Ipsum</div>
-                                                                                    <div class="price">Starting with Rs.1,29,990/-</div>
-                                                                                    <a href="#" class="cta">
-                                                                                        <img src="{{asset('front_assets/icons/telephone-white.png')}}" alt="">
-                                                                                        Call To Know More
-                                                                                    </a>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="swiper-slide">
-                                                                            <div class="activity-content-box">
-                                                                                <img src="{{asset('front_assets/images/activity-2.webp')}}" alt="Trip">
-                                                                                <div class="info-holder">
-                                                                                    <div class="title">Jungle Safari</div>
-                                                                                    <div class="price">Starting with Rs.1,29,990/-</div>
-                                                                                    <a href="#" class="cta">
-                                                                                        <img src="{{asset('front_assets/icons/telephone-white.png')}}" alt="">
-                                                                                        Call To Know More
-                                                                                    </a>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="swiper-slide">
-                                                                            <div class="activity-content-box">
-                                                                                <img src="{{asset('front_assets/images/activity-3.webp')}}" alt="Trip">
-                                                                                <div class="info-holder">
-                                                                                    <div class="title">Lorem Ipsum</div>
-                                                                                    <div class="price">Starting with Rs.1,29,990/-</div>
-                                                                                    <a href="#" class="cta">
-                                                                                        <img src="{{asset('front_assets/icons/telephone-white.png')}}" alt="">
-                                                                                        Call To Know More
-                                                                                    </a>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="swiper-slide">
-                                                                            <div class="activity-content-box">
-                                                                                <img src="{{asset('front_assets/images/activity-4.webp')}}" alt="Trip">
-                                                                                <div class="info-holder">
-                                                                                    <div class="title">Lorem Ipsum</div>
-                                                                                    <div class="price">Starting with Rs.1,29,990/-</div>
-                                                                                    <a href="#" class="cta">
-                                                                                        <img src="{{asset('front_assets/icons/telephone-white.png')}}" alt="">
-                                                                                        Call To Know More
-                                                                                    </a>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-
-                                                                        <div class="swiper-slide">
-                                                                            <div class="activity-content-box">
-                                                                                <img src="{{asset('front_assets/images/activity-1.webp')}}" alt="Trip">
-                                                                                <div class="info-holder">
-                                                                                    <div class="title">Lorem Ipsum</div>
-                                                                                    <div class="price">Starting with Rs.1,29,990/-</div>
-                                                                                    <a href="#" class="cta">
-                                                                                        <img src="{{asset('front_assets/icons/telephone-white.png')}}" alt="">
-                                                                                        Call To Know More
-                                                                                    </a>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="swiper-slide">
-                                                                            <div class="activity-content-box">
-                                                                                <img src="{{asset('front_assets/images/activity-2.webp')}}" alt="Trip">
-                                                                                <div class="info-holder">
-                                                                                    <div class="title">Jungle Safari</div>
-                                                                                    <div class="price">Starting with Rs.1,29,990/-</div>
-                                                                                    <a href="#" class="cta">
-                                                                                        <img src="{{asset('front_assets/icons/telephone-white.png')}}" alt="">
-                                                                                        Call To Know More
-                                                                                    </a>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="swiper-slide">
-                                                                            <div class="activity-content-box">
-                                                                                <img src="{{asset('front_assets/images/activity-3.webp')}}" alt="Trip">
-                                                                                <div class="info-holder">
-                                                                                    <div class="title">Lorem Ipsum</div>
-                                                                                    <div class="price">Starting with Rs.1,29,990/-</div>
-                                                                                    <a href="#" class="cta">
-                                                                                        <img src="{{asset('front_assets/icons/telephone-white.png')}}" alt="">
-                                                                                        Call To Know More
-                                                                                    </a>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="swiper-slide">
-                                                                            <div class="activity-content-box">
-                                                                                <img src="{{asset('front_assets/images/activity-4.webp')}}" alt="Trip">
-                                                                                <div class="info-holder">
-                                                                                    <div class="title">Lorem Ipsum</div>
-                                                                                    <div class="price">Starting with Rs.1,29,990/-</div>
-                                                                                    <a href="#" class="cta">
-                                                                                        <img src="{{asset('front_assets/icons/telephone-white.png')}}" alt="">
-                                                                                        Call To Know More
-                                                                                    </a>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-
-                                                                    </div>
-                                                                </div>
-                                                                
-                                                            </div>
-
-                                                            <div class="content-wrap-box">
-                                                                <h2>Jungle Safari in Meghalaya Rain Forest</h2>
-                                                                <div class="divider"></div>
-                                                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident,</p>
-                                                                <p>Sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem.</p>
-                                                            </div>
-                                                            
-                                                        </div> --}}
-
                                                     </div>
                                                 </div>
                                             </div>
+                                           @endforeach
+                                            
 
-                                            <div class="accordion-item">
+                                            {{-- <div class="accordion-item">
                                                 <h2 class="accordion-header" id="headingTwo">
                                                     <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
                                                         <div class="accordion-head">
@@ -751,7 +600,7 @@
                                                         <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </div> --}}
 
                                         </div>
                                     </div>

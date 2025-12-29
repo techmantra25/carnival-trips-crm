@@ -25,4 +25,9 @@ class DivisionWiseActivity extends Model
         return $this->hasMany(DivisionWiseActivityImage::class, 'division_wise_activity_id', 'id');
     }
 
+    public function firstImage()
+    {
+        return $this->hasOne(DivisionWiseActivityImage::class)->oldest();
+    }
+
 }

@@ -230,6 +230,28 @@
                                 @error('division_id') <span class="text-danger text-sm font-12">{{ $message }}</span> @enderror
                             </div>
 
+                            {{-- Category --}}
+                            <div class="grid grid-cols-1 hover:grid-cols-6 mb-2">
+                                <label>
+                                    <span class="badge gap-2 bg-primary/10 text-primary uppercase">Categories</span>
+                                </label>
+                                <select name="category_list"
+                                    class="placeholder:text-textmuted text-sm selected_seasion_type {{ $errors->has('category_id') ? '!border-danger focus:border-danger focus:ring-danger' : '' }}"
+                                    wire:model="category_id"
+                                    wire:change="getCategory($event.target.value)" 
+                                    wire:key="category-0">
+                                    <option value="" disabled {{ $category_id === '' ? 'selected' : '' }}>
+                                        Select Category
+                                    </option>
+                                    @foreach ($hotel_categories as $category_item)
+                                        <option value="{{ $category_item->id }}">
+                                            {{ ucfirst($category_item->name) }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('category_id') <span class="text-danger text-sm font-12">{{ $message }}</span> @enderror
+                            </div>
+
                             <!-- Hotel Name -->
                             <div class="grid grid-cols-1 hover:grid-cols-6 mb-2">
                                 <label>

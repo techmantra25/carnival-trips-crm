@@ -27,7 +27,7 @@
     </div>
 </div>
     <!-- Start:: row-10 -->
-    <livewire:itinerary.preset-itinerary-list :lead-id="$lead_id ?? null"/>
+<livewire:itinerary.preset-itinerary-list :lead-id="$lead_id ?? null"/>
 <!-- End:: row-10 -->
 @endsection
 

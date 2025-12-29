@@ -69,8 +69,10 @@
 </div>
 @if(count($dateRange)>0)
     <div class="date-pick-row !mb-3">
+       
         <button class="badge rounded-full bg-light text-dark mb-1 ammenity_icon fs-15 {{ $activeButtonid == 'second' && $activeViewSummary == 0 ? 'active' : 'hidden' }}" wire:click="OpenViewSummary()"><i class="ri-eye-line pr-0.5"></i>View Summary</button>
         <button class="ti-btn-primary-full !py-1 pt-0 ti-btn-wave inventory_btn me-[0.375rem] {{ $activeButtonid == 'second' ? 'active' : 'hidden' }}" wire:click="TabChange('second')"><i class="fa-solid fa-plus"></i>Upload Your Inventory</button>
+         <button class="ti-btn-danger-full !py-1 pt-0 ti-btn-wave inventory_btn me-[0.375rem]" wire:click="pageRefresh()">Refresh</button>
     </div>
 @endif
 <div class="date-pick-row !mb-3">
@@ -125,7 +127,8 @@
                 <div class="col2">
                     <label class="cta-label">Bulk Blocking</label>
                     <div class="cta-row">
-                        <button type="button" class="yellow availability_mail" id="button_test" onclick="openModal('bulk_booking')">Availability Mail</button>
+                        {{-- <button type="button" class="yellow availability_mail" id="button_test" onclick="openModal('bulk_booking')">Availability Mail</button> --}}
+                        <button type="button" class="yellow availability_mail" id="button_test">Hotel</button>
                     </div>
                 </div>
                 {{-- bulk booking mail --}}
@@ -180,7 +183,8 @@
                 <div class="col2">
                     <label class="cta-label">Fresh Block</label>
                     <div class="cta-row">
-                        <button type="button" class="green" onclick="openModal('fresh_booking')">Availability Mail</button>
+                        {{-- <button type="button" class="green" onclick="openModal('fresh_booking')">Availability Mail</button> --}}
+                        <button type="button" class="green">Hotel</button>
                     </div>
                 </div>
                 {{-- Fresh booking mail --}}
@@ -222,27 +226,28 @@
                     </div>
                 </div>
             </div>
-            <div class="cta-block">
+            <div class="cta-block" wire:key="release-trigger-{{ $selectedHotel }}">
                 <div class="col2">
                     <label class="cta-label">Release Trigger</label>
                     <div class="cta-row">
-                        <button type="button" class="yellow">Policy</button>
-                        <button type="button" class="yellow">D-
+                        <button type="button" class="yellow">
+                            D-
                             <x-input-field 
                                 type="text" 
                                 name="release_trigger_point"
                                 wire:model.debounce.500ms="release_trigger_point" 
-                                wire:keyup="ReleaseTriggerUpdate({{$selectedHotel}}, $event.target.value)" 
+                                wire:keyup="ReleaseTriggerUpdate({{ $selectedHotel }}, $event.target.value)" 
                                 placeholder="0"
                                 class="release_trigger_point" 
-                                value="{{$selected_trigger_point}}" 
+                                value="{{ $selected_trigger_point }}" 
                                 wire:loading.class="opacity-100"
                                 onkeyup="validateNumber(this)"
-                                />
+                            />
                         </button>
                     </div>
                 </div>
             </div>
+
         </div>
         <div class="my-3">
             @if (session('success'))
@@ -317,8 +322,8 @@
                                         $inventoryData = App\Helpers\CustomHelper::GetDateWiseHotelInventory($selectedHotel,$room->id,$date_item)
                                     @endphp
                                     <li class="inventory_count">
-                                        <input type="text" value="{{$inventoryData['total_unsold']}}" placeholder="0" class="count-{{$inventoryData['block_request_type']}}"  @if($inventoryData['total_unsold'] == 0)  wire:click="BlockSingleRequestItem('{{$date_item}}', {{$inventoryData['total_unsold']}},'{{$room->room_name}}',{{$room->id}})" @endif readonly>
-                                        <span class="info active">0 Sold</span><span class="info">D {{$selected_trigger_point}}</span>
+                                        <input type="text" value="{{$inventoryData['total_unsold']}}" placeholder="0" class="count-{{$inventoryData['total_unsold'] == 0?"0":$inventoryData['block_request_type']}}"  @if($inventoryData['total_unsold'] == 0)  wire:click="BlockSingleRequestItem('{{$date_item}}', {{$inventoryData['total_unsold']}},'{{$room->room_name}}',{{$room->id}})" @endif readonly>
+                                        <span class="{{ $inventoryData['total_sold'] > 0 ? 'info active' : 'info' }}">{{$inventoryData['total_sold']}} Sold</span><span class="info">D {{$selected_trigger_point}}</span>
                                     </li>
                                     @endforeach
                                 </ul>
@@ -860,7 +865,7 @@
         </div>
     @endif
 @endif
-<div wire:loading class="loader" wire:target="FilterDate,accordionItem,GetDivisions,loadCategories,loadHotels,OpenViewSummary,TabChange,CloseBlockSingleModal,BlockSingleRequestItem,toggleExtraDays,updateMonth,toggleRoomWiseQuantity,SecondAccordionItem,GetRoomItemMaxPrice,UpdateInventory">
+<div wire:loading class="loader" wire:target="FilterDate,accordionItem,GetDivisions,loadCategories,loadHotels,OpenViewSummary,TabChange,CloseBlockSingleModal,BlockSingleRequestItem,toggleExtraDays,updateMonth,toggleRoomWiseQuantity,SecondAccordionItem,GetRoomItemMaxPrice,UpdateInventory, pageRefresh">
     <div class="spinner">
     <img src="{{asset('build/assets/images/media/loader.svg')}}" alt="">
     </div>

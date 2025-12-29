@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('change_logs', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->string('title');
             $table->text('before_value')->nullable();
             $table->text('after_value')->nullable();

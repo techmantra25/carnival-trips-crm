@@ -98,6 +98,13 @@ class HotelRepository
             $hotel->email2 = $data['secndary_email'];
             $hotel->address = $data['address'];
             $hotel->number_of_rooms = 0; // Initialize
+
+            // Priority logic
+            $maxPriority = Hotel::where('division', $data['division'])
+                ->where('hotel_category', $data['hotel_category'])
+                ->max('priority');
+
+            $hotel->priority = $maxPriority ? $maxPriority + 1 : 1;
     
             $hotel->save();
 
@@ -121,6 +128,7 @@ class HotelRepository
                     $room->mattress = $mattress;
                     // $room->capacity = $bed + $extra + $mattress;
                     $room->capacity = $capacity;
+                    $room->positions = $key+1;
                     
                       // Safely handle amenities (ensure it's an array)
                     $room->ammenities = isset($roomData['amenities']) ? implode(',', (array) $roomData['amenities']) : null;
@@ -222,6 +230,7 @@ class HotelRepository
                     $room->mattress = $mattress;
                     // $room->capacity = $bed + $extra + $mattress;
                     $room->capacity = $capacity;
+                    $room->positions = $key+1;
                     
                       // Safely handle amenities (ensure it's an array)
                     $room->ammenities = isset($roomData['amenities']) ? implode(',', (array) $roomData['amenities']) : null;

@@ -50,9 +50,9 @@
 									<li class="slide">
 										<a href="{{route('admin.division.index')}}" class="side-menu__item">Divisions</a>
 									</li>
-									<li class="slide">
+									{{-- <li class="slide">
 										<a href="{{route('admin.master.trip_preference_form')}}" class="side-menu__item">Trip Preference Form</a>
-									</li>
+									</li> --}}
 								</ul>
 							</li>
 							<!-- Start::slide -->
@@ -111,9 +111,9 @@
 									<li class="slide {{ request()->is('admin/whatsapp-campaign*')? 'active' : '' }}">
 										<a href="{{route('admin.whatsapp.campaign.index')}}" class="side-menu__item">Dashboard</a>
 									</li>
-									<li class="slide {{ request()->is('admin/leads/confirmed*')? 'active' : '' }}">
+									{{-- <li class="slide {{ request()->is('admin/leads/confirmed*')? 'active' : '' }}">
 										<a href="{{route('admin.leads.confirmed.index')}}" class="side-menu__item">Whatsapp Templates</a>
-									</li>
+									</li> --}}
 								</ul>
 							</li>
 							<li class="slide has-sub {{ request()->is('admin/hotel*') 
@@ -173,9 +173,9 @@
 									<li class="slide {{ request()->is('admin/inventory*')? 'active' : '' }}">
 										<a href="{{route('admin.inventory.index')}}" class="side-menu__item">Inventories</a>
 									</li>
-									<li class="slide {{ request()->is('admin/inventory/hotel-booking-request*')? 'active' : '' }}">
+									{{-- <li class="slide {{ request()->is('admin/inventory/hotel-booking-request*')? 'active' : '' }}">
 										<a href="{{route('admin.inventory.hotel-booking-request')}}" class="side-menu__item">Hotel Booking Request</a>
-									</li>
+									</li> --}}
 								</ul>
 							</li>
 							<li class="slide has-sub {{ request()->is('admin/route*') 

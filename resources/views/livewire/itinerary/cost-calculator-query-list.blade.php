@@ -161,6 +161,15 @@
                                                 <a href="{{route('admin.cost_calculator.query_edit',$encryptedId)}}" class="ti-btn ti-btn-sm ti-btn-soft-primary !border !border-primary/20" title="Edit Itinerary">
                                                     <i class="ti ti-pencil"></i>
                                                 </a>
+                                                @if($item->lead_id)
+                                                <a href="javascript:void(0)"
+                                                    wire:click="$dispatch('showConvertToLead', { itemId: '{{ $item->lead_id }}' })"
+                                                    class="ti-btn ti-btn-sm ti-btn-soft-success !border !border-success/20 ms-1"
+                                                    title="Convert Query To Lead">
+                                                        <i class="ti ti-arrow-right"></i>
+                                                    </a>
+                                                @endif
+
                                             </div>
                                         </td>
                                     </tr>
@@ -277,6 +286,21 @@
                                             @foreach ($childs as $index => $child)
                                             <div class="sm:col-span-12 col-span-12">
                                                 <div class="flex items-center gap-2 mb-2">
+                                                    <div class="w-[45%]">
+                                                        @if($index==0)
+                                                        <label for=""
+                                                            class="block text-sm font-medium text-gray-700 modal_query_lable">Addon Type</label>
+                                                        @endif
+                                                        <select wire:model="childs.{{ $index }}.addon_type"
+                                                            class="form-control form-control-sm" wire:change="changeAddonType($event.target.value)">
+                                                            <option value="" hidden>Type</option>
+                                                            <option value="CNB">CNB</option>
+                                                            <option value="CNB">CWM</option>
+                                                        </select>
+                                                        @error("childs.$index.addon_type") <span
+                                                            class="text-danger text-sm font-12">{{ $message }}</span>
+                                                        @enderror
+                                                    </div>
                                                     <div class="w-[45%]">
                                                         @if($index==0)
                                                         <label for=""
@@ -834,7 +858,7 @@
         {{-- Model --}}
     </div>
     <div wire:loading class="loader"
-        wire:target="NewPresetItinerary, changeDestination,submitForm,setNightHalt,nightHaltSubmitForm,GetCategory,NewNightHalt,updateJourneyDivision,changePackageType,changeHotelCategory,changeMealPlan,getDestination, addExtraChild, removeExtraChild, enableChildren,changeNationalityType,changeArrivalDate">
+        wire:target="NewPresetItinerary, changeDestination,submitForm,setNightHalt,nightHaltSubmitForm,GetCategory,NewNightHalt,updateJourneyDivision,changePackageType,changeHotelCategory,changeMealPlan,getDestination, addExtraChild, removeExtraChild, enableChildren,changeNationalityType,changeArrivalDate,changeAddonType">
         <div class="spinner">
             <img src="{{asset('build/assets/images/media/loader.svg')}}" alt="">
         </div>
@@ -860,22 +884,23 @@
         $('#departure_date').val(departure_date);
     });
 
-    // window.addEventListener('showConfirm', function (event) {
-    //     let itemId = event.detail[0].itemId;
-    //     Swal.fire({
-    //         title: "Are you sure?",
-    //         text: "You won't be able to revert this!",
-    //         icon: "warning",
-    //         showCancelButton: true,
-    //         confirmButtonColor: "#3085d6",
-    //         cancelButtonColor: "#d33",
-    //         confirmButtonText: "Yes, delete it!"
-    //     }).then((result) => {
-    //         if (result.isConfirmed) {
-    //             @this.call('deleteItem', itemId); // Calls Livewire method directly
-    //             Swal.fire("Deleted!", "Your item has been deleted.", "success");
-    //         }
-    //     });
-    // });
+    window.addEventListener('showConvertToLead', function (event) {
+        let itemId = event.detail.itemId;
+        Swal.fire({
+            title: "Convert Query to Lead?",
+            text: "This will move the query into the Lead section.",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#28a745",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, convert it!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                @this.call('convertQueryToLead', itemId); 
+                Swal.fire("Converted!", "The query has been moved to Lead.", "success");
+            }
+        });
+    });
+
 </script>
 @endsection

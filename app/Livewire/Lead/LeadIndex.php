@@ -122,21 +122,7 @@ class LeadIndex extends Component
         $this->mealTypes = SeasionPlan::where('status', 1)->where('type', 'main')->orderBy('position', 'ASC')->first();
         $this->categories = Category::where('status', 1)->orderBy('name', 'ASC')->get();
         $this->fetchItinerary();
-        $rawItems = SeasionPlan::where('status', 1)
-        ->where('type', 'addon')
-        ->where('plan_item', 'like', '%YEAR%')
-        ->pluck('plan_item')
-        ->toArray();
-
-        $flattened = collect($rawItems)
-            ->flatMap(function ($item) {
-                return array_map('trim', explode(',', $item));
-            })
-            ->unique()
-            ->values()
-            ->toArray();
-
-        $this->childsData = $flattened;
+        
     }
     public function changeLeadType($value){
         $this->filter_source_type = $value;
@@ -151,6 +137,7 @@ class LeadIndex extends Component
     public function SetFilter($value)
     {
         $this->filter = $value;
+        $this->resetPage();
     }
 
     public function toggleDestination($id)
@@ -168,6 +155,7 @@ class LeadIndex extends Component
     }
 
     public function changeLeadStatus($value){
+        $this->resetPage();
         if (in_array($value, $this->filter_lead_status)) {
             $this->filter_lead_status = array_diff($this->filter_lead_status, [$value]);
         } else {
@@ -231,6 +219,7 @@ class LeadIndex extends Component
         $this->dispatch('refreshComponent');
     }
     public function changeMealPlan($value){
+        $this->reset(['childs']);
         $this->meal_type = $value;
     }
     public function changeNationalityType($value){
@@ -238,8 +227,49 @@ class LeadIndex extends Component
     }
 
 
+    public function changeAddonType($value){
+        $this->reset(['childsData']);
+        $rawItems = SeasionPlan::where('status', 1)
+        ->where('type', 'addon')
+        ->where('title', $value)
+        ->pluck('plan_item')
+        ->toArray();
+
+        $flattened = collect($rawItems)
+        ->flatMap(function ($item) {
+            return array_map('trim', explode(',', $item));
+        })
+        ->filter(function ($item) {
+            return str_contains($item, "[{$this->meal_type}]");
+        })
+        ->unique()
+        ->values()
+        ->toArray();
+        $this->childsData = $flattened;
+    }
     public function NewPresetItinerary($value){
-        // $this->reset([]);
+        // Make sure $this->mealTypes exists and has plan_item
+        $planItemString = $this->mealTypes->plan_item ?? '';
+
+        // Convert to array
+        $items = array_filter(array_map('trim', explode(',', $planItemString)));
+        // Set first index value if exists, else null
+        $this->meal_type = $items[0] ?? null;
+
+        $rawItems = SeasionPlan::where('status', 1)
+        ->where('type', 'addon')
+        ->whereIn('title', ['CWM','CNB'])
+        ->pluck('plan_item')
+        ->toArray();
+
+        $flattened = collect($rawItems)
+            ->flatMap(function ($item) {
+                return array_map('trim', explode(',', $item));
+            })
+            ->unique()
+            ->values()
+            ->toArray();
+        $this->childsData = $flattened;
         $this->active_assign_new_modal = $value=="yes"?1:0;
         $this->dispatch('refreshComponent');
     }
@@ -373,8 +403,12 @@ class LeadIndex extends Component
         $this->newPresetError = null;
     }
     public function updateJourneyDivision($index, $value){
+        $last_index = $index+1;
         $this->itinerary_journey_divisions[$index] = $value;
-        $this->nightHalt['night_distribution'] = CustomHelper::formatDayJourney($this->itinerary_journey_divisions);
+        if($last_index !== count($this->itinerary_journey)){
+            $this->nightHalt['night_distribution'] = CustomHelper::formatDayJourney($this->itinerary_journey_divisions);
+        }
+        
     }
     // public function validateNightDistribution(){
     //     if(!$this->selectedCategory){
@@ -544,6 +578,7 @@ class LeadIndex extends Component
             'total_members' => 'required|numeric|min:1',
             'number_of_adults' => 'required|numeric|min:1',
             // 'number_of_childs' => 'nullable|numeric',
+            'childs.*.addon_type' => 'required_if:enableChildren,true',
             'childs.*.quantity' => 'required_if:enableChildren,true',
             'childs.*.age' => 'required_if:enableChildren,true',
 
@@ -582,6 +617,7 @@ class LeadIndex extends Component
             'night_halt_details.required' => 'Night halt is required.',
             'meal_type.required' => 'Meal type is required.',
             'nationality_type.required' => 'Nationality type is required.',
+            'childs.*.addon_type.required_if' => 'Type is required.',
             'childs.*.quantity.required_if' => 'Quantity is required.',
             'childs.*.age.required_if' => 'Child age is required.',
             'number_of_rooms.required' => 'Number of rooms required.',
@@ -685,7 +721,6 @@ class LeadIndex extends Component
                 if(count($SharedIds)>0){
                     foreach($SharedIds as $link_index => $linkItem){
                         $LeadUrlShare = LeadUrlShare::find($linkItem);
-
                         CustomHelper::sendItineraryLinkOnWhatsapp($linkItem);
                         CustomHelper::sendItineraryLinkOnEmail($linkItem);
                     
@@ -895,6 +930,8 @@ class LeadIndex extends Component
             return;
         }
 
+        DB::beginTransaction(); // ← Transaction start
+
         try {
             $lead = Lead::find($this->active_lead->id);
             if ($lead) {
@@ -910,25 +947,33 @@ class LeadIndex extends Component
                     'timestamp' => now()->toDateTimeString(),
                 ];
 
+                // Reset previous confirmed itinerary (if any)
+                $previousConfirmed = SendedLeadItinerary::where('lead_id', $lead->id)
+                    ->where('is_confirmed', 1)
+                    ->first();
+                
+                
+                // If previously confirmed itinerary exists and new status is NOT Confirmed,
+                // then add back (restore) the deducted room inventory stock
+                if ($previousConfirmed && $this->selected_status !== 'Confirmed') {
+                    CustomHelper::updateRoomInventoryStock($previousConfirmed->id, $this->selected_status);
+                }
+                
+                if($previousConfirmed){
+                    $previousConfirmed->is_confirmed = 0;
+                    $previousConfirmed->confirmed_by = null;
+                    $previousConfirmed->confirmed_at = null;
+                    $previousConfirmed->save();
+                }
+
                 if ($this->selected_status == 'Confirmed') {
-                    // Reset previous confirmed itinerary (if any)
-                    $previousConfirmed = SendedLeadItinerary::where('lead_id', $lead->id)
-                        ->where('is_confirmed', 1)
-                        ->first();
-
-                    if ($previousConfirmed && $previousConfirmed->id != $this->selected_itinerary) {
-                        $previousConfirmed->is_confirmed = 0;
-                        $previousConfirmed->confirmed_by = null;
-                        $previousConfirmed->confirmed_at = null;
-                        $previousConfirmed->save();
-                    }
-
                     // Confirm the newly selected itinerary
                     $SendedLeadItinerary = SendedLeadItinerary::findOrFail($this->selected_itinerary);
                     $SendedLeadItinerary->is_confirmed = 1;
                     $SendedLeadItinerary->confirmed_by = $this->authUser->id;
                     $SendedLeadItinerary->confirmed_at = now()->toDateTimeString();
                     $SendedLeadItinerary->save();
+                    $this->selected_itinerary = null;
 
                     // Log both itineraries
                     $logMessage += [
@@ -948,6 +993,7 @@ class LeadIndex extends Component
                             'hotel_category' => optional($SendedLeadItinerary->category)->name,
                         ],
                     ];
+                    CustomHelper::updateRoomInventoryStock($SendedLeadItinerary->id, "Confirmed");
                 }
 
                 // Final log write
@@ -957,29 +1003,46 @@ class LeadIndex extends Component
                     'message' => json_encode($logMessage),
                 ]);
 
+                DB::commit(); // ← Transaction commit
+
                 session()->flash('success', 'Lead status updated successfully!');
-                $this->showLeadStatusModal = false;
-                $this->selected_status = null;
-                $this->selected_itinerary = null;
+                $this->reset(['selected_itinerary', 'showLeadStatusModal', 'selected_status']);
             } else {
                 $this->leadAssignError = 'Selected lead not found.';
+                DB::rollBack(); // rollback on failure
             }
-           
+
         } catch (\Exception $e) {
+            DB::rollBack(); // ← Transaction rollback
             $this->leadAssignError = $e->getMessage();
         }
+    }
+    public function getLead(){
+
     }
     public function render()
     {
         $this->divisions= City::where('state_id', $this->destination)->orderBy('name', 'ASC')->get();
         $leads = Lead::
         when($this->filter, function ($query) {
-            $searchTerm = '%' . $this->filter . '%';
-            $query->where(function ($q) use ($searchTerm) {
+
+            $rawFilter = trim($this->filter);
+
+            // Remove leading country code 91 if present
+            $normalizedMobile = preg_replace('/^91/', '', $rawFilter);
+
+            $searchTerm = '%' . $rawFilter . '%';
+            $mobileTerm = '%' . $normalizedMobile . '%';
+
+            $query->where(function ($q) use ($searchTerm, $mobileTerm) {
+
                 $q->where('customer_name', 'like', $searchTerm)
                 ->orWhere('customer_email', 'like', $searchTerm)
                 ->orWhere('unique_id', 'like', $searchTerm)
-                ->orWhere('customer_mobile', 'like', $searchTerm);
+
+                // 🔹 Mobile search WITHOUT country code
+                ->orWhere('customer_mobile', 'like', $mobileTerm)
+                ->orWhere('customer_whatsapp', 'like', $mobileTerm);
             });
         })
         ->when(count($this->search_destination)>0, function ($query){
@@ -1005,6 +1068,7 @@ class LeadIndex extends Component
             ]);
         })
         ->when($this->start_date && !$this->end_date, function ($query) {
+            
             $query->where('created_at', '>=', Carbon::parse($this->start_date)->startOfDay());
         })
         ->when(!$this->start_date && $this->end_date, function ($query) {
@@ -1021,7 +1085,7 @@ class LeadIndex extends Component
             }
         })
         ->orderBy('id', 'DESC')
-        ->paginate(10);
+        ->paginate(20);
         return view('livewire.lead.lead-index',[
             'leads'=>$leads,
         ]);

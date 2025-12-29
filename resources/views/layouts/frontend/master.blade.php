@@ -13,7 +13,7 @@
 </head>
 <body>
 
-    <header>
+    {{-- <header>
         <nav class="navbar navbar-expand-lg">
             <div class="container">
                 <a class="navbar-brand py-0" href="#">
@@ -21,7 +21,7 @@
                 </a>
             </div>
         </nav>
-    </header>
+    </header> --}}
 
     <main>
         {{ $slot }}
@@ -33,17 +33,19 @@
         </div>
         <div class="container">
             <div class="row main-content">
-                <div class="col-lg-4 col-12 footer-col">
+                <div class="col-12 footer-col">
                     <div class="logo">
                         <a href="javascript:void(0)">
                             <img src="{{asset('front_assets/images/footer-logo.png')}}" alt="Logo">
                         </a>
                     </div>
+                </div>
+                <div class="col-12 footer-col">
                     <div class="desc">
                         <p>Carrnival Trips is a prominent company offering the best packages to Darjeeling and Sikkim, making the clients happy and satisfied with their exemplary services.</p>
                     </div>
-                </div>
-                <div class="col-lg-2 col-12 footer-col">
+                </div> 
+                {{-- <div class="col-lg-2 col-12 footer-col">
                     <label class="menu-heading">Links</label>
                     <ul class="nav">
                         <li class="nav-item"><a href="javascript:void(0)" class="nav-link">T&amp;C</a></li>
@@ -83,11 +85,11 @@
                             <img src="{{asset('front_assets/icons/right-angle-circle-white.png')}}" alt="">
                         </button>
                     </form>
-                </div>
+                </div> --}}
             </div>
             <div class="row copyright-content">
                 <div class="col-12">
-                    <p>Copyright &copy; 2025 Carrnivaltrips. All Rights Reserved</p>
+                    <p>Copyright &copy; {{date('Y')}} Carrnivaltrips. All Rights Reserved</p>
                 </div>
             </div>
         </div>

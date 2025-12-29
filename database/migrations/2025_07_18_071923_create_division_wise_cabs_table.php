@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
          Schema::create('division_wise_cabs', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->unsignedBigInteger('division_id')->comment('cities table id');
             $table->unsignedBigInteger('cab_id')->comment('cabs table id');
             $table->tinyInteger('status')->default(1)->comment('1:Active, 0:Inactive');

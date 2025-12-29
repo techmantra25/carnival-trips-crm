@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('hotel_availability_requests', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->foreignId('hotel_id')->constrained('hotels')->onDelete('cascade');
             $table->date('start_date');
             $table->date('end_date');
