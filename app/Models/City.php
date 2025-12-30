@@ -28,4 +28,8 @@ class City extends Model
     public function itinerary_banner(){
         return $this->hasMany(ItineraryBanner::class, 'division_id', 'id');
     }
+
+    public function nonServiceHotels(){
+        return $this->hasMany(NonServicesHotel::class,'city_id','id');
+    }
 }
