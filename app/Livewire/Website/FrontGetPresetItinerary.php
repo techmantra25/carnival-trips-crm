@@ -24,7 +24,7 @@ class FrontGetPresetItinerary extends Component
         if(!$this->lead_url_share){
             abort(404);
         }
-
+     
         $this->lead = Lead::findOrFail($this->lead_url_share->lead_id);
 
         $this->itinerary = $this->lead_url_share->itinerary;
