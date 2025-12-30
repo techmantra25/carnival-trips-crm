@@ -31,7 +31,7 @@ class NonServiceHotelList extends Component
     {
         // Optional: validate or resize images here
         $this->validate([
-            'image' => 'image|max:2048', // max 2MB each
+            'image' => 'image|max:20048', // max 2MB each
         ]);
     }
      public function saveHotel()
@@ -41,7 +41,7 @@ class NonServiceHotelList extends Component
             'division_id'    => 'required|exists:cities,id',
             'hotel_name'     => 'required|string|max:255',
             'hotel_address'  => 'required|string',
-            'image'          => 'nullable|image|max:2048',
+            'image'          => 'nullable|image|max:20048',
         ]);
 
         $uploadedPath = null;
@@ -68,7 +68,7 @@ class NonServiceHotelList extends Component
                 'city_id'    => $this->division_id,
                 'hotel_name' => $this->hotel_name,
                 'address'    => $this->hotel_address,
-                'image'      => $uploadedPath,
+                'image'      => $uploadedPath??'build/assets/images/logo/hotel.jpg',
             ]);
             session()->flash('success', 'Hotel added successfully!');
         }
