@@ -13,7 +13,7 @@
                 <tr>
                     <td style="padding: 0;">
                         <div style="display: block; background: #fff; border-radius: 50px; width: 400px; box-sizing: border-box; padding: 20px; margin: 0 auto;">
-                            <img src="{{asset('assets/final_quotation_images/logo1.png')}}" alt="logo" style="max-width: 100%;">
+                            <img src="{{public_path('assets/final_quotation_images/logo1.png')}}" alt="logo" style="max-width: 100%;">
                         </div>
                     </td>
                 </tr>
@@ -42,7 +42,7 @@
                                     <td style="width: 34%;"></td>
                                     <td style="width: 33%;">
                                         <div style="display: block; background: #fff; border-radius: 30px; width: 100%; box-sizing: border-box; padding: 20px; margin: 0 auto;">
-                                            <img src="{{asset('assets/final_quotation_images/logo2.jpg')}}" alt="logo" style="max-width: 100%;">
+                                            <img src="{{public_path('assets/final_quotation_images/logo2.jpg')}}" alt="logo" style="max-width: 100%;">
                                         </div>
                                     </td>
                                 </tr>
@@ -96,7 +96,7 @@
                                     <td style="width: 34%;"></td>
                                     <td style="width: 33%;">
                                         <div style="display: block; background: #fff; border-radius: 30px; width: 100%; box-sizing: border-box; padding: 20px; margin: 0 auto;">
-                                            <img src="{{asset('assets/final_quotation_images/logo3.jpg')}}" alt="logo" style="max-width: 100%;">
+                                            <img src="{{public_path('assets/final_quotation_images/logo3.jpg')}}" alt="logo" style="max-width: 100%;">
                                         </div>
                                     </td>
                                 </tr>
@@ -300,7 +300,7 @@
                                     <td style="width: 34%;"></td>
                                     <td style="width: 33%;">
                                         <div style="display: block; background: #fff; border-radius: 30px; width: 100%; box-sizing: border-box; padding: 20px; margin: 0 auto;">
-                                            <img src="{{asset('assets/final_quotation_images/logo4.jpg')}}" alt="logo" style="max-width: 100%;">
+                                            <img src="{{public_path('assets/final_quotation_images/logo4.jpg')}}" alt="logo" style="max-width: 100%;">
                                         </div>
                                     </td>
                                 </tr>
@@ -410,7 +410,7 @@
                                     <td style="width: 34%;"></td>
                                     <td style="width: 33%;">
                                         <div style="display: block; background: #fff; border-radius: 30px; width: 100%; box-sizing: border-box; padding: 20px; margin: 0 auto;">
-                                            <img src="{{asset('assets/final_quotation_images/logo5.jpg')}}" alt="logo" style="max-width: 100%;">
+                                            <img src="{{public_path('assets/final_quotation_images/logo5.jpg')}}" alt="logo" style="max-width: 100%;">
                                         </div>
                                     </td>
                                 </tr>
@@ -545,7 +545,7 @@
                                     <td style="width: 34%;"></td>
                                     <td style="width: 33%;">
                                         <div style="display: block; background: #fff; border-radius: 30px; width: 100%; box-sizing: border-box; padding: 20px; margin: 0 auto;">
-                                            <img src="{{asset('assets/final_quotation_images/logo6.jpg')}}" alt="logo" style="max-width: 100%;">
+                                            <img src="{{public_path('assets/final_quotation_images/logo6.jpg')}}" alt="logo" style="max-width: 100%;">
                                         </div>
                                     </td>
                                 </tr>
@@ -624,7 +624,7 @@
                                     <td style="width: 34%;"></td>
                                     <td style="width: 33%;">
                                         <div style="display: block; background: #fff; border-radius: 30px; width: 100%; box-sizing: border-box; padding: 20px; margin: 0 auto;">
-                                            <img src="{{asset('assets/final_quotation_images/logo7.jpg')}}" alt="logo" style="max-width: 100%;">
+                                            <img src="{{public_path('assets/final_quotation_images/logo7.jpg')}}" alt="logo" style="max-width: 100%;">
                                         </div>
                                     </td>
                                 </tr>
@@ -700,7 +700,7 @@
                                     <td style="width: 34%;"></td>
                                     <td style="width: 33%;">
                                         <div style="display: block; background: #fff; border-radius: 30px; width: 100%; box-sizing: border-box; padding: 20px; margin: 0 auto;">
-                                            <img src="{{asset('assets/final_quotation_images/logo8.jpg')}}" alt="logo" style="max-width: 100%;">
+                                            <img src="{{public_path('assets/final_quotation_images/logo8.jpg')}}" alt="logo" style="max-width: 100%;">
                                         </div>
                                     </td>
                                 </tr>
