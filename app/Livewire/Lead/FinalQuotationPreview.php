@@ -252,7 +252,6 @@ class FinalQuotationPreview extends Component
         if ($this->send_email) {
             $methods[] = 'email';
         }
-        // $pdfData = $this->generateQuotationPdf();
         if (empty($methods)) {
             session()->flash('error', 'No communication method selected.');
             return;
@@ -265,7 +264,6 @@ class FinalQuotationPreview extends Component
         try {
             /* ===================== SEND EMAIL ===================== */
             if ($this->send_email) {
-
                 $mailService = app(MailTemplateService::class);
 
                 // Dynamic subject
@@ -273,7 +271,11 @@ class FinalQuotationPreview extends Component
                 // Send booking confirmed email (PDF attached inside Mail service)
                 $pdfData = $this->generateQuotationPdf();
                 $attachments = [
-                    public_path('assets/img/sample.pdf'),
+                     [
+                        'data' => $pdfData,
+                        'name' => 'Final_Quotation.pdf',
+                        'mime' => 'application/pdf',
+                    ]
                 ];
                 $mailSent = $mailService->send(
                     $this->leadData->customer_email,

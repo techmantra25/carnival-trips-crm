@@ -7,13 +7,17 @@
 </head>
 <body style="background-image: url(page1-bg.jpg); background-size: cover; background-position: center center; background-repeat: no-repeat; padding: 0; margin: 0;">
     <div style="background: rgba(0,0,0,0.5); width: 100%; min-height: 100vh;">
-        <table cellspacing="0" cellpadding="0" style="width: 100%; border: none;">
+        <table cellspacing="0" cellpadding="0" style="width:100%;
+           background-image: url('{{ asset('assets/final_quotation_images/logo2.jpg') }}');
+           background-repeat: no-repeat;
+           background-position: center center;
+           background-size: cover;">
             <tbody>
                 <tr><td style="padding: 75px 0;"></td></tr>
                 <tr>
                     <td style="padding: 0;">
                         <div style="display: block; background: #fff; border-radius: 50px; width: 400px; box-sizing: border-box; padding: 20px; margin: 0 auto;">
-                            <img src="{{public_path('assets/final_quotation_images/logo1.png')}}" alt="logo" style="max-width: 100%;">
+                            <img src="{{asset('assets/final_quotation_images/logo1.png')}}" alt="logo" style="max-width: 100%;">
                         </div>
                     </td>
                 </tr>
@@ -28,10 +32,15 @@
         </table>
     </div>
 
-    <br>
+   
     <!-- page 2 -->
     <div style="background: rgba(0,0,0,0.5); width: 100%; min-height: 100vh;">
-        <table cellspacing="0" cellpadding="0" style="width: 100%; border: none;">
+        <table cellspacing="0" cellpadding="0"
+         style="width:100%;
+           background-image: url('{{ asset('assets/final_quotation_images/logo3.jpg') }}');
+           background-repeat: no-repeat;
+           background-position: center center;
+           background-size: cover;">
             <tbody>
                 <tr>
                     <td style="padding: 20px;">
@@ -42,7 +51,7 @@
                                     <td style="width: 34%;"></td>
                                     <td style="width: 33%;">
                                         <div style="display: block; background: #fff; border-radius: 30px; width: 100%; box-sizing: border-box; padding: 20px; margin: 0 auto;">
-                                            <img src="{{public_path('assets/final_quotation_images/logo2.jpg')}}" alt="logo" style="max-width: 100%;">
+                                            <img src="{{asset('assets/final_quotation_images/logo1.png')}}" alt="logo" style="max-width: 100%;">
                                         </div>
                                     </td>
                                 </tr>
@@ -81,11 +90,16 @@
         </table>
     </div>
 
-    <br>
+   
 
     <!-- page 3 -->
       <div style="background: rgba(0,0,0,0.5); width: 100%; min-height: 100vh;">
-        <table cellspacing="0" cellpadding="0" style="width: 100%; border: none;">
+        <table cellspacing="0" cellpadding="0" 
+        style="width:100%;
+           background-image: url('{{ asset('assets/final_quotation_images/logo4.jpg') }}');
+           background-repeat: no-repeat;
+           background-position: center center;
+           background-size: cover;">
             <tbody>
                 <tr>
                     <td style="padding: 20px;">
@@ -96,7 +110,7 @@
                                     <td style="width: 34%;"></td>
                                     <td style="width: 33%;">
                                         <div style="display: block; background: #fff; border-radius: 30px; width: 100%; box-sizing: border-box; padding: 20px; margin: 0 auto;">
-                                            <img src="{{public_path('assets/final_quotation_images/logo3.jpg')}}" alt="logo" style="max-width: 100%;">
+                                            <img src="{{asset('assets/final_quotation_images/logo1.png')}}" alt="logo" style="max-width: 100%;">
                                         </div>
                                     </td>
                                 </tr>
@@ -141,15 +155,15 @@
         </table>
     </div>
 
-    <br>
+
 
     <!-- page 4 -->
-    <div style="background: rgba(0,0,0,0.5); width: 100%; min-height: 100vh;">
+    <div style="background: #fff; width: 100%; min-height: 100vh;">
         <table cellspacing="0" cellpadding="0" style="width: 100%; border: none;">
             <tbody>
                 <tr>
                     <td>
-                        <div style="background-image: url(page4-bg.jpg); background-size: cover; background-position: center center; background-repeat: no-repeat; width: 100%; height: 40vh;"></div>
+                        <div style="background-image: url('{{ asset('assets/final_quotation_images/logo5.jpg') }}'); background-size: cover; background-position: center center; background-repeat: no-repeat; width: 100%; height: 40vh;"></div>
                     </td>
                 </tr>
                 <tr><td style="padding: 10px 0;"></td></tr>
@@ -191,12 +205,12 @@
     </div> 
 
     <!-- page 5 -->
-    <div style="background: rgba(0,0,0,0.5); width: 100%; min-height: 100vh;">
+    <div style="background: #fff; width: 100%; min-height: 100vh;">
         <table cellspacing="0" cellpadding="0" style="width: 100%; border: none;">
             <tbody>
                 <tr>
                     <td>
-                        <div style="background-image: url(page5-bg.jpg); background-size: cover; background-position: center center; background-repeat: no-repeat; width: 100%; height: 40vh;"></div>
+                        <div style="background-image: url('{{ asset('assets/final_quotation_images/logo6.jpg') }}'); background-size: cover; background-position: center center; background-repeat: no-repeat; width: 100%; height: 40vh;"></div>
                     </td>
                 </tr>
                 <tr><td style="padding: 10px 0;"></td></tr>
@@ -238,12 +252,12 @@
     </div>
  
     <!-- page 6 -->
-    <div style="background: rgba(0,0,0,0.5); width: 100%; min-height: 100vh;">
+    <div style="background: #fff; width: 100%; min-height: 100vh;">
         <table cellspacing="0" cellpadding="0" style="width: 100%; border: none;">
         <tbody>
             <tr>
                 <td>
-                    <div style="background-image: url(page6-bg.jpg); background-size: cover; background-position: center center; background-repeat: no-repeat; width: 100%; height: 40vh;"></div>
+                    <div style="background-image: url('{{ asset('assets/final_quotation_images/logo7.jpg') }}'); background-size: cover; background-position: center center; background-repeat: no-repeat; width: 100%; height: 40vh;"></div>
                 </td>
             </tr>
             <tr><td style="padding: 10px 0;"></td></tr>
@@ -287,9 +301,13 @@
      </table>
     </div>
 
-    <!-- page 11 -->
+    <!-- page 7 -->
      <div style="background: rgba(0,0,0,0.5); width: 100%; min-height: 100vh;">
-        <table cellspacing="0" cellpadding="0" style="width: 100%; border: none;">
+        <table cellspacing="0" cellpadding="0" style="width:100%;
+           background-image: url('{{ asset('assets/final_quotation_images/logo8.jpg') }}');
+           background-repeat: no-repeat;
+           background-position: center center;
+           background-size: cover;">
             <tbody>
                 <tr>
                     <td style="padding: 20px;">
@@ -300,7 +318,7 @@
                                     <td style="width: 34%;"></td>
                                     <td style="width: 33%;">
                                         <div style="display: block; background: #fff; border-radius: 30px; width: 100%; box-sizing: border-box; padding: 20px; margin: 0 auto;">
-                                            <img src="{{public_path('assets/final_quotation_images/logo4.jpg')}}" alt="logo" style="max-width: 100%;">
+                                            <img src="{{asset('assets/final_quotation_images/logo1.png')}}" alt="logo" style="max-width: 100%;">
                                         </div>
                                     </td>
                                 </tr>
@@ -397,9 +415,13 @@
         </table>
     </div>
 
-    <!-- page 12 -->
+    <!-- page 8 -->
      <div style="background: rgba(0,0,0,0.5); width: 100%; min-height: 100vh;">
-        <table cellspacing="0" cellpadding="0" style="width: 100%; border: none;">
+        <table cellspacing="0" cellpadding="0" style="width:100%;
+           background-image: url('{{ asset('assets/final_quotation_images/logo9.jpg') }}');
+           background-repeat: no-repeat;
+           background-position: center center;
+           background-size: cover;">
             <tbody>
                 <tr>
                     <td style="padding: 20px;">
@@ -410,7 +432,7 @@
                                     <td style="width: 34%;"></td>
                                     <td style="width: 33%;">
                                         <div style="display: block; background: #fff; border-radius: 30px; width: 100%; box-sizing: border-box; padding: 20px; margin: 0 auto;">
-                                            <img src="{{public_path('assets/final_quotation_images/logo5.jpg')}}" alt="logo" style="max-width: 100%;">
+                                            <img src="{{asset('assets/final_quotation_images/logo1.png')}}" alt="logo" style="max-width: 100%;">
                                         </div>
                                     </td>
                                 </tr>
@@ -532,9 +554,13 @@
         </table>
     </div>
 
-    <!-- page 13 -->
+    <!-- page 9 -->
      <div style="background: rgba(0,0,0,0.5); width: 100%; min-height: 100vh;">
-        <table cellspacing="0" cellpadding="0" style="width: 100%; border: none;">
+        <table cellspacing="0" cellpadding="0" style="width:100%;
+           background-image: url('{{ asset('assets/final_quotation_images/logo9.jpg') }}');
+           background-repeat: no-repeat;
+           background-position: center center;
+           background-size: cover;">
             <tbody>
                 <tr>
                     <td style="padding: 20px;">
@@ -545,7 +571,7 @@
                                     <td style="width: 34%;"></td>
                                     <td style="width: 33%;">
                                         <div style="display: block; background: #fff; border-radius: 30px; width: 100%; box-sizing: border-box; padding: 20px; margin: 0 auto;">
-                                            <img src="{{public_path('assets/final_quotation_images/logo6.jpg')}}" alt="logo" style="max-width: 100%;">
+                                            <img src="{{asset('assets/final_quotation_images/logo1.png')}}" alt="logo" style="max-width: 100%;">
                                         </div>
                                     </td>
                                 </tr>
@@ -611,9 +637,13 @@
         </table>
     </div>
 
-    <!-- page 14 -->
+    <!-- page 10 -->
      <div style="background: rgba(0,0,0,0.5); width: 100%; min-height: 100vh;">
-        <table cellspacing="0" cellpadding="0" style="width: 100%; border: none;">
+        <table cellspacing="0" cellpadding="0"  style="width:100%;
+           background-image: url('{{ asset('assets/final_quotation_images/logo10.jpg') }}');
+           background-repeat: no-repeat;
+           background-position: center center;
+           background-size: cover;">
             <tbody>
                 <tr>
                     <td style="padding: 20px;">
@@ -624,7 +654,7 @@
                                     <td style="width: 34%;"></td>
                                     <td style="width: 33%;">
                                         <div style="display: block; background: #fff; border-radius: 30px; width: 100%; box-sizing: border-box; padding: 20px; margin: 0 auto;">
-                                            <img src="{{public_path('assets/final_quotation_images/logo7.jpg')}}" alt="logo" style="max-width: 100%;">
+                                            <img src="{{asset('assets/final_quotation_images/logo1.png')}}" alt="logo" style="max-width: 100%;">
                                         </div>
                                     </td>
                                 </tr>
@@ -687,9 +717,13 @@
         </table>
     </div>
 
-    <!-- page 15 -->
+    <!-- page 11 -->
       <div style="background: rgba(0,0,0,0.5); width: 100%; min-height: 100vh;">
-        <table cellspacing="0" cellpadding="0" style="width: 100%; border: none;">
+        <table cellspacing="0" cellpadding="0" style="width:100%;
+           background-image: url('{{ asset('assets/final_quotation_images/logo11.jpg') }}');
+           background-repeat: no-repeat;
+           background-position: center center;
+           background-size: cover;">
             <tbody>
                 <tr>
                     <td style="padding: 20px;">
@@ -700,7 +734,7 @@
                                     <td style="width: 34%;"></td>
                                     <td style="width: 33%;">
                                         <div style="display: block; background: #fff; border-radius: 30px; width: 100%; box-sizing: border-box; padding: 20px; margin: 0 auto;">
-                                            <img src="{{public_path('assets/final_quotation_images/logo8.jpg')}}" alt="logo" style="max-width: 100%;">
+                                            <img src="{{asset('assets/final_quotation_images/logo1.png')}}" alt="logo" style="max-width: 100%;">
                                         </div>
                                     </td>
                                 </tr>
