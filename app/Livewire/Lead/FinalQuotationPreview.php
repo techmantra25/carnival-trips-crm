@@ -216,13 +216,13 @@ class FinalQuotationPreview extends Component
             $this->sent_lead_itinerary->id
         )->sum('price');
 
-        $pdf = Pdf::loadView('pdf.final-quotation', [
+        $data = [
             'lead' => $this->leadData,
             'itinerary' => $this->itinerary,
             'day_itinerary' => $this->day_itinerary,
             'day_wise_amount_data' => $this->day_wise_amount_data,
             'total_amount' => $this->total_amount,
-        ]);
+        ];
         $pdf = Pdf::loadView('pdf.final-quotation', $data)
         ->setPaper('A4', 'portrait')
         ->setOptions([
@@ -252,7 +252,6 @@ class FinalQuotationPreview extends Component
         if ($this->send_email) {
             $methods[] = 'email';
         }
-        // $pdfData = $this->generateQuotationPdf();
         if (empty($methods)) {
             session()->flash('error', 'No communication method selected.');
             return;
@@ -265,14 +264,18 @@ class FinalQuotationPreview extends Component
         try {
             /* ===================== SEND EMAIL ===================== */
             if ($this->send_email) {
-
                 $mailService = app(MailTemplateService::class);
 
                 // Dynamic subject
                $subject = "hi, {$this->leadData->customer_name}, Your {$this->sent_lead_itinerary->itinerary_syntax} Trip Is Confirmed! 🎉";
                 // Send booking confirmed email (PDF attached inside Mail service)
+                $pdfData = $this->generateQuotationPdf();
                 $attachments = [
-                    public_path('assets/img/sample.pdf'),
+                     [
+                        'data' => $pdfData,
+                        'name' => 'Final_Quotation.pdf',
+                        'mime' => 'application/pdf',
+                    ]
                 ];
                 $mailSent = $mailService->send(
                     $this->leadData->customer_email,
@@ -364,7 +367,7 @@ class FinalQuotationPreview extends Component
             session()->flash('success', 'Quotation sent successfully and logged.');
         } catch (\Throwable $e) {
             DB::rollBack();
-
+            dd($e->getMessage());
             logger()->error('Quotation send failed', [
                 'error' => $e->getMessage(),
                 'lead_id' => $this->leadData->id,
