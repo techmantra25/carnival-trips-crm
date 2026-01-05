@@ -227,12 +227,15 @@ class FinalQuotationPreview extends Component
         ->setPaper('A4', 'portrait')
         ->setOptions([
             'isHtml5ParserEnabled' => true,
-            'isRemoteEnabled' => true,
+            'isRemoteEnabled' => true, 
+            'enable_font_subsetting' => true,
+            'dpi' => 72,
         ]);
+        $fileName = 'Final_Quotation_'. $this->sent_lead_itinerary->itinerary_code. '_' . now()->format('Y-m-d_H-i-s'). '.pdf';
 
-        $fileName = 'Final_Quotation_' . $this->sent_lead_itinerary->itinerary_code . '.pdf';
         $filePath = 'quotations/' . $fileName;
 
+        \Storage::disk('public')->delete($filePath); // safe even if not exists
         \Storage::disk('public')->put($filePath, $pdf->output());
 
         return [
@@ -270,6 +273,7 @@ class FinalQuotationPreview extends Component
                $subject = "hi, {$this->leadData->customer_name}, Your {$this->sent_lead_itinerary->itinerary_syntax} Trip Is Confirmed! 🎉";
                 // Send booking confirmed email (PDF attached inside Mail service)
                 $pdfData = $this->generateQuotationPdf();
+                dd($pdfData);
                 $attachments = [
                      [
                         'data' => $pdfData,
@@ -334,6 +338,7 @@ class FinalQuotationPreview extends Component
                 // if (empty($whatsapp_response) || isset($whatsapp_response['error'])) {
                 //     throw new \Exception('WhatsApp message failed to send.');
                 // }
+                 dd('Send via WhatsApp currently not implemented.');
             }
 
             /* ===================== SAVE FINAL QUOTATION LOG ===================== */

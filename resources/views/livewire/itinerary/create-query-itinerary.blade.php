@@ -68,6 +68,15 @@
             background: #fff;
             font-size: 13px !important;
         }
+        body::-webkit-scrollbar {
+            width: 10px;
+            background-color: #fff;
+        }
+        body::-webkit-scrollbar-thumb {
+            background-color: #C1C1C1;
+            height: 10px;
+            border-radius: 6px;
+        }
     </style>
     <link rel="stylesheet" href="{{ asset('build/assets/libs/dragula/dragula.min.css') }}">
     <div class="grid grid-cols-12 gap-6">

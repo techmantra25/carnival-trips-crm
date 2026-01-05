@@ -197,17 +197,22 @@
 
                 <!-- ================= TABS ================= -->
                 <div class="hb-tabs">
+                    @php
+                        $hasConfirmed = $leadData->sent_itinerary->contains('is_confirmed', true);
+                    @endphp
                     @foreach($leadData->sent_itinerary as $index => $itinerary)
-                        <button
-                            wire:click="activeTabChange({{ $index }})"
-                            class="hb-tab-btn {{ ($activeTab ?? 0) === $index ? 'active' : '' }}"
-                        >
-                            {{ $itinerary->itinerary_code }}
+                        @if(!$hasConfirmed || $itinerary->is_confirmed)
+                            <button
+                                wire:click="activeTabChange({{ $index }})"
+                                class="hb-tab-btn {{ ($activeTab ?? 0) === $index ? 'active' : '' }}"
+                            >
+                                {{ $itinerary->itinerary_code }}
 
-                            @if($itinerary->is_confirmed)
-                                <span class="hb-badge-confirmed">✓ Confirmed</span>
-                            @endif
-                        </button>
+                                @if($itinerary->is_confirmed)
+                                    <span class="hb-badge-confirmed">✓ Confirmed</span>
+                                @endif
+                            </button>
+                        @endif
                     @endforeach
                 </div>
 

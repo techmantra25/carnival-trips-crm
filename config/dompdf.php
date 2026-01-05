@@ -21,6 +21,8 @@ return [
     'convert_entities' => true,
 
     'options' => [
+        'isRemoteEnabled' => true,
+        'isHtml5ParserEnabled' => true,
         /**
          * The location of the DOMPDF font directory
          *
@@ -78,7 +80,7 @@ return [
          * direct class use like:
          * $dompdf = new DOMPDF();  $dompdf->load_html($htmldata); $dompdf->render(); $pdfdata = $dompdf->output();
          */
-        'chroot' => realpath(base_path()),
+        'chroot' => public_path(),
 
         /**
          * Protocol whitelist
@@ -214,7 +216,7 @@ return [
          *
          * @var int
          */
-        'dpi' => 96,
+        'dpi' => 72,
 
         /**
          * Enable embedded PHP
@@ -267,7 +269,7 @@ return [
          *
          * @var bool
          */
-        'enable_remote' => true,
+        'enable_remote' => false,
 
         /**
          * List of allowed remote hosts

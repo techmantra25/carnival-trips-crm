@@ -141,7 +141,15 @@
     page-break-after: always;
     break-after: page;
     }
-    
+    body::-webkit-scrollbar {
+        width: 10px;
+        background-color: #fff;
+    }
+    body::-webkit-scrollbar-thumb {
+        background-color: #C1C1C1;
+        height: 10px;
+        border-radius: 6px;
+    }
 </style>
     <div class="card">
         <table class="table" id="print-section">
@@ -455,7 +463,8 @@
                                                                 <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px; width:65px; border-right: 1px solid rgba(1, 98, 232, 0.5) !important;">SL.No</th>
                                                                 <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px; border-right: 1px solid rgba(1, 98, 232, 0.5) !important;">Route</th>
                                                                 <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px; border-right: 1px solid rgba(1, 98, 232, 0.5) !important;">sightseeing</th>
-                                                                <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">Activity</th>
+                                                                <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px; border-right: 1px solid rgba(1, 98, 232, 0.5) !important;">Activity</th>
+                                                                <th style="font-size:11px; text-transform:uppercase; color:#031b4e; padding: 10px;">Cab</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -496,7 +505,7 @@
                                                                     </td>
 
                                                                     {{-- ACTIVITY --}}
-                                                                    <td style="vertical-align:top;">
+                                                                    <td style="vertical-align:top; border-right:1px solid #ccc !important;">
                                                                         @forelse($route['activitys'] ?? [] as $activity)
                                                                             <p>
                                                                                 <span style="color:#031b4e; border:1px solid #ddd;
@@ -510,45 +519,50 @@
                                                                             —
                                                                         @endforelse
                                                                     </td>
-                                                                </tr>
+                                                                    {{-- CAB --}}
+                                                                    <td style="vertical-align:top;">
+                                                                        @if(!empty($route['cabs']))
+                                                                            <div style="display:flex; align-items:center; gap:12px; flex-wrap:nowrap;">
+                                                                                @foreach($route['cabs'] as $cab)
+                                                                                    <div style="
+                                                                                        display:flex;
+                                                                                        align-items:center;
+                                                                                        gap:10px;
+                                                                                        border:1px solid #ccc;
+                                                                                        padding:10px 14px;
+                                                                                        min-width:180px;
+                                                                                    ">
 
-                                                                {{-- CAB ROW --}}
-                                                                @if(!empty($route['cabs']))
-                                                                <tr style="border-bottom:1px solid #ccc;">
-                                                                    <td colspan="4">
-                                                                        <table>
-                                                                            <tbody>
-                                                                                <tr>
-                                                                                    <td>
-                                                                                        <ul style="display:flex; align-items:center; flex-wrap:wrap; padding:0; margin:0;">
-                                                                                            @foreach($route['cabs'] as $cab)
-                                                                                                <li style="list-style:none; text-align:center; width:180px;
-                                                                                                    border:1px solid #ccc; margin:6px; padding:18px 0;">
-                                                                                                    
-                                                                                                    <img width="80"
-                                                                                                        src="{{ $cab['image'] ?? asset('assets/img/cab.png') }}"
-                                                                                                        alt="{{ $cab['name'] }}"
-                                                                                                        style="margin:auto;">
+                                                                                        <img
+                                                                                            width="60"
+                                                                                            src="{{ $cab['image'] ?? asset('assets/img/cab.png') }}"
+                                                                                            alt="{{ $cab['name'] }}"
+                                                                                            style="display:block;"
+                                                                                        >
 
-                                                                                                    <p>
-                                                                                                        <span style="color:#22c03c; border:1px solid #ddd;
-                                                                                                            display:inline-block; font-size:11px;
-                                                                                                            text-transform:uppercase; border-radius:5px;
-                                                                                                            padding:4px 6px; background:rgba(34,192,60,.1);">
-                                                                                                            {{ $cab['name'] }}
-                                                                                                            <i style="color:#ee335e;">({{ $cab['quantity'] }})</i>
-                                                                                                        </span>
-                                                                                                    </p>
-                                                                                                </li>
-                                                                                            @endforeach
-                                                                                        </ul>
-                                                                                    </td>
-                                                                                </tr>
-                                                                            </tbody>
-                                                                        </table>
+                                                                                        <div style="text-align:left;">
+                                                                                            <span style="
+                                                                                                color:#22c03c;
+                                                                                                border:1px solid #ddd;
+                                                                                                display:inline-block;
+                                                                                                font-size:11px;
+                                                                                                text-transform:uppercase;
+                                                                                                border-radius:5px;
+                                                                                                padding:4px 6px;
+                                                                                                background:rgba(34,192,60,.1);
+                                                                                            ">
+                                                                                                {{ $cab['name'] }}
+                                                                                                <i style="color:#ee335e;">({{ $cab['quantity'] }})</i>
+                                                                                            </span>
+                                                                                        </div>
+
+                                                                                    </div>
+                                                                                @endforeach
+                                                                            </div>
+                                                                        @endif
                                                                     </td>
+
                                                                 </tr>
-                                                                @endif
                                                             @endforeach
                                                         </tbody>
                                                     </table>
@@ -656,75 +670,6 @@
                     </table>
                 </td>
             </tr>
-
-
-            <tr>
-                <td>
-                    <table style="border:1px solid rgba(1, 98, 232, 0.5) !important; width:100%;">
-                        <thead style="background-color:#d2e8ff;">
-                            <tr>
-                                <th>
-                                    <h4 style="font-size:22px; color:#031b4e; text-align:center;">
-                                        <i class="fa-solid fa-circle-check"
-                                        style="font-size:20px; color:#1e58a3;"></i>
-                                        Activities Summary
-                                    </h4>
-                                </th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                        @foreach($day_itinerary as $dayData)
-                            @php
-                                $day = $dayData['day'];
-
-                                // Check if this day has at least one activity
-                                $hasActivity = collect($dayData['route'])
-                                    ->pluck('activitys')
-                                    ->flatten(1)
-                                    ->isNotEmpty();
-                            @endphp
-
-                            @if($hasActivity)
-                                {{-- DAY HEADING --}}
-                                <tr>
-                                    <td style="padding:10px; background:#f4f8ff;">
-                                        <h3 style="margin:0; color:#1e58a3;">
-                                            Day {{ $day }}
-                                        </h3>
-                                    </td>
-                                </tr>
-
-                                {{-- ACTIVITIES --}}
-                                <tr>
-                                    <td>
-                                        <ul class="activity-list">
-                                            @foreach($dayData['route'] as $route)
-                                                @foreach($route['activitys'] as $activity)
-                                                    <li style="
-                                                        background:url('{{ $activity['image'] }}');
-                                                        background-repeat:no-repeat;
-                                                        background-size:cover;
-                                                        background-position:center center;
-                                                    ">
-                                                        <figcaption>
-                                                            <h2>{{ $activity['name'] }}</h2>
-                                                        </figcaption>
-                                                    </li>
-                                                @endforeach
-                                            @endforeach
-                                        </ul>
-                                    </td>
-                                </tr>
-                            @endif
-                        @endforeach
-
-                        </tbody>
-                    </table>
-                </td>
-            </tr>
-
-
             <tr>
                 <td>
                     <table style="border:1px solid rgba(1, 98, 232, 0.5) !important">
