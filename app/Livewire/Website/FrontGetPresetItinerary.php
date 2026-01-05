@@ -37,7 +37,7 @@ class FrontGetPresetItinerary extends Component
         $night_journeys  = explode(',', $this->itinerary->night_journey);
 
         $map = [];
-        
+        array_pop($division_ids);
         foreach ($division_ids as $i => $value) {
             $index = $i + 1; // 1-based index
         

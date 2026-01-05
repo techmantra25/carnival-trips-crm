@@ -11,6 +11,7 @@ use App\Models\City;
 use App\Models\LeadUrlShare;
 use App\Models\LeadUrlClick;
 use Illuminate\Support\Facades\Auth;
+use App\Models\ItineraryTemplate;
 
 class FrontGetCustomizedItinerary extends Component
 {
@@ -20,11 +21,39 @@ class FrontGetCustomizedItinerary extends Component
     public $day_wise_amount_data = [];
     public $total_amount = 0;
     public bool $authUser = false;
+
+    public $template,$divisions_journeies = [];
+
     public function mount($code){
         $this->authUser = Auth::guard('admin')->check();
         $this->sent_lead_itinerary = SendedLeadItinerary::where('itinerary_code', $code)
         ->firstOrFail();
         $this->leadData = $this->sent_lead_itinerary->lead;
+
+        $this->template = ItineraryTemplate::with('detail')->where('destination_id',$this->leadData->travel_location)->first();
+        $division_ids = explode(',',$this->sent_lead_itinerary->stay_by_journey);
+
+        $map = [];
+        array_pop($division_ids);
+        foreach ($division_ids as $i => $value) {
+            $index = $i + 1; // 1-based index
+        
+            if (!isset($map[$value])) {
+                $city = City::find($value);
+                $map[$value] = [
+                    'city_id' => $value,
+                    'city_name' => $city ? $city->name : null,
+                    'count' => 0,
+                    'index' => [],
+                ];
+            }
+        
+            $map[$value]['count']++;
+            $map[$value]['index'][] = $index;
+        }
+        
+        $this->divisions_journeies= array_values($map);
+
         $this->lead_url_share = LeadUrlShare::where('sended_lead_itinerary_id', $this->sent_lead_itinerary->id)->firstOrFail();
         $this->itinerary = [
             'name' => $this->sent_lead_itinerary->lead->customer_name ?? 'N/A',
@@ -257,6 +286,6 @@ class FrontGetCustomizedItinerary extends Component
          $this->GetAllQuantity();
         //  dd($this->day_wise_amount_data);
         $this->total_amount = SendedLeadItineraryDetail::where('sended_lead_itinerary_id', $this->sent_lead_itinerary->id)->sum('price');
-        return view('livewire.website.front-get-customized-itinerary')->layout('layouts.frontend.master2', ['title' => $this->title]);
+        return view('livewire.website.front-get-customized-itinerary')->layout('layouts.frontend.master', ['title' => $this->title]);
     }
 }

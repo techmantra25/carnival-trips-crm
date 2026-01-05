@@ -36,7 +36,7 @@
                         <div class="location">
                             <img src="{{asset('front_assets/icons/company_logo.png')}}" alt="">
                             @foreach($divisions_journeies as $journey_index=>$divisions_journey)
-                            {{$divisions_journey['city_name'].'('.$divisions_journey['count'].'D)'}} @if (!$loop->last),
+                            {{$divisions_journey['city_name'].'('.$divisions_journey['count'].'N)'}} @if (!$loop->last),
                             @endif
                             @endforeach
                         </div>
@@ -119,15 +119,11 @@ $great_experience_sub_details = $template->detail()
     </div>
 </section>
 @php
-$about_destination_title =
-$template->detail->where('header','about_destination')->where('field','about_destination_title')->first();
-$about_destination_text =
-$template->detail->where('header','about_destination')->where('field','about_destination_text')->first();
+$about_destination_title = $template->detail->where('header','about_destination')->where('field','about_destination_title')->first();
+$about_destination_text = $template->detail->where('header','about_destination')->where('field','about_destination_text')->first();
 
-$about_destination_image =
-$template->detail->where('header','about_destination')->where('field','about_destination_image')->first();
-$about_destination_slider_image =
-$template->detail()->where('header','about_destination')->where('field','slider_image')->get();
+$about_destination_image = $template->detail->where('header','about_destination')->where('field','about_destination_image')->first();
+$about_destination_slider_image = $template->detail()->where('header','about_destination')->where('field','slider_image')->get();
 
 $trip_highlights = $itinerary->details()
 ->where('header', 'about_destination')

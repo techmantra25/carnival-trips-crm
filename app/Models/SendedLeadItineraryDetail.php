@@ -21,12 +21,14 @@ class SendedLeadItineraryDetail extends Model
         'price',
         'rate',
         'ticket_price',
+        'extra_hotels_and_rooms',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'rate' => 'decimal:2',
         'ticket_price' => 'decimal:2',
+        'extra_hotels_and_rooms' => 'array',
     ];
 
     // Relationship with Itinerary model

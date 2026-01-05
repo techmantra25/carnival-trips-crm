@@ -1948,6 +1948,7 @@ class CreateQueryItinerary extends Component
     public function OpenAssignRouteModal($index){
         $this->active_new_route_modal = 0;
         $this->active_assign_route_modal = $index;
+       
     }
 
     public function OpenNewRouteModal($index){
@@ -3324,6 +3325,38 @@ class CreateQueryItinerary extends Component
             // Step 4: Bulk insert
             if (!empty($bulkInsertData)) {
                 SendedLeadItineraryDetail::insert($bulkInsertData);
+
+                $get_all_rooms = SendedLeadItineraryDetail::where('sended_lead_itinerary_id', $store->id)
+                    ->where('field', 'day_room')
+                    ->whereNotNull('room_id')
+                    ->orderBy('day', 'ASC')
+                    ->get();
+                array_pop($this->day_by_divisions);
+                foreach ($get_all_rooms as $index => $room_data) {
+
+                    $rooms_for_day = $this->day_by_divisions[$index+1]['day_hotel'];
+
+                    $extraHotelsAndRooms = [];
+
+                    foreach ($rooms_for_day as $room_index => $hotel) {
+                      
+                        if (!empty($hotel['rooms']) && isset($hotel['rooms'][0])) {
+                            $hotel_data = Hotel::findOrFail($hotel['id']);
+                            $hotel_image = $hotel_data->image ?? 'build/assets/images/logo/demo.webp';
+                            $room = $hotel['rooms'][0]; // first room only
+
+                            $extraHotelsAndRooms[] = [
+                                'hotel_id' => $hotel['id'],
+                                'hotel_image' => $hotel_image,
+                                'hotel_name' => $hotel['name'],
+                                'room_name'  => $room['room_name'],
+                                'type' => 'extra'
+                            ];
+                        }
+                    }
+                    $room_data->extra_hotels_and_rooms = json_encode($extraHotelsAndRooms);
+                    $room_data->save();
+                }
             }
         
 
