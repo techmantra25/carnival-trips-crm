@@ -1358,3 +1358,21 @@ input[type="checkbox"]:checked + .hotel-card .checkmark {
     font-weight: 700;
     color: #4d5875;
 }
+
+/* 05-01-2026 */
+.ct-leads-table th:first-child,
+.ct-leads-table td:first-child {
+    width: 70px;
+}
+.ct-leads-table th:last-child,
+.ct-leads-table td:last-child {
+    width: 380px;
+}
+.ct-leads-table td {
+    vertical-align: top;
+    padding: .25rem !important;
+}
+.ct-leads-table td:last-child .ti-btn {
+    font-size: 0.65rem;
+    padding: .375rem .55rem;
+}

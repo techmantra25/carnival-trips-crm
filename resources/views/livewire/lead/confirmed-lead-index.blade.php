@@ -128,7 +128,7 @@
             <div class="box custom-box">
                 <div class="box-body">
                     <div class="table-responsive">
-                        <table class="table whitespace-nowrap table-bordered table-bordered-primary border-primary/10 min-w-full">
+                        <table class="table whitespace-nowrap table-bordered table-bordered-primary border-primary/10 min-w-full ct-leads-table">
                             <thead class="uppercase">
                                 <tr class="border-b !border-primary/30">
                                     <th scope="col" class="!text-center">SL No.</th>
@@ -145,12 +145,12 @@
                                             <span class="badge bg-primary/10 text-primary"> {{ $leads->firstItem() + $index }}</span>
                                         </td>
                                         <td>
-                                                <p class="badge bg-primary text-white">{{$lead_item->unique_id }}</p>
-                                                <p class="mt-1"> {{ $lead_item->customer_name }}
-                                                {{-- <span class="badge gap-2 bg-success/10 text-success">
-                                                    <span class="w-1.5 h-1.5 inline-block bg-success rounded-full"></span>Online
-                                                </span> --}}
-                                                </p>
+                                            <p class="badge bg-primary text-white">{{$lead_item->unique_id }}</p>
+                                            <p class="mt-1"> {{ $lead_item->customer_name }}
+                                            {{-- <span class="badge gap-2 bg-success/10 text-success">
+                                                <span class="w-1.5 h-1.5 inline-block bg-success rounded-full"></span>Online
+                                            </span> --}}
+                                            </p>
                                             
                                             @php
                                                 $confirmed_itinerary = $lead_item->sent_itinerary()->where('is_confirmed', 1)->first();
@@ -158,7 +158,7 @@
                                                 $timeInfo = $confirmed_itinerary ? \App\Helpers\CustomHelper::formatLeadTime($confirmed_itinerary->confirmed_at) : null;
                                             @endphp
                                             @if($timeInfo)
-                                                <button type="button" class="badge bg-outline-secondary my-3 me-2 badge-custom-outline-secondary">
+                                                <button type="button" class="badge my-3 me-2">
                                                     {{ $timeInfo?$timeInfo['formatted_date']:'N/A' }}
                                                     <span class="badge bg-secondary ms-2 text-white">{{ $timeInfo?$timeInfo['time_ago']:'N/A' }}</span>
                                                 </button>
@@ -213,42 +213,31 @@
                                                 {{ $lead_item->destination?$lead_item->destination->name:"..." }} 
                                                 <span class="badge bg-primary/10 text-primary">{{$lead_item->travel_duration_text}} @if($lead_item->number_of_travellor)| {{$lead_item->number_of_travellor}} PAX @endif</span>
                                             </div>
-                                            <div>
-                                                <i class="fa-regular fa-clock text-danger"></i>
-                                                Start Date: {{ \Carbon\Carbon::parse($lead_item->arrival_date)->format('d M Y') }}
+                                            <div class="bg-outline-secondary rounded-sm text-black flex items-center justify-between px-1 py-0.5">
+                                                <div class="text-[10px]">
+                                                    <i class="fa-regular fa-clock"></i>
+                                                    Start Date: {{ \Carbon\Carbon::parse($lead_item->arrival_date)->format('d M Y') }}
+                                                </div>
+                                                <div class="text-[10px]">
+                                                    <i class="fa-regular fa-clock"></i>
+                                                    End Date: {{ \Carbon\Carbon::parse($lead_item->departure_date)->format('d M Y') }}
+                                                </div>
                                             </div>
-                                            <div>
-                                                <i class="fa-regular fa-clock text-danger"></i>
-                                                End Date: {{ \Carbon\Carbon::parse($lead_item->departure_date)->format('d M Y') }}
-                                            </div>
-                                            <div>
-                                                <span class="lead_itinerary_journey">
+                                            <div class="block">
+                                                <span class="block lead_itinerary_journey text-[10px] font-bold tracking-wide">
                                                     {{ optional($lead_item->itinerary)->itinerary_journey ?? '...' }}
                                                     ({{ optional($lead_item->category)->name ?? '...' }})
                                                 </span>
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="!text-center mb-2">
-                                                @foreach($lead_item->sent_itinerary()->where('is_confirmed', 1)->orderBy('id', 'ASC')->get() as $sent_itinerary_item)
-                                                    @php
-                                                        $title  = "Itinerary: {$sent_itinerary_item->itinerary_syntax}\n";
-                                                        $title .= "Send Via: {$sent_itinerary_item->send_via}\n";
-                                                        $title .= "Total Cost: ₹" . number_format($sent_itinerary_item->total_cost) . "\n";
-                                                        $title .= "Destination: " . optional($sent_itinerary_item->destination)->name . "\n";
-                                                        $title .= "Hotel Category: " . optional($sent_itinerary_item->category)->name;
-                                                    @endphp
-
-                                                    <a href="{{ route('admin.leads.final-quotation', $sent_itinerary_item->itinerary_code) }}"
-                                                    target="_blank"
-                                                    class="badge bg-outline-secondary badge-custom-outline-secondary cursor-pointer"
-                                                    title="{{ $title }}"
-                                                    >
-                                                        <i class="fa fa-file-pdf text-danger me-1"></i>
-                                                        {{ $sent_itinerary_item->itinerary_code }}
-                                                    </a>
-                                                @endforeach
-
+                                            <div class="!text-center flex flex-wrap justify-center gap-x-1 gap-y-1">
+                                                 <a href="javascript:void(0)" title="Click to update lead status">
+                                                    <span class="badge gap-2 {{ \App\Helpers\CustomHelper::getLeadStatusBadgeColor($lead_item->status) }}">
+                                                        <span class="w-1.5 h-1.5 inline-block bg-black rounded-full"></span>
+                                                        {{ ucwords($lead_item->status) }}
+                                                    </span>
+                                                </a>
                                             </div>
 
                                             <div class="!text-center">
@@ -282,34 +271,40 @@
                                                 
                                                 {{-- Edit Lead --}}
                                                 @if($lead_item->itinerary)
-                                                    @php
-                                                        $encryptedId = Crypt::encrypt($lead_item->itinerary->id);
-                                                    @endphp
-                                                    {{-- <a href="{{route('admin.cost_calculator.query_edit',$encryptedId)}}" class="ti-btn ti-btn-orange  mt-[0.375rem]" title="Edit Lead"><i class="fa-regular fa-pen-to-square"></i></a> --}}
-
-                                                    {{-- Itinerary --}}
-                                                    {{-- @if($lead_item->itinerary->night_journey && $lead_item->itinerary->stay_by_journey)
-                                                        <a href="{{route('admin.itinerary.query.build', $encryptedId)}}" class="ti-btn ti-btn-teal mt-[0.375rem]" title="Itinerary"><i class="fa-solid fa-arrows-up-down-left-right"></i></a> 
-                                                    @endif --}}
                                                     @if(count($lead_item->sent_itinerary()->orderBy('id', 'ASC')->get())>0)
-                                                        {{-- <a href="{{route('admin.leads.manage-hotel-booking', $lead_item->id)}}"
+                                                        <a href="{{route('admin.leads.manage-hotel-booking', $lead_item->id)}}"
                                                         class="ti-btn ti-btn-red mt-[0.375rem]"
                                                         title="Manage Hotel Booking">
                                                             <i class="fa-solid fa-bed"></i>
-                                                        </a> --}}
+                                                        </a>
                                                     @endif
-                                                     <br>
                                                 @endif
-                                            </div>
-                                            <div class="!text-center">
-                                                <a href="javascript:void(0)" title="Click to update lead status">
-                                                    <span class="badge gap-2 {{ \App\Helpers\CustomHelper::getLeadStatusBadgeColor($lead_item->status) }}">
-                                                        <span class="w-1.5 h-1.5 inline-block bg-black rounded-full"></span>
-                                                        {{ ucwords($lead_item->status) }}
-                                                    </span>
-                                                </a>     
+                                                @php
+                                                    $sent_itinerary_item = $lead_item->sent_itinerary()
+                                                        ->where('is_confirmed', 1)
+                                                        ->orderBy('id', 'ASC')
+                                                        ->first();
+                                                @endphp
+
+                                                @if($sent_itinerary_item)
+                                                    @php
+                                                        $title  = "Itinerary: {$sent_itinerary_item->itinerary_syntax}\n";
+                                                        $title .= "Send Via: {$sent_itinerary_item->send_via}\n";
+                                                        $title .= "Total Cost: ₹" . number_format($sent_itinerary_item->total_cost) . "\n";
+                                                        $title .= "Destination: " . optional($sent_itinerary_item->destination)->name . "\n";
+                                                        $title .= "Hotel Category: " . optional($sent_itinerary_item->category)->name;
+                                                    @endphp
+
+                                                    <a href="{{ route('admin.leads.final-quotation', $sent_itinerary_item->itinerary_code) }}"
+                                                    target="_blank"
+                                                    class="badge bg-outline-secondary badge-custom-outline-secondary cursor-pointer"
+                                                    title="{{ $title }}">
+                                                        <i class="fa fa-file-pdf text-danger me-1"></i>
+                                                        Send Quotation
+                                                    </a>
+                                                @endif  
                                             </div>  
-                                            <div>
+                                            <div class="!text-center">
                                                 <span class="badge bg-warning/10 text-warning" title="Assign Lead Member">
                                                     <span class="text-black"><i class="fa-regular fa-user me-1"></i></span>
                                                     <span class="text-black"> Assigned To:</span>
@@ -323,7 +318,7 @@
                                                 </span>
                                             </div>
                                             @if($confirmed_itinerary)
-                                                <div>
+                                                <div class="!text-center">
                                                     <span class="badge bg-success/10 text-warning" title="Assign Lead Member">
                                                         <span class="text-black">
                                                             <i class="fa-regular fa-user me-1"></i>

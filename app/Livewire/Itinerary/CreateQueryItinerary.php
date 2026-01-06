@@ -3332,6 +3332,7 @@ class CreateQueryItinerary extends Component
                     ->orderBy('day', 'ASC')
                     ->get();
                 array_pop($this->day_by_divisions);
+                // dd($this->day_by_divisions,$get_all_rooms);
                 foreach ($get_all_rooms as $index => $room_data) {
 
                     $rooms_for_day = $this->day_by_divisions[$index+1]['day_hotel'];
@@ -3390,51 +3391,51 @@ class CreateQueryItinerary extends Component
 
       
 
-        DB::commit();
+            DB::commit();
 
-        // Mailing section
-        if ($this->send_whatsapp) {
-        //   MailTemplateService::send(
-        //         $this->leadData->customer_email,//mail to
-        //         'customer_customized_itinerary_link', //mail template slug
-        //         [
-        //             'customer_name' => $this->leadData->customer_name,
-        //             'itinerary_link' => $leadUrlShare->links,
-        //             'estimated_amount' => env('DEFAULT_CURRENCY_SYMBOL').number_format($this->total_amount,2),
-        //             'admin_name' => Auth::guard('admin')->user()->name,
-        //         ], // mail body data
-        //         ['customer_name' => $this->leadData->customer_name,], //mail subject data
-        //         ENV('MAIL_FROM_ADDRESS'),     // From Email
-        //         ENV('MAIL_FROM_NAME')         // From Name
-        //     );
-        }
+            // Mailing section
+            if ($this->send_whatsapp) {
+            //   MailTemplateService::send(
+            //         $this->leadData->customer_email,//mail to
+            //         'customer_customized_itinerary_link', //mail template slug
+            //         [
+            //             'customer_name' => $this->leadData->customer_name,
+            //             'itinerary_link' => $leadUrlShare->links,
+            //             'estimated_amount' => env('DEFAULT_CURRENCY_SYMBOL').number_format($this->total_amount,2),
+            //             'admin_name' => Auth::guard('admin')->user()->name,
+            //         ], // mail body data
+            //         ['customer_name' => $this->leadData->customer_name,], //mail subject data
+            //         ENV('MAIL_FROM_ADDRESS'),     // From Email
+            //         ENV('MAIL_FROM_NAME')         // From Name
+            //     );
+            }
 
-        // Whatspp Section
-        if ($this->send_email) {
-            $mailService = app(MailTemplateService::class);
+            // Whatspp Section
+            if ($this->send_email) {
+                $mailService = app(MailTemplateService::class);
 
-            $subject = "Hi {$this->leadData->customer_name}, Your Customized Itinerary ({$this->itineraryData->itinerary_syntax}) for {$this->leadData->destination->name} is Ready.";
+                $subject = "Hi {$this->leadData->customer_name}, Your Customized Itinerary ({$this->itineraryData->itinerary_syntax}) for {$this->leadData->destination->name} is Ready.";
 
-            $mailService->send(
-                $this->leadData->customer_email,
-                'customize_itinerary_link',
-                $subject,
-                [
-                    'template_type'  => 'customize_itinerary_link',
-                    'recipient_name' => $this->leadData->customer_name,
-                    'itinerary_link' => $leadUrlShare->links,
-                    'itinerary'      => $this->itineraryData->itinerary_syntax,
-                    'total_amount'   => $this->total_amount,
-                    'company_name'   => env('MAIL_FROM_NAME'),
-                    'sender_name'    => Auth::guard('admin')->user()->name ?? env('MAIL_FROM_NAME'),
-                    'sender_mobile'  => Auth::guard('admin')->user()->phone ?? '',
-                    'subject'        => $subject,
-                ],
-                env('MAIL_FROM_ADDRESS'),
-                env('MAIL_FROM_NAME'),
-                []//attachments
-            );
-        }
+                $mailService->send(
+                    $this->leadData->customer_email,
+                    'customize_itinerary_link',
+                    $subject,
+                    [
+                        'template_type'  => 'customize_itinerary_link',
+                        'recipient_name' => $this->leadData->customer_name,
+                        'itinerary_link' => $leadUrlShare->links,
+                        'itinerary'      => $this->itineraryData->itinerary_syntax,
+                        'total_amount'   => $this->total_amount,
+                        'company_name'   => env('MAIL_FROM_NAME'),
+                        'sender_name'    => Auth::guard('admin')->user()->name ?? env('MAIL_FROM_NAME'),
+                        'sender_mobile'  => Auth::guard('admin')->user()->phone ?? '',
+                        'subject'        => $subject,
+                    ],
+                    env('MAIL_FROM_ADDRESS'),
+                    env('MAIL_FROM_NAME'),
+                    []//attachments
+                );
+            }
 
             session()->flash('success', 'Itinerary sent and details saved successfully!');
         } catch (\Exception $e) {
