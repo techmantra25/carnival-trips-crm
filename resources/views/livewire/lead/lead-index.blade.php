@@ -173,7 +173,7 @@
             <div class="box custom-box">
                 <div class="box-body">
                     <div class="table-responsive">
-                        <table class="table whitespace-nowrap table-bordered table-bordered-primary border-primary/10 min-w-full">
+                        <table class="table whitespace-nowrap table-bordered table-bordered-primary border-primary/10 min-w-full ct-leads-table">
                             <thead class="uppercase">
                                 <tr class="border-b !border-primary/30">
                                     <th scope="col" class="!text-center">SL No.</th>
@@ -186,7 +186,7 @@
                             <tbody>
                                 @forelse ($leads as $index=>$lead_item)
                                     <tr class="text-grey" id="delete{{$lead_item->id}}">
-                                        <td scope="row" class="!text-center !p-1">
+                                        <td scope="row" class="!text-center">
                                             <span class="badge bg-primary/10 text-primary"> {{ $leads->firstItem() + $index }}</span>
                                         </td>
                                         <td>
@@ -201,7 +201,7 @@
                                                 $timeInfo = \App\Helpers\CustomHelper::formatLeadTime($lead_item->created_at);
                                              
                                             @endphp
-                                            <button type="button" class="badge bg-outline-secondary my-3 me-2 badge-custom-outline-secondary">
+                                            <button type="button" class="badge my-3 me-2 px-0">
                                                 {{ $timeInfo['formatted_date'] }}
                                                 <span class="badge bg-secondary ms-2 text-white">{{ $timeInfo['time_ago'] }}</span>
                                             </button>
@@ -255,23 +255,25 @@
                                                 {{ $lead_item->destination?$lead_item->destination->name:"..." }} 
                                                 <span class="badge bg-primary/10 text-primary">{{$lead_item->travel_duration_text}} @if($lead_item->number_of_travellor)| {{$lead_item->number_of_travellor}} PAX @endif</span>
                                             </div>
-                                            <div>
-                                                <i class="fa-regular fa-clock text-danger"></i>
-                                                Start Date: {{ \Carbon\Carbon::parse($lead_item->arrival_date)->format('d M Y') }}
+                                            <div class="bg-outline-secondary rounded-sm text-black flex items-center justify-between px-1 py-0.5">
+                                                <div class="text-[10px]">
+                                                    <i class="fa-regular fa-clock"></i>
+                                                    Start Date: {{ \Carbon\Carbon::parse($lead_item->arrival_date)->format('d M Y') }}
+                                                </div>
+                                                <div class="text-[10px]">
+                                                    <i class="fa-regular fa-clock"></i>
+                                                    End Date: {{ \Carbon\Carbon::parse($lead_item->departure_date)->format('d M Y') }}
+                                                </div>
                                             </div>
-                                            <div>
-                                                <i class="fa-regular fa-clock text-danger"></i>
-                                                End Date: {{ \Carbon\Carbon::parse($lead_item->departure_date)->format('d M Y') }}
-                                            </div>
-                                            <div>
-                                                <span class="lead_itinerary_journey">
+                                            <div class="block">
+                                                <span class="block lead_itinerary_journey text-[10px] font-bold tracking-wide">
                                                     {{ optional($lead_item->itinerary)->itinerary_journey ?? '...' }}
                                                     ({{ optional($lead_item->category)->name ?? '...' }})
                                                 </span>
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="!text-center mb-2">
+                                            <div class="!text-center flex flex-wrap justify-center gap-x-1 gap-y-1">
                                                 @if($lead_item->itinerary)
                                                     @php
                                                         $destination_slug = $lead_item->destination
@@ -351,7 +353,7 @@
 
                                                     {{-- Itinerary --}}
                                                     @if($lead_item->itinerary->night_journey &&                 $lead_item->itinerary->stay_by_journey)
-                                                        <a href="{{route('admin.itinerary.query.build', $encryptedId)}}" class="ti-btn ti-btn-teal mt-[0.375rem]" title="Cost Calculator"><i class="fa-solid fa-arrows-up-down-left-right"></i></a> 
+                                                    <a href="{{route('admin.itinerary.query.build', $encryptedId)}}" class="ti-btn ti-btn-teal mt-[0.375rem]" title="Cost Calculator"><i class="fa-solid fa-arrows-up-down-left-right"></i></a> 
                                                     @endif
                                                     @if(count($lead_item->sent_itinerary()->orderBy('id', 'ASC')->get())>0)
                                                         <a href="{{route('admin.leads.manage-hotel-booking', $lead_item->id)}}"
@@ -360,12 +362,11 @@
                                                             <i class="fa-solid fa-bed"></i>
                                                         </a>
                                                     @endif
-                                                    <br>
+                                                    
                                                 @endif
                                                
                                                  {{-- <a href="{{route('website.trip.preference.form', $lead_item->unique_id)}}" target="_blank" class="ti-btn ti-btn-secondary ti-btn-border-start  mt-[0.375rem]" title="Itinerary">FB Form</a> --}}
-                                            </div>
-                                            <div class="!text-center">
+                                            
                                                 <a href="javascript:void(0)" wire:click="LeadStatusModal({{$lead_item->id}})"   title="Click to update lead status">
                                                     <span class="badge gap-2 {{ \App\Helpers\CustomHelper::getLeadStatusBadgeColor($lead_item->status) }}">
                                                         <span class="w-1.5 h-1.5 inline-block bg-black rounded-full"></span>
@@ -373,8 +374,8 @@
                                                     </span>
                                                 </a>     
                                             </div>  
-                                           <div>
-                                                <span class="badge bg-warning/10 text-warning" title="Assign Lead Member">
+                                           <div class="!text-center">
+                                                <span class="badge bg-warning/10 text-warning justify-center" title="Assign Lead Member">
                                                     <span class="text-black"><i class="fa-regular fa-user me-1"></i></span>
                                                     <span class="text-black"> Assigned To:</span>
                                                     <strong class="ms-1 text-black">
@@ -390,8 +391,8 @@
                                                 $confirmed_itinerary = $lead_item->sent_itinerary()->where('is_confirmed', 1)->first();
                                             @endphp
                                             @if($confirmed_itinerary)
-                                                <div>
-                                                    <span class="badge bg-success/10 text-warning" title="Assign Lead Member">
+                                                <div class="!text-center">
+                                                    <span class="badge bg-success/10 text-warning justify-center" title="Assign Lead Member">
                                                         <span class="text-black">
                                                             <i class="fa-regular fa-user me-1"></i>
                                                         </span>
