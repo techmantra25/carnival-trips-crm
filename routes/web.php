@@ -63,6 +63,7 @@ use App\Http\Controllers\{LeadManagementController,CommonController,HotelManagem
             Route::get('/confirmed', [LeadManagementController::class, 'confirmed'])->name('admin.leads.confirmed.index');
             Route::get('/manage-hotel-booking/{lead_id}', [LeadManagementController::class, 'manage_hotel_booking'])->name('admin.leads.manage-hotel-booking');
             Route::get('/confirmed/final-quotation/{code}', [LeadManagementController::class, 'final_quotation'])->name('admin.leads.final-quotation');
+            Route::get('/confirmed/final-quotation/pdf/{code}', [LeadManagementController::class, 'final_quotation_pdf'])->name('admin.leads.final-quotation-pdf');
             Route::get('/log-history/{lead_id}', [LeadManagementController::class, 'lead_log_history'])->name('admin.leads.log.history');
             Route::get('/shared-history/{lead_id}', [LeadManagementController::class, 'lead_shared_history'])->name('admin.leads.shared.itinerary.history');
             Route::get('/trip-preference-form/{lead_id}', [LeadManagementController::class, 'trip_preference_data'])->name('admin.leads.trip.preference.data');

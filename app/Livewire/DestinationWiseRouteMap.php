@@ -245,8 +245,6 @@ class DestinationWiseRouteMap extends Component
 
     public function submitEditForm()
     {
-        // dd($this->edit_routes);
-       
         $this->resetErrorBag();
         $checkExisting = DestinationWiseRoute::where('route_name', $this->edit_routes['route_name'])
                 ->where('destination_id', $this->edit_routes['destination_id'])->where('id', '!=', $this->edit_routes['id'])

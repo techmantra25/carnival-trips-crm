@@ -3435,6 +3435,7 @@ class CreateQueryItinerary extends Component
                     env('MAIL_FROM_NAME'),
                     []//attachments
                 );
+                $this->reset(['send_email']);
             }
 
             session()->flash('success', 'Itinerary sent and details saved successfully!');

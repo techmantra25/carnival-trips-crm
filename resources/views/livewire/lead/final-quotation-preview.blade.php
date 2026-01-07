@@ -816,6 +816,20 @@
                     max-w-full sm:max-w-md w-full mx-auto text-center">
 
             <!-- Header -->
+            <div class="mb-4">
+                <a href="{{ route('admin.leads.final-quotation-pdf', $sent_lead_itinerary->itinerary_code) }}"
+                target="_blank"
+                class="inline-flex items-center justify-center px-4 py-2
+                        text-sm font-semibold text-white
+                        bg-secondary hover:bg-secondary/90
+                        rounded-lg shadow transition">
+
+                    <i class="fa-solid fa-download mr-1"></i>
+                     <span class="ml-2">Download Attachment</span>
+                </a>
+            </div>
+
+
             <div class="mb-2">
                 <h4 class="text-xs font-semibold tracking-widest uppercase text-gray-500">
                     Total Amount
