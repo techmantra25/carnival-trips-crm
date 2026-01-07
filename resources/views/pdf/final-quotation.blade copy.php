@@ -721,7 +721,7 @@
     </div>
 
     <!-- page 11 -->
-      <div style="background: rgba(0,0,0,0.5); width: 100%; min-height: 100vh;">
+    <div style="background: rgba(0,0,0,0.5); width: 100%; min-height: 100vh;">
         <table cellspacing="0" cellpadding="0" style="width:100%;
            background-image: url('{{ public_path('assets/final_quotation_images/logo11.jpg') }}');
            background-repeat: no-repeat;

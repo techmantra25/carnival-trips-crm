@@ -1191,6 +1191,7 @@
 </div>
 @section('scripts')
 <script>
+    
     window.addEventListener('refreshComponent', function (event) {
         document.querySelectorAll('.refresh_component').forEach(element => {
             element.value = ''; // Clear input fields

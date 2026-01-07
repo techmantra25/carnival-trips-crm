@@ -1102,7 +1102,7 @@
 
                 <!-- Footer -->
                 <div class="ti-modal-footer border-t px-6 py-3 text-end">
-                   <button onclick="printAttachment()" class="ti-btn ti-btn-primary-full">
+                   <button onclick="window.print()" class="ti-btn ti-btn-primary-full">
                         <i class="ri-printer-line me-1"></i>
                         Print / Download PDF
                     </button>

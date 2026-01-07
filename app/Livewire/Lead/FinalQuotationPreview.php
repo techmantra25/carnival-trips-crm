@@ -19,7 +19,7 @@ use App\Services\MailTemplateService;
 class FinalQuotationPreview extends Component
 {
    public $title = "Customized Itinerary";
-    public $sent_lead_itinerary, $itinerary = [],$lead_url_share,$leadData;
+    public $sent_lead_itinerary, $itinerary = [],$lead_url_share,$leadData,$open_attachment_modal;
     public $day_itinerary = [];
     public $day_wise_amount_data = [];
     public $sent_itineraries = [];
@@ -382,6 +382,9 @@ class FinalQuotationPreview extends Component
         }
     }
 
+    public function openAttachmentModal($value){
+        $this->open_attachment_modal = $value;
+    }
     public function render()
     {
         $this->GetAllQuantity();
