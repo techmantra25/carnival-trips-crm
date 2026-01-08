@@ -150,6 +150,14 @@
         height: 10px;
         border-radius: 6px;
     }
+    @keyframes progressMove {
+        0% {
+            transform: translateX(-100%);
+        }
+        100% {
+            transform: translateX(100%);
+        }
+    }
 </style>
     <div class="card">
         <table class="table" id="print-section">
@@ -862,24 +870,129 @@
                 </div>
             @endif
             <!-- Action -->
-            @if($send_whatsapp || $send_email)
-                <button wire:click="sendMessages"
-                    class="w-full bg-primary text-white py-3 rounded-xl font-medium
-                        hover:bg-primary-dark focus:outline-none focus:ring-2
-                        focus:ring-primary/50 transition-all duration-200">
-                    Send Messages
-                </button>
+            @if ($send_whatsapp || $send_email)
+
+                <!-- PDF Attachment Field -->
+                <div class="mt-4">
+                    <label style="
+                        display:block;
+                        font-size:14px;
+                        font-weight:600;
+                        margin-bottom:6px;
+                        color:#374151;
+                    ">
+                        Attach PDF
+                    </label>
+
+                    <input type="file"
+                        wire:model="pdf_attachment"
+                        accept="application/pdf"
+                        style="
+                            width:100%;
+                            padding:10px;
+                            border:1px solid #d1d5db;
+                            border-radius:10px;
+                            background:#ffffff;
+                        ">
+                    
+                    @error('pdf_attachment')
+                        <p style="color:#dc2626;font-size:12px;margin-top:4px;">
+                            {{ $message }}
+                        </p>
+                    @enderror
+                </div>
+
+                <!-- Send Button -->
+                @if($pdf_attachment)
+
+                    <!-- SEND BUTTON -->
+                    <button
+                        wire:click="sendMessages"
+                        wire:loading.attr="disabled"
+                        wire:target="sendMessages"
+                        style="
+                            width:100%;
+                            background:#2563eb;
+                            color:#ffffff;
+                            padding:12px;
+                            margin-top:16px;
+                            border-radius:14px;
+                            font-weight:600;
+                            cursor:pointer;
+                            border:none;
+                            position: relative;
+                            overflow: hidden;
+                        "
+                    >
+                        <!-- Normal Text -->
+                        <span wire:loading.remove wire:target="sendMessages">
+                            Send Messages
+                        </span>
+
+                        <!-- Loading Text -->
+                        <span wire:loading wire:target="sendMessages">
+                            Sending… Please wait
+                        </span>
+                    </button>
+
+                    <!-- PROGRESS BAR -->
+                    <div
+                        wire:loading
+                        wire:target="sendMessages"
+                        style="
+                            width:100%;
+                            height:6px;
+                            background:#e5e7eb;
+                            border-radius:10px;
+                            margin-top:10px;
+                            overflow:hidden;
+                        "
+                    >
+                        <div
+                            style="
+                                width:100%;
+                                height:100%;
+                                background:linear-gradient(
+                                    90deg,
+                                    #2563eb 0%,
+                                    #3b82f6 50%,
+                                    #2563eb 100%
+                                );
+                                animation: progressMove 1.2s linear infinite;
+                            "
+                        ></div>
+                    </div>
+
+                @endif
+
+
             @else
-                <p class="text-gray-500 text-sm mt-2">
+                <p style="
+                    color:#6b7280;
+                    font-size:14px;
+                    margin-top:8px;
+                    text-align:center;
+                ">
                     No communication method selected.
                 </p>
             @endif
+
         </div>
 
     </div>
-     <div wire:loading class="loader" wire:target="messageChannelChanged,sendMessages">
+     <div wire:loading class="loader" wire:target="messageChannelChanged,sendMessages,pdf_attachment">
         <div class="spinner">
         <img src="{{asset('build/assets/images/media/loader.svg')}}" alt="">
         </div>
     </div>
 </div>
+@section('scripts')
+<script>
+    window.addEventListener('refreshComponent', function () {
+        // Uncheck all checkboxes
+        document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+            cb.checked = false;
+        });
+    });
+</script>
+@endsection

@@ -104,7 +104,7 @@
                                             </th>
                                             <td class="itinerary-build">
                                                 <div class="image-preview" style="margin-top: 0px !important;">
-                                                    <img src="{{asset('assets/img/travel-route.jpg')}}" alt="" style="padding: 0px !important;">
+                                                    <img src="{{$route_item->image?asset($route_item->image):asset('assets/img/travel-route.jpg')}}" alt="" style="padding: 0px !important;">
                                                 </div>  
                                                 
                                             </td>
@@ -495,33 +495,40 @@
                                                 <td colspan="2">
                                                     <!-- Display Selected Image Previews -->
                                                       
-                                                    {{-- <div class="image-preview-container">
-                                                        @if (count($edit_activities['images'])>0)
-                                                            @foreach ($edit_activities['images'] as $edit_file)
-                                                                <div class="image-preview">
-                                                                    <img src="{{ asset($edit_file['file_path']) }}" alt="Image Preview" class="image-thumbnail">
-                                                                </div>
-                                                            @endforeach
-                                                        @endif
-                                                        @if (isset($update_files[$index]) && is_array($update_files[$index]) && count($update_files[$index]) > 0)
-                                                        @foreach ($update_files[$index] as $file)
+                                                    {{-- Existing image from DB --}}
+                                                    {{-- New selected image preview --}}
+                                                    @if (isset($edit_routes['image']))
+                                                        <div class="image-preview">
+                                                            <img src="{{ $edit_routes['image']->temporaryUrl() }}"
+                                                                class="image-thumbnail"
+                                                                alt="New Preview">
+                                                            <p class="text-xs text-gray-500 text-center">New Image Preview</p>
+                                                        </div>
+                                                    @else
+                                                        @if ($existingImage)
                                                             <div class="image-preview">
-                                                                <img src="{{ $file->temporaryUrl() }}" alt="Image Preview" class="image-thumbnail">
+                                                                <img src="{{ asset($existingImage) }}"
+                                                                    alt="Existing Image"
+                                                                    class="image-thumbnail">
+                                                                <p class="text-xs text-gray-500 text-center">Current Image</p>
                                                             </div>
-                                                        @endforeach
                                                         @endif
-                                                    </div>
+                                                    @endif
                                                     <!-- Display Error Message for File Upload -->
-                                                    @error('edit_routes.' . $index) 
-                                                        <span class="text-danger">{{ $message }}</span> 
-                                                    @enderror --}}
+                                                    @error('edit_routes.image')
+                                                        <span class="text-danger">{{ $message }}</span>
+                                                    @enderror
                                                 </td>
                                                 <td colspan="2" class=" border-l-0">
-                                                    <!-- Custom File Upload Design -->
-                                                    <label class="file-upload-container">
-                                                        <span class="choose-text">Choose Images</span>
-                                                        <input type="file" wire:model="edit_routes.image" class="file-input" accept="image/*">
+                                                   <label class="file-upload-container">
+                                                        <span class="choose-text">Choose Image</span>
+                                                        <input type="file"
+                                                            wire:model="edit_routes.image"
+                                                            class="file-input"
+                                                            accept="image/*">
                                                     </label>
+
+                                                  
                                                 </td>
                                             </tr>
                                         </tbody>

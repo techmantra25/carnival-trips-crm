@@ -17,7 +17,7 @@ class DestinationWiseRoute extends Model
     }
 
     public function destination(){
-        return $this>belongsTo(State::class, 'destination_id', 'id');
+        return $this->belongsTo(State::class, 'destination_id', 'id');
     }
     public function waypoints ()
     {

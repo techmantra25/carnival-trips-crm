@@ -16,8 +16,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\MailTemplateService;
+use Livewire\WithFileUploads;
 class FinalQuotationPreview extends Component
 {
+    use WithFileUploads;
    public $title = "Customized Itinerary";
     public $sent_lead_itinerary, $itinerary = [],$lead_url_share,$leadData;
     public $day_itinerary = [];
@@ -26,6 +28,10 @@ class FinalQuotationPreview extends Component
     public $total_amount = 0;
     public $send_whatsapp = false;
     public $send_email = false;
+    public $pdf_attachment;
+    protected $rules = [
+        'pdf_attachment' => 'required|mimes:pdf|max:20020', // 20MB
+    ];
     public function mount($code){
        $this->sent_lead_itinerary = SendedLeadItinerary::where('itinerary_code', $code)
         ->firstOrFail();
@@ -246,6 +252,8 @@ class FinalQuotationPreview extends Component
     }
     public function sendMessages()
     {
+        $this->validate();
+
         $methods = [];
 
         if ($this->send_whatsapp) {
@@ -272,15 +280,19 @@ class FinalQuotationPreview extends Component
                 // Dynamic subject
                $subject = "hi, {$this->leadData->customer_name}, Your {$this->sent_lead_itinerary->itinerary_syntax} Trip Is Confirmed! 🎉";
                 // Send booking confirmed email (PDF attached inside Mail service)
-                $pdfData = $this->generateQuotationPdf();
-                dd($pdfData);
-                $attachments = [
-                     [
-                        'data' => $pdfData,
+                
+                 $attachments = [];
+
+                if (
+                    $this->pdf_attachment &&
+                    $this->pdf_attachment instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile
+                ) {
+                    $attachments[] = [
+                        'data' => $this->pdf_attachment,
                         'name' => 'Final_Quotation.pdf',
                         'mime' => 'application/pdf',
-                    ]
-                ];
+                    ];
+                }
                 $mailSent = $mailService->send(
                     $this->leadData->customer_email,
                     'booking_confirmed',
@@ -304,7 +316,6 @@ class FinalQuotationPreview extends Component
                         'sender_name'    => Auth::guard('admin')->user()->name ?? env('MAIL_FROM_NAME'),
                         'sender_mobile'  => Auth::guard('admin')->user()->phone ?? '',
                         'subject'        => $subject,
-                        'attached_file'  => asset('assets/img/sample.pdf'),
                     ],
                     env('MAIL_FROM_ADDRESS'),
                     env('MAIL_FROM_NAME'),
@@ -368,7 +379,15 @@ class FinalQuotationPreview extends Component
             ]);
 
             DB::commit();
+            // Reset only required fields
+            $this->reset([
+                'send_email',
+                'send_whatsapp',
+                'pdf_attachment',
+            ]);
 
+            // Dispatch browser event to reset checkboxes
+            $this->dispatch('refreshComponent');
             session()->flash('success', 'Quotation sent successfully and logged.');
         } catch (\Throwable $e) {
             DB::rollBack();
