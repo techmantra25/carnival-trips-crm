@@ -168,69 +168,14 @@
             margin: 0;
         }
     }
-
-    /* MASTER WRAPPER */
-    #quotation-print {
-        width: 100%;
+    @keyframes progressMove {
+        0% {
+            transform: translateX(-100%);
+        }
+        100% {
+            transform: translateX(100%);
+        }
     }
-
-    /* A4 PAGE */
-    #quotation-print .a4-page {
-        width: 210mm;
-        height: 297mm;
-        margin: 0 auto;
-        background: white;
-        overflow: hidden;
-    }
-
-    /* BACKGROUND */
-    #quotation-print .a4-bg {
-        width: 100%;
-        height: 100%;
-        position: relative;
-    }
-
-    #quotation-print .a4-bg-img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    /* CENTER CONTENT */
-    #quotation-print .a4-center {
-        position: absolute;
-        top: 40%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        text-align: center;
-        color: #000;
-    }
-
-    #quotation-print .logo-box {
-        margin-bottom: 20px;
-    }
-
-    #quotation-print .a4-logo {
-        width: 120px;
-    }
-
-    #quotation-print .a4-title {
-        font-size: 32px;
-        margin: 10px 0;
-    }
-
-    /* CONTENT AREA */
-    #quotation-print .a4-content {
-        position: absolute;
-        top: 60%;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 80%;
-        text-align: center;
-        font-size: 16px;
-        line-height: 1.6;
-    }
-
 </style>
     <div class="card">
         <table class="table" id="print-section">
@@ -909,6 +854,20 @@
                 </span>
             </div>
             <!-- Header -->
+            <div class="mb-4">
+                <a href="{{ route('admin.leads.final-quotation-pdf', $sent_lead_itinerary->itinerary_code) }}"
+                target="_blank"
+                class="inline-flex items-center justify-center px-4 py-2
+                        text-sm font-semibold text-white
+                        bg-secondary hover:bg-secondary/90
+                        rounded-lg shadow transition">
+
+                    <i class="fa-solid fa-download mr-1"></i>
+                     <span class="ml-2">Download Attachment</span>
+                </a>
+            </div>
+
+
             <div class="mb-2">
                 <h4 class="text-xs font-semibold tracking-widest uppercase text-gray-500">
                     Total Amount
@@ -941,177 +900,117 @@
                 </div>
             @endif
             <!-- Action -->
-            @if($send_whatsapp || $send_email)
-                <button wire:click="sendMessages"
-                    class="w-full bg-primary text-white py-3 rounded-xl font-medium
-                        hover:bg-primary-dark focus:outline-none focus:ring-2
-                        focus:ring-primary/50 transition-all duration-200">
-                    Send Messages
-                </button>
+            @if ($send_whatsapp || $send_email)
+
+                <!-- PDF Attachment Field -->
+                <div class="mt-4">
+                    <label style="
+                        display:block;
+                        font-size:14px;
+                        font-weight:600;
+                        margin-bottom:6px;
+                        color:#374151;
+                    ">
+                        Attach PDF
+                    </label>
+
+                    <input type="file"
+                        wire:model="pdf_attachment"
+                        accept="application/pdf"
+                        style="
+                            width:100%;
+                            padding:10px;
+                            border:1px solid #d1d5db;
+                            border-radius:10px;
+                            background:#ffffff;
+                        ">
+                    
+                    @error('pdf_attachment')
+                        <p style="color:#dc2626;font-size:12px;margin-top:4px;">
+                            {{ $message }}
+                        </p>
+                    @enderror
+                </div>
+
+                <!-- Send Button -->
+                @if($pdf_attachment)
+
+                    <!-- SEND BUTTON -->
+                    <button
+                        wire:click="sendMessages"
+                        wire:loading.attr="disabled"
+                        wire:target="sendMessages"
+                        style="
+                            width:100%;
+                            background:#2563eb;
+                            color:#ffffff;
+                            padding:12px;
+                            margin-top:16px;
+                            border-radius:14px;
+                            font-weight:600;
+                            cursor:pointer;
+                            border:none;
+                            position: relative;
+                            overflow: hidden;
+                        "
+                    >
+                        <!-- Normal Text -->
+                        <span wire:loading.remove wire:target="sendMessages">
+                            Send Messages
+                        </span>
+
+                        <!-- Loading Text -->
+                        <span wire:loading wire:target="sendMessages">
+                            Sending… Please wait
+                        </span>
+                    </button>
+
+                    <!-- PROGRESS BAR -->
+                    <div
+                        wire:loading
+                        wire:target="sendMessages"
+                        style="
+                            width:100%;
+                            height:6px;
+                            background:#e5e7eb;
+                            border-radius:10px;
+                            margin-top:10px;
+                            overflow:hidden;
+                        "
+                    >
+                        <div
+                            style="
+                                width:100%;
+                                height:100%;
+                                background:linear-gradient(
+                                    90deg,
+                                    #2563eb 0%,
+                                    #3b82f6 50%,
+                                    #2563eb 100%
+                                );
+                                animation: progressMove 1.2s linear infinite;
+                            "
+                        ></div>
+                    </div>
+
+                @endif
+
+
             @else
-                <p class="text-gray-500 text-sm mt-2">
+                <p style="
+                    color:#6b7280;
+                    font-size:14px;
+                    margin-top:8px;
+                    text-align:center;
+                ">
                     No communication method selected.
                 </p>
             @endif
+
         </div>
 
     </div>
-
-    <div class="hs-overlay {{ $open_attachment_modal == 0 ? 'hidden' : '' }} fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-        <div class="lg:!max-w-4xl lg:w-full m-3 bg-white rounded-lg shadow-xl">
-
-            <div class="ti-modal-content p-6">
-
-                <!-- Header -->
-                <div class="ti-modal-header flex justify-between items-center border-b px-6 py-4">
-                    <h5 class="text-lg font-semibold uppercase">
-                        Final Quotation Preview
-                    </h5>
-                    <button wire:click="openAttachmentModal(0)"
-                        class="badge bg-danger/10 text-danger">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                </div>
-
-                <!-- BODY (PRINT AREA) -->
-                <div class="ti-modal-body flex-1 overflow-auto bg-gray-100 p-6">
-                    <div id="quotation-print">
-
-                        <!-- PAGE 1 -->
-                        <div class="a4-page">
-                            <div class="a4-bg">
-                                <img src="assets/final_quotation_images/logo8.jpg" class="a4-bg-img">
-                                <div class="a4-center">
-                                    <div class="logo-box">
-                                        <img src="assets/final_quotation_images/logo1.png" class="a4-logo">
-                                    </div>
-                                    <h1 class="a4-title">7 Days Amazing Sikkim Tour</h1>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- PAGE 2 -->
-                        <div class="a4-page">
-                            <div class="a4-bg">
-                                <img src="assets/final_quotation_images/logo9.jpg" class="a4-bg-img">
-                                <div class="a4-center">
-                                    <h1 class="a4-title">Tour Overview</h1>
-                                </div>
-                                <div class="a4-content">
-                                    <p>
-                                        Experience the beauty of Sikkim with breathtaking mountains,
-                                        peaceful monasteries, and unforgettable landscapes.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- PAGE 3 -->
-                        <div class="a4-page">
-                            <div class="a4-bg">
-                                <img src="assets/final_quotation_images/logo10.jpg" class="a4-bg-img">
-                                <div class="a4-center">
-                                    <h1 class="a4-title">Day 1 – Arrival</h1>
-                                </div>
-                                <div class="a4-content">
-                                    <p>
-                                        Arrival at Gangtok. Meet & greet, transfer to hotel.
-                                        Evening free for leisure.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- PAGE 4 -->
-                        <div class="a4-page">
-                            <div class="a4-bg">
-                                <img src="assets/final_quotation_images/logo11.jpg" class="a4-bg-img">
-                                <div class="a4-center">
-                                    <h1 class="a4-title">Day 2 – Local Sightseeing</h1>
-                                </div>
-                                <div class="a4-content">
-                                    <p>
-                                        Visit MG Marg, Rumtek Monastery, and local markets.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- PAGE 5 -->
-                        <div class="a4-page">
-                            <div class="a4-bg">
-                                <img src="assets/final_quotation_images/logo5.jpg" class="a4-bg-img">
-                                <div class="a4-center">
-                                    <h1 class="a4-title">Day 3 – Tsomgo Lake</h1>
-                                </div>
-                                <div class="a4-content">
-                                    <p>
-                                        Excursion to Tsomgo Lake & Baba Mandir.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- PAGE 6 -->
-                        <div class="a4-page">
-                            <div class="a4-bg">
-                                <img src="assets/final_quotation_images/logo4.jpg" class="a4-bg-img">
-                                <div class="a4-center">
-                                    <h1 class="a4-title">Inclusions</h1>
-                                </div>
-                                <div class="a4-content">
-                                    <p>
-                                        Hotel accommodation, breakfast, sightseeing, transfers.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- PAGE 7 -->
-                        <div class="a4-page">
-                            <div class="a4-bg">
-                                <img src="assets/final_quotation_images/logo3.jpg" class="a4-bg-img">
-                                <div class="a4-center">
-                                    <h1 class="a4-title">Thank You 3</h1>
-                                </div>
-                                <div class="a4-content">
-                                    <p>
-                                        We look forward to serving you.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="a4-page">
-                            <div class="a4-bg">
-                                <img src="assets/final_quotation_images/logo7.jpg" class="a4-bg-img">
-                                <div class="a4-center">
-                                    <h1 class="a4-title">Thank You</h1>
-                                </div>
-                                <div class="a4-content">
-                                    <p>
-                                        We look forward to serving you.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-
-
-                <!-- Footer -->
-                <div class="ti-modal-footer border-t px-6 py-3 text-end">
-                   <button onclick="printAttachment()" class="ti-btn ti-btn-primary-full">
-                        <i class="ri-printer-line me-1"></i>
-                        Print / Download PDF
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-     <div wire:loading class="loader" wire:target="messageChannelChanged,sendMessages,openAttachmentModal">
+     <div wire:loading class="loader" wire:target="messageChannelChanged,sendMessages,pdf_attachment">
         <div class="spinner">
         <img src="{{asset('build/assets/images/media/loader.svg')}}" alt="">
         </div>
@@ -1119,8 +1018,11 @@
 </div>
 @section('scripts')
 <script>
-    function printAttachment() {
-        window.print();
-    }
+    window.addEventListener('refreshComponent', function () {
+        // Uncheck all checkboxes
+        document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+            cb.checked = false;
+        });
+    });
 </script>
 @endsection

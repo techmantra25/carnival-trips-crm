@@ -8,7 +8,7 @@
 <table style="background-color:#dde2ffd6; width:600px; margin:auto; font-family: Arial, sans-serif;">
     <tr>
         <td style="text-align:center; padding:20px 0;">
-            <img src="{{ asset('front_assets/images/logo.png') }}" alt="Logo" style="width:165px;">
+            <img src="{{ asset('front_assets/images/logo.png') }}" alt="logo" style="width:165px;" >
         </td>
     </tr>
 

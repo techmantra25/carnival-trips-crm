@@ -27,11 +27,22 @@ class MailTemplateService
                 }
 
                 // Attach multiple files
-                foreach ($attachments as $file) {
-                    if (file_exists($file)) {
-                        $message->attach($file);
-                    }
+                foreach ($attachments as $attachment) {
+                if (
+                    isset($attachment['data']) &&
+                    $attachment['data'] instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile
+                ) {
+                    $file = $attachment['data'];
+
+                    $message->attach(
+                        $file->getRealPath(),
+                        [
+                            'as'   => $attachment['name'] ?? $file->getClientOriginalName(),
+                            'mime' => $attachment['mime'] ?? $file->getMimeType(),
+                        ]
+                    );
                 }
+            }
             });
             // Update log after success
             $log->update([

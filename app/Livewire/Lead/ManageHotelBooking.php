@@ -264,8 +264,8 @@ class ManageHotelBooking extends Component
         dd('Send via WhatsApp currently not implemented.');
     }
     public function sendViaEmail(){
-        // $to = $this->active_hotel_data['room_bookings'][0]['hotel_email'];
-        $to = "rajib.techmantra@gmail.com";
+        $to = $this->active_hotel_data['room_bookings'][0]['hotel_email'];
+        // $to = "rajib.techmantra@gmail.com";
         $recipient_name = $this->active_hotel_data['room_bookings'][0]['hotel_name'];
         $room_name = $this->active_hotel_data['room_bookings'][0]['room_name'];
         $code = $this->active_hotel_data['room_bookings'][0]['mail_tab'];

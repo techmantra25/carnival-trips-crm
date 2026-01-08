@@ -86,7 +86,8 @@
                                 class="table whitespace-nowrap table-bordered table-bordered-primary border-primary/10 min-w-full">
                                 <thead class="uppercase">
                                     <tr class="border-b !border-primary/30">
-                                        <th scope="col" class="!text-center">SL No.</th>
+                                        <th scope="col" class="!text-center" width="5%">SL No.</th>
+                                        <th scope="col" class="!text-center" width="13%">Banner</th>
                                         <th scope="col" class="!text-center w-1/3">Route Name</th>
                                         {{-- <th scope="col" class="!text-center w-1/5">Divisions</th> --}}
                                         <th scope="col" class="!text-center">Details</th>
@@ -101,6 +102,12 @@
                                                   {{$k+1}}
                                                 </span>
                                             </th>
+                                            <td class="itinerary-build">
+                                                <div class="image-preview" style="margin-top: 0px !important;">
+                                                    <img src="{{$route_item->image?asset($route_item->image):asset('assets/img/travel-route.jpg')}}" alt="" style="padding: 0px !important;">
+                                                </div>  
+                                                
+                                            </td>
                                             <td>
                                                 <!-- Route Name -->
                                                 <p class="mb-1">{{ ucwords($route_item->route_name) }}</p>
@@ -223,7 +230,7 @@
                                         </tr>
                                         @empty
                                         <tr>
-                                            <td colspan="7">
+                                            <td colspan="8">
                                                 <div class="alert alert-danger">
                                                     Result not found
                                                 </div>
@@ -484,73 +491,46 @@
                                                 <td class="!text-center border-l-0">
                                                 </td>
                                             </tr>
-                                            {{-- <tr class="border-t-0">
-                                                <td colspan="3" class="border-r-0">
-                                                    <div class="table-responsive">
-                                                        <label class="mb-1">
-                                                            <span class="badge gap-2 bg-primary/10 text-primary uppercase">Waypoints</span>
-                                                        </label>
-                                                        <table class="table whitespace-nowrap min-w-full new-activity">
-                                                            <thead class="bg-primary">
-                                                                <tr class="border-b border-defaultborder uppercase">
-                                                                    <th class="!text-center w-1/3 way_point_th">Waypoint name</th>
-                                                                    <th class="!text-center way_point_th">Division</th>
-                                                                    <th class="!text-center way_point_th">Distance from (KM)</th>
-                                                                    <th class="!text-center way_point_th">Travel Time (HR)</th>
-                                                                    <th class="!text-center w-1/20">
-                                                                        <button type="button" wire:click.prevent="UpdateWayPoint()" class="ti-btn ti-btn-sm ti-btn-soft-primary way_point_add">
-                                                                            <i class="fa-solid fa-plus text-sm"></i>
-                                                                        </button>
-                                                                    </th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                @foreach ($edit_routes['waypoints'] as $waypointIndex => $waypoint)
-                                                                    <tr class="border-b border-defaultborder">
-                                                                        <td class="!text-center">
-                                                                            <div>
-                                                                                <input type="text" wire:model="edit_routes.waypoints.{{ $waypointIndex }}.point_name" class="form-control form-control-sm text-center" placeholder="e.g., Guwahati" value="{{$waypoint['point_name']}}">
-                                                                            </div>
-                                                                            @error('edit_routes.waypoints.' . $waypointIndex . '.point_name') 
-                                                                                <span class="text-danger">{{ $message }}</span> 
-                                                                            @enderror
-                                                                        </td>
-                                                                        <td class="!text-center">
-                                                                            <div>
-                                                                                <select wire:model="edit_routes.waypoints.{{ $waypointIndex }}.division_id"
-                                                                                class="placeholder:text-textmuted way_point_division">
-                                                                                <option value="" hidden>Filter Divisions</option>
-                                                                                @foreach ($divisions as $division_item)
-                                                                                    <option value="{{ $division_item->id }}" wire:key="way-point-division-{{ $waypointIndex }}-{{ $division_item->id }}" {{ $waypoint['division_id'] == $division_item->id ? 'selected' : '' }}>
-                                                                                        {{ $division_item->name }}
-                                                                                    </option>
-                                                                                @endforeach
-                                                                            </select>
-                                                                            </div>
-                                                                            @error('edit_routes.waypoints.' . $waypointIndex . '.division_id') 
-                                                                                <span class="text-danger">{{ $message }}</span> 
-                                                                            @enderror
-                                                                        </td>
-                                                                        
-                                                                        <td class="!text-center">
-                                                                            <input type="text" wire:model="edit_routes.waypoints.{{ $waypointIndex }}.distance_from_previous_km" class="form-control form-control-sm text-center" placeholder="{{$waypointIndex==0?"0 km":"From Previous"}}" {{$waypointIndex==0?"disabled":""}} value="{{$waypoint['distance_from_previous_km']}}">
-                                                                        </td>
-                                                                        <td class="!text-center">
-                                                                            <input type="text" wire:model="edit_routes.waypoints.{{ $waypointIndex }}.travel_time_from_previous" class="form-control form-control-sm text-center" placeholder="{{$waypointIndex==0?"0 hours":"e.g., 3 hours"}}" {{$waypointIndex==0?"disabled":""}} value="{{$waypoint['travel_time_from_previous']}}">
-                                                                        </td>
-                                                                        <td class="!text-center">
-                                                                            <button type="button" wire:click="removeEditWayPoint( {{ $waypointIndex }})" class="ti-btn ti-btn-sm ti-btn-soft-danger !border !border-danger/20">
-                                                                                <i class="ti ti-minus"></i>
-                                                                            </button>
-                                                                        </td>
-                                                                    </tr>
-                                                                @endforeach
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
+                                            <tr class="border-t-0">
+                                                <td colspan="2">
+                                                    <!-- Display Selected Image Previews -->
+                                                      
+                                                    {{-- Existing image from DB --}}
+                                                    {{-- New selected image preview --}}
+                                                    @if (isset($edit_routes['image']))
+                                                        <div class="image-preview">
+                                                            <img src="{{ $edit_routes['image']->temporaryUrl() }}"
+                                                                class="image-thumbnail"
+                                                                alt="New Preview">
+                                                            <p class="text-xs text-gray-500 text-center">New Image Preview</p>
+                                                        </div>
+                                                    @else
+                                                        @if ($existingImage)
+                                                            <div class="image-preview">
+                                                                <img src="{{ asset($existingImage) }}"
+                                                                    alt="Existing Image"
+                                                                    class="image-thumbnail">
+                                                                <p class="text-xs text-gray-500 text-center">Current Image</p>
+                                                            </div>
+                                                        @endif
+                                                    @endif
+                                                    <!-- Display Error Message for File Upload -->
+                                                    @error('edit_routes.image')
+                                                        <span class="text-danger">{{ $message }}</span>
+                                                    @enderror
                                                 </td>
-                                                <td class="border-l-0"></td>
-                                            </tr> --}}
+                                                <td colspan="2" class=" border-l-0">
+                                                   <label class="file-upload-container">
+                                                        <span class="choose-text">Choose Image</span>
+                                                        <input type="file"
+                                                            wire:model="edit_routes.image"
+                                                            class="file-input"
+                                                            accept="image/*">
+                                                    </label>
+
+                                                  
+                                                </td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>

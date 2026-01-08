@@ -26,6 +26,7 @@ class DestinationWiseRouteMap extends Component
     public $active_assign_update_modal = 0;
     public $destination_wise_route = [];
     public $selected_routes = [];
+    public $existingImage;
 
 
     public $new_routes = []; // Holds dynamic route rows
@@ -207,6 +208,7 @@ class DestinationWiseRouteMap extends Component
                     'destination_id' => $this->selectedDestination, // Save 0 if empty
                     'total_distance_km' => $route['total_distance_km'], // Validate this is set
                     'total_travel_time' => $route['total_travel_time'], // Validate this is set
+                    'image'             => 'assets/img/travel-route.jpg',
                 ]);
         
                 // if(count($route['waypoints'])>0){
@@ -245,8 +247,6 @@ class DestinationWiseRouteMap extends Component
 
     public function submitEditForm()
     {
-        // dd($this->edit_routes);
-       
         $this->resetErrorBag();
         $checkExisting = DestinationWiseRoute::where('route_name', $this->edit_routes['route_name'])
                 ->where('destination_id', $this->edit_routes['destination_id'])->where('id', '!=', $this->edit_routes['id'])
@@ -285,13 +285,35 @@ class DestinationWiseRouteMap extends Component
        
            // Find the existing route record by ID
             $RouteRecord = DestinationWiseRoute::find($this->edit_routes['id']);
-
             if ($RouteRecord) {
+                // Keep old image by default
+                $uploadedPath = $RouteRecord->image;
+
+                // Upload new image only if selected
+                if (!empty($this->edit_routes['image'])) {
+
+                    $file = $this->edit_routes['image'];
+                    $dynamicText = rand(1111, 9999);
+                    $divisionName = $RouteRecord->destination->name ?? 'route';
+
+                    $uploadedPath = CustomHelper::uploadImage(
+                        $file,
+                        'route',
+                        $dynamicText,
+                        $divisionName
+                    );
+
+                    // OPTIONAL: delete old image
+                    if ($RouteRecord->image && file_exists(public_path($RouteRecord->image))) {
+                        unlink(public_path($RouteRecord->image));
+                    }
+                }
                 $RouteRecord->update([
                     'route_name' => $this->edit_routes['route_name'],
                     'destination_id' => $this->edit_routes['destination_id'], // Default to 0 if empty
                     'total_distance_km' => $this->edit_routes['total_distance_km'],
                     'total_travel_time' => $this->edit_routes['total_travel_time'],
+                    'image' => $uploadedPath,
                 ]);
             } else {
                 // Handle case where the record doesn't exist
@@ -362,6 +384,8 @@ class DestinationWiseRouteMap extends Component
         $this->active_assign_update_modal = 1;
         $route = DestinationWiseRoute::with('waypoints')->find($id);
         $this->edit_routes = $route->toArray();
+        $this->existingImage = $this->edit_routes['image'];
+        $this->edit_routes['image'] = null;
         $this->resetValidation();
     }
 
